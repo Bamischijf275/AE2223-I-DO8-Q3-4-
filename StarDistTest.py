@@ -1,4 +1,6 @@
+import numpy as np
 from stardist.models import StarDist2D
+from PIL import Image
 
 # prints a list of available models
 StarDist2D.from_pretrained()
@@ -11,8 +13,12 @@ from stardist.plot import render_label
 from csbdeep.utils import normalize
 import matplotlib.pyplot as plt
 
-img = test_image_nuclei_2d()
+#img = test_image_nuclei_2d()
+img = Image.open('/Users/ryan/PycharmProjects/scientificProject/TapeA_registration1stSlice.jpg')
 
+# convert image object into array
+img = np.asarray(img)
+print(img)
 labels, _ = model.predict_instances(normalize(img))
 
 plt.subplot(1,2,1)

@@ -1,4 +1,5 @@
 import numpy as np
+from stardist import random_label_cmap
 from stardist.models import StarDist2D
 from PIL import Image
 
@@ -13,22 +14,20 @@ from stardist.plot import render_label
 from csbdeep.utils import normalize
 import matplotlib.pyplot as plt
 
+lbl_cmap = random_label_cmap()
+
 #img = test_image_nuclei_2d()
 img = Image.open('/Users/ryan/PycharmProjects/scientificProject/TapeA_registration1stSlice.jpg')
 
 # convert image object into array
 img = np.asarray(img)
-print(img)
+
 labels, _ = model.predict_instances(normalize(img))
 
-plt.subplot(1,2,1)
-plt.imshow(img, cmap="gray")
-plt.axis("off")
-plt.title("input image")
+plt.figure(figsize=(8,8))
+plt.imshow(img if img.ndim==2 else img[...,0], clim=(0,1), cmap='gray')
+plt.imshow(labels, cmap=lbl_cmap, alpha=0.5)
+plt.axis('off')
 
-plt.subplot(1,2,2)
-plt.imshow(render_label(labels, img=img))
-plt.axis("off")
-plt.title("prediction + input overlay")
+plt.savefig('output.png')
 
-plt.show()

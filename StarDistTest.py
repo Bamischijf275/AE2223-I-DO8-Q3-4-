@@ -25,9 +25,9 @@ img = np.asarray(img)
 labels, _ = model.predict_instances(normalize(img))
 
 plt.figure(figsize=(8,8))
-plt.imshow(img if img.ndim==2 else img[...,0], clim=(0,1), cmap='gray')
+#plt.imshow(img if img.ndim==2 else img[...,0], clim=(0,1), cmap='gray')
 plt.imshow(labels, cmap=lbl_cmap, alpha=0.5)
 plt.axis('off')
 
-plt.savefig('output.png')
+plt.show()
 

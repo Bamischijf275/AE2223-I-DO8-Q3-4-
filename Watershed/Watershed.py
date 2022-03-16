@@ -9,7 +9,7 @@ k_OPN = 100
 k_DIL = k_OPN + 1
 K_dist = 0.5
 
-img = cv.imread(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg')
+img = cv.imread(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data\TapeB.tif')
 
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 ret, thresh = cv.threshold(gray,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
@@ -40,6 +40,6 @@ markers[unknown==255] = 0
 markers = cv.watershed(img,markers)
 img[markers == -1] = [255,0,0]
 
-print(len(markers))
+print(len(markers)-1)
 cv.imshow('image',img)
 cv.waitKey(0)

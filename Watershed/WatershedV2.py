@@ -15,9 +15,12 @@ path_script = os.path.dirname(__file__)
 path_relative = "..\Data\TapeA_registration.jpg"
 path = os.path.join(path_script, path_relative)
 img = cv.imread(path)
+#Cleanup
+imgPMSF = cv.pyrMeanShiftFiltering(img, 10, 2)
+cv.imshow('imagePMSF',imgPMSF)
 
 #Otsu binarization
-gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+gray = cv.cvtColor(imgPMSF,cv.COLOR_BGR2GRAY)
 ret, thresh = cv.threshold(gray,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
 
 #BG/FG/X separation

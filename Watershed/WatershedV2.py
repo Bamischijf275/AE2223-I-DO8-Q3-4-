@@ -1,53 +1,60 @@
+# import the necessary packages
+from skimage.feature import peak_local_max
+from skimage.segmentation import watershed
+from scipy import ndimage
 import numpy as np
-import cv2 as cv
-from matplotlib import pyplot as plt
-from matplotlib import image as mpimg
-import os
+import argparse
+import imutils
+import cv2
+# construct the argument parse and parse the arguments
+#ap = argparse.ArgumentParser()
+#ap.add_argument("-i", "--image", required=True,
+#	help="path to input image")
+#args = vars(ap.parse_args())
+# load the image and perform pyramid mean shift filtering
+# to aid the thresholding step
+image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
+shifted = cv2.pyrMeanShiftFiltering(image, 1, 2)
+cv2.imshow("Input", image)
+# convert the mean shift image to grayscale, then apply
+# Otsu's thresholding
+gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
+thresh = cv2.threshold(gray, 0, 255,
+	cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+cv2.imshow("Thresh", thresh)
 
-#PARAMETERS:
-k_Kernel = 1
-k_OPN = 100
-k_DIL = k_OPN + 1
-K_dist = 0.5
-
-#open image
-path_script = os.path.dirname(__file__)
-path_relative = "..\Data\TapeA_registration.jpg"
-path = os.path.join(path_script, path_relative)
-img = cv.imread(path)
-#Cleanup
-imgPMSF = cv.pyrMeanShiftFiltering(img, 10, 2)
-cv.imshow('imagePMSF',imgPMSF)
-
-#Otsu binarization
-gray = cv.cvtColor(imgPMSF,cv.COLOR_BGR2GRAY)
-ret, thresh = cv.threshold(gray,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-
-#BG/FG/X separation
-kernel = np.ones((k_Kernel,k_Kernel),np.uint8)
-opening = cv.morphologyEx(thresh,cv.MORPH_OPEN,kernel, iterations =k_OPN)
-
-sure_bg = cv.dilate(opening,kernel,iterations=k_DIL)
-
-dist_transform = cv.distanceTransform(opening,cv.DIST_L2,5)
-ret, sure_fg = cv.threshold(dist_transform,K_dist*dist_transform.max(),255,0)
-
-sure_fg = np.uint8(sure_fg)
-unknown = cv.subtract(sure_bg,sure_fg)
-
-#cv.imshow('sureBG',sure_bg)
-#cv.imshow('sureFG',sure_fg)
-#cv.imshow('Unknown',unknown)
-
-# Marker labelling
-ret, markers = cv.connectedComponents(sure_fg)
-markers = markers+1
-markers[unknown==255] = 0
-
-#Watershed and output
-markers = cv.watershed(img,markers)
-img[markers == -1] = [255,0,0]
-cv.imshow('image',img)
-
-#end
-cv.waitKey(0)
+# compute the exact Euclidean distance from every binary
+# pixel to the nearest zero pixel, then find peaks in this
+# distance map
+D = ndimage.distance_transform_edt(thresh)
+localMax = peak_local_max(D, indices=False, min_distance=3,
+	labels=thresh)
+# perform a connected component analysis on the local peaks,
+# using 8-connectivity, then appy the Watershed algorithm
+markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
+labels = watershed(-D, markers, mask=thresh)
+print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
+# loop over the unique labels returned by the Watershed
+# algorithm
+for label in np.unique(labels):
+	# if the label is zero, we are examining the 'background'
+	# so simply ignore it
+	if label == 0:
+		continue
+	# otherwise, allocate memory for the label region and draw
+	# it on the mask
+	mask = np.zeros(gray.shape, dtype="uint8")
+	mask[labels == label] = 255
+	# detect contours in the mask and grab the largest one
+	cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+		cv2.CHAIN_APPROX_SIMPLE)
+	cnts = imutils.grab_contours(cnts)
+	c = max(cnts, key=cv2.contourArea)
+	# draw a circle enclosing the object
+	((x, y), r) = cv2.minEnclosingCircle(c)
+	cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
+	#cv2.putText(image, "#{}".format(label), (int(x) - 10, int(y)),
+	#	cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+# show the output image
+cv2.imshow("Output", image)
+cv2.waitKey(0)

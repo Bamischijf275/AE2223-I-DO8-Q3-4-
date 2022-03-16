@@ -12,9 +12,12 @@ K_dist = 0.5
 
 #open image
 path_script = os.path.dirname(__file__)
-path_relative = "..\Data\TapeB.tif"
+path_relative = "..\Data\TapeA_registration.jpg"
 path = os.path.join(path_script, path_relative)
 img = cv.imread(path)
+#Cleanup
+imgPMSF = cv.pyrMeanShiftFiltering(img, 50, 10)
+cv.imshow('imagePMSF',imgPMSF)
 
 #Otsu binarization
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
@@ -44,7 +47,7 @@ markers[unknown==255] = 0
 #Watershed and output
 markers = cv.watershed(img,markers)
 img[markers == -1] = [255,0,0]
-print(len(markers)-1)
 cv.imshow('image',img)
-#END
+
+#end
 cv.waitKey(0)

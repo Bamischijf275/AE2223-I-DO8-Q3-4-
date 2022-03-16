@@ -40,5 +40,6 @@ markers[unknown==255] = 0
 markers = cv.watershed(img,markers)
 img[markers == -1] = [255,0,0]
 
+print(len(markers))
 cv.imshow('image',img)
 cv.waitKey(0)

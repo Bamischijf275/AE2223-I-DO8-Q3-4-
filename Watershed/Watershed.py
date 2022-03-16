@@ -15,9 +15,6 @@ path_script = os.path.dirname(__file__)
 path_relative = "..\Data\TapeA_registration.jpg"
 path = os.path.join(path_script, path_relative)
 img = cv.imread(path)
-#Cleanup
-imgPMSF = cv.pyrMeanShiftFiltering(img, 50, 10)
-cv.imshow('imagePMSF',imgPMSF)
 
 #Otsu binarization
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)

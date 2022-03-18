@@ -7,7 +7,7 @@ import os
 import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
-from skimage.morphology import watershed
+from skimage.segmentation import watershed
 
 # CONSTANTS:
 # parameters:
@@ -96,7 +96,7 @@ for label in np.unique(labels):
     S.add(r)
     if R_min < r < R_max:
         if Show_FiberCircle:
-            cv.circle(img, (int(x), int(y)), int(r), Col_FiberCircle, 1)
+            cv.circle(img, (int(x), int(y)), int(r), Col_FiberCircle, -1)
             # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
             # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         F.add(r)

@@ -2,8 +2,25 @@ import numpy as np
 import geojson as GeoJSON
 import shapely as shapely
 
+# SIZE OF IMAGE
+x_range = 1000
+y_range = 1000
+
+
 with open("Tape A 2.geojson") as f:
     allobjects = GeoJSON.load(f)
 
-test = allobjects
+grid = np.zeros([x_range, y_range])
+
+
+
+for i in range(len(allobjects.features)):
+    for j in range(len(allobjects.features[i].geometry.coordinates[0])):
+        x = allobjects.features[i].geometry.coordinates[0][j][0]
+        y = allobjects.features[i].geometry.coordinates[0][j][1]
+        grid[int(y)][int(x)] = i + 1
+
+
+
+
 

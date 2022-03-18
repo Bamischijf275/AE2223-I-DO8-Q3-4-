@@ -16,17 +16,17 @@ F_delta = 0.3 #% deviation
 
 R_min = F_mean * (1 - F_delta)
 R_max = F_mean * (1 + F_delta)
-MinDist = int(R_min)
+MinDist = int(R_min-1)
 
 PyrFilt1 = 10
 PyrFilt2 = 10
 
 # Display
-Show_In =           False
-Show_Otsu =         False
+Show_In =           True
+Show_Otsu =         True
 Show_PyrFilt =      True
-Show_Boundary =     False
-Show_ShapeCenter =  False
+Show_Boundary =     True
+Show_ShapeCenter =  True
 Show_FiberCircle =  True
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)

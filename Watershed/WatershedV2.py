@@ -13,7 +13,7 @@ import cv2
 #args = vars(ap.parse_args())
 # load the image and perform pyramid mean shift filtering
 # to aid the thresholding step
-image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
+image = cv2.imread(r"C:\Users\huege\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
 shifted = cv2.pyrMeanShiftFiltering(image, 1, 2)
 cv2.imshow("Input", image)
 # convert the mean shift image to grayscale, then apply

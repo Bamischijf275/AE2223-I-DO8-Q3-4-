@@ -22,7 +22,7 @@ PyrFilt1 = 10  # iterations
 PyrFilt2 = 10  # strength
 
 path_R_input = "..\Data\TapeB.tif"
-path_R_output = "..\Data Processed"
+path_R_output = "..\Data Processed\Watershed"
 
 # Display
 Show_In = False
@@ -30,11 +30,11 @@ Show_Otsu = False
 Show_PyrFilt = False
 Show_Boundary = False
 Show_ShapeCenter = False
-Show_FiberCircle = False
+Show_FiberCircle = True
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
-Show_IndiFibers = True
+
 Print_Output = False
 
 # IMAGE PROCESSING
@@ -43,6 +43,7 @@ path_script = os.path.dirname(__file__)
 path = os.path.join(path_script, path_R_input)
 img = cv.imread(path)
 if Show_In: cv.imshow('INPUT', img)
+height, width, _ = img.shape
 
 # Smoothing / de-noising
 imgPMSF = cv.pyrMeanShiftFiltering(img, PyrFilt1, PyrFilt2)
@@ -99,17 +100,21 @@ for label in np.unique(labels):
     S.add(r)
     if R_min < r < R_max:
         if Show_FiberCircle:
-            cv.circle(img, (int(x), int(y)), int(r), Col_FiberCircle, -1)
+            cv.circle(img, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),x*y*r), -1)
             # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
             # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         F.add(r)
         Fibers.append([round(x), round(y), round(r, 1)])
         
 # OUTPUT:
-if Show_IndiFibers:
-    
     
 if Print_Output:
+    img_out = np.zeros((height,width,3), np.uint8)
+    for fib in Fibers:
+        cv.circle(img_out, (int(x), int(y)), int(r), (255,255,255), -1)
+        #print("x, y, r: ", fib[0],fib[1], fib[2])
+    cv.imshow("OUTPUT", img_out)
+
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)
     os.chdir(path)
@@ -117,11 +122,11 @@ if Print_Output:
     print(os.listdir(path))  
     # Filename
     filename = "TapeB_WT-V2.png"
-    cv.imwrite(filename, img)
+    cv.imwrite(filename, img_out)
     print("After saving image:")  
     print(os.listdir(path))
     print('Successfully saved')
-        
+    
 # STATISCTICS:
 
 S_med = stat.median(S)
@@ -131,10 +136,6 @@ S_avg = stat.mean(S)
 F_med = stat.median(F)
 F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
-
-for fib in Fibers:
-    #print("x, y, r: ", fib[0],fib[1], fib[2])
-    continue
 
 print("\n\n -----")
 

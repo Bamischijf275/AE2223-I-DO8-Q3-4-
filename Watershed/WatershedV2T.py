@@ -22,11 +22,13 @@ MinDist = int(R_min - 1)
 PyrFilt1 = 10  # iterations
 PyrFilt2 = 10  # strength
 
-path_R_input = "..\Data\TapeB.tif"
-path_R_output = "..\Data Processed\Watershed"
+input_file = ["TapeB",".tif"]
+output_file = [input_file[0], ".png"]
+path_R_input = "../Data"
+path_R_output = "../Data Processed/Watershed"
 
 # Display
-Show_In = False
+Show_In = True
 Show_Otsu = False
 Show_PyrFilt = False
 Show_Boundary = False
@@ -41,7 +43,8 @@ Print_Output = True
 # IMAGE PROCESSING
 # Open image
 path_script = os.path.dirname(__file__)
-path = os.path.join(path_script, path_R_input)
+path = os.path.join(path_script, path_R_input,(input_file[0]+input_file[1]))
+#print (path)
 img = cv.imread(path)
 if Show_In: cv.imshow('INPUT', img)
 height, width, _ = img.shape
@@ -119,14 +122,13 @@ if Print_Output:
     print('IMAGE TO FILE')
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)
+    path = os.path.join(path_script, path_R_output)
     os.chdir(path)
-    print("Before saving image:")  
-    print(os.listdir(path))  
-    filename = "TapeB_WT-V2.png"
+    print(os.listdir(path))
+    print(path)
+    filename = (output_file[0]+output_file[1])
     print(filename)
     cv.imwrite(filename, img)
-    print("After saving image:")  
-    print(os.listdir(path))
     print('Successfully saved')
     
 # STATISCTICS:

@@ -12,9 +12,8 @@ import os
 
 # CONSTANTS
 #parameters
-path_R_input_GT = "..\Data Processed\TapeB_WT-V2T.png"
-path_R_input_WT = "..\Data Processed\TapeB_WT-V2.png"
-#path_R_input_AI = "..\Data Processed\TapeB_WT-V2.png"
+input_file = "TapeB"
+input_algo = ["Watershed","Ground Thruth"]
 
 # Display
 Show_In = False
@@ -24,6 +23,8 @@ Show_Out = False
 # Open image
 path_script = os.path.dirname(__file__)
 
+for image in input_compare:
+    path_R_input = "..\Data Processed\TapeB_WT-V2T.png"
 path = os.path.join(path_script, path_R_input_GT)
 img_GT = cv.imread(path)
 path = os.path.join(path_script, path_R_input_WT)

@@ -27,7 +27,7 @@ cv2.imshow("Thresh", thresh)
 # pixel to the nearest zero pixel, then find peaks in this
 # distance map
 D = ndimage.distance_transform_edt(thresh)
-localMax = peak_local_max(D, indices=False, min_distance=3,
+localMax = peak_local_max(D, indices=False, min_distance=5,
 	labels=thresh)
 # perform a connected component analysis on the local peaks,
 # using 8-connectivity, then appy the Watershed algorithm
@@ -52,9 +52,15 @@ for label in np.unique(labels):
 	c = max(cnts, key=cv2.contourArea)
 	# draw a circle enclosing the object
 	((x, y), r) = cv2.minEnclosingCircle(c)
-	cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
+	cv2.circle(image, (int(x), int(y)), int(r), (abs(2*int(x)-0.5*int(y))*12, (int(x)+int(y))/4, 3*int(x)*int(y)/(int(x)+int(y))), -1)
+
 	#cv2.putText(image, "#{}".format(label), (int(x) - 10, int(y)),
-	#	cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+		#cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 # show the output image
 cv2.imshow("Output", image)
 cv2.waitKey(0)
+#width, height = Image.image.size
+#for x in width:
+#	for y in height:
+#		img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+#		cv2.imshow('RGB Image', img_rgb)

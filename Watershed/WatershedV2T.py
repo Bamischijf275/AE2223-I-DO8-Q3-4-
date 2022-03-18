@@ -8,7 +8,7 @@ import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
-import sys
+#import sys
 
 # CONSTANTS:
 # parameters:
@@ -36,7 +36,7 @@ Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
 
-Print_Output = False
+Print_Output = True
 
 # IMAGE PROCESSING
 # Open image
@@ -75,8 +75,8 @@ labels = watershed(-D, markers, mask=imgTSH)
 
 # FIBERS
 
-S = set([])
-F = set([])
+S = set([]) #shapes stats (radius)
+F = set([]) #same but filtered
 Fibers = []
 for label in np.unique(labels):
     # eliminate background
@@ -101,26 +101,29 @@ for label in np.unique(labels):
     S.add(r)
     if R_min < r < R_max:
         if Show_FiberCircle:
-            cv.circle(img, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),x*y*r), -1)
+            cv.circle(img, (int(x), int(y)), int(r), 
+                      (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2))
+                      ,-1)
             # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
-            # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-        F.add(r)
-        Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
+                # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            F.add(r)
+            Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
         
 # OUTPUT:
-array_out = np.zeros((height,width), np.uint16)
-for fib in Fibers:
-    cv.circle(array_out, (int(x), int(y)), int(r), fib[0], -1)
+#array_out = np.zeros((height,width), np.uint16)
+#for fib in Fibers:
     #print("x, y, r: ", fib[0],fib[1], fib[2])
     
 if Print_Output:
+    print("\n\n -----")
+    print('IMAGE TO FILE')
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)
     os.chdir(path)
     print("Before saving image:")  
     print(os.listdir(path))  
-    # Filename
     filename = "TapeB_WT-V2.png"
+    print(filename)
     cv.imwrite(filename, img)
     print("After saving image:")  
     print(os.listdir(path))
@@ -136,9 +139,6 @@ F_med = stat.median(F)
 F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
 
-print("\n\n -----")
-#np.set_printoptions(threshold=sys.maxsize)
-print(array_out)
 print("\n\n -----")
 print('WATERSHED')
 print("[INFO] {} unique contours found".format(len(cnts)))

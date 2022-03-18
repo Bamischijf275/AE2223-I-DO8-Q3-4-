@@ -12,21 +12,27 @@ import os
 
 # CONSTANTS
 #parameters
-path_R_input = "..\Data\TapeB.tif"
-path_R_output = "..\Data Processed\Watershed"
+path_R_input_GT = "..\Data Processed\TapeB_WT-V2T.png"
+path_R_input_WT = "..\Data Processed\TapeB_WT-V2.png"
+#path_R_input_AI = "..\Data Processed\TapeB_WT-V2.png"
 
 # Display
 Show_In = False
 Show_Out = False
 
-
 # IMAGE PROCESSING
 # Open image
 path_script = os.path.dirname(__file__)
-path = os.path.join(path_script, path_R_input)
-img = cv.imread(path)
-if Show_In: cv.imshow('INPUT', img)
-height, width, _ = img.shape
+
+path = os.path.join(path_script, path_R_input_GT)
+img_GT = cv.imread(path)
+path = os.path.join(path_script, path_R_input_WT)
+img_WT = cv.imread(path)
+#path = os.path.join(path_script, path_R_input_AI)
+#img_AI = cv.imread(path)
+if Show_In: 
+    cv.imshow('INPUT Ground Truth', img_GT)
+    height_GT, width_GT, _ = img_GT.shape
 
 # COMPARISON
 

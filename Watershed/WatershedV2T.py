@@ -28,12 +28,13 @@ path_R_output = "..\Data Processed"
 Show_In = False
 Show_Otsu = False
 Show_PyrFilt = False
-Show_Boundary = True
-Show_ShapeCenter = True
-Show_FiberCircle = True
+Show_Boundary = False
+Show_ShapeCenter = False
+Show_FiberCircle = False
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
+Show_IndiFibers = True
 Print_Output = False
 
 # IMAGE PROCESSING
@@ -105,6 +106,9 @@ for label in np.unique(labels):
         Fibers.append([round(x), round(y), round(r, 1)])
         
 # OUTPUT:
+if Show_IndiFibers:
+    
+    
 if Print_Output:
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)

@@ -3,7 +3,7 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 from scipy import ndimage
 import numpy as np
-import argparse
+#import argparse
 import imutils
 import cv2
 # construct the argument parse and parse the arguments

@@ -104,17 +104,15 @@ for label in np.unique(labels):
             # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
             # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         F.add(r)
-        Fibers.append([round(x), round(y), round(r, 1)])
+        Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
         
 # OUTPUT:
+array_out = np.zeros((height,width,1), np.uint16)
+for fib in Fibers:
+    cv.circle(array_out, (int(x), int(y)), int(r), fib[0], -1)
+    print("x, y, r: ", fib[0],fib[1], fib[2])
     
 if Print_Output:
-    img_out = np.zeros((height,width,3), np.uint8)
-    for fib in Fibers:
-        cv.circle(img_out, (int(x), int(y)), int(r), (255,255,255), -1)
-        #print("x, y, r: ", fib[0],fib[1], fib[2])
-    cv.imshow("OUTPUT", img_out)
-
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)
     os.chdir(path)
@@ -122,7 +120,7 @@ if Print_Output:
     print(os.listdir(path))  
     # Filename
     filename = "TapeB_WT-V2.png"
-    cv.imwrite(filename, img_out)
+    cv.imwrite(filename, img)
     print("After saving image:")  
     print(os.listdir(path))
     print('Successfully saved')
@@ -138,7 +136,7 @@ F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
 
 print("\n\n -----")
-
+print(array_out)
 print("\n\n -----")
 print('WATERSHED')
 print("[INFO] {} unique contours found".format(len(cnts)))

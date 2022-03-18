@@ -6,6 +6,7 @@ import numpy as np
 #import argparse
 import imutils
 import cv2
+from PIL import Image as uwu
 # construct the argument parse and parse the arguments
 #ap = argparse.ArgumentParser()
 #ap.add_argument("-i", "--image", required=True,
@@ -36,6 +37,9 @@ labels = watershed(-D, markers, mask=thresh)
 print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
 # loop over the unique labels returned by the Watershed
 # algorithm
+height=232
+width=952
+blank_image = np.zeros((height,width,3), np.uint8)
 for label in np.unique(labels):
 	# if the label is zero, we are examining the 'background'
 	# so simply ignore it
@@ -52,15 +56,11 @@ for label in np.unique(labels):
 	c = max(cnts, key=cv2.contourArea)
 	# draw a circle enclosing the object
 	((x, y), r) = cv2.minEnclosingCircle(c)
-	cv2.circle(image, (int(x), int(y)), int(r), (abs(2*int(x)-0.5*int(y))*12, (int(x)+int(y))/4, 3*int(x)*int(y)/(int(x)+int(y))), -1)
+	cv2.circle(blank_image, (int(x), int(y)), int(r), (abs(2*int(x)-0.5*int(y))*12, (int(x)+int(y))/4, 3*int(x)*int(y)/(int(x)+int(y))), -1)
 
 	#cv2.putText(image, "#{}".format(label), (int(x) - 10, int(y)),
 		#cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 # show the output image
 cv2.imshow("Output", image)
+cv2.imshow("no bg", blank_image)
 cv2.waitKey(0)
-#width, height = Image.image.size
-#for x in width:
-#	for y in height:
-#		img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-#		cv2.imshow('RGB Image', img_rgb)

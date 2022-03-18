@@ -100,7 +100,8 @@ for label in np.unique(labels):
             # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
             # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         F.add(r)
-        Fibers.append([x, y, round(r, 1)])
+        Fibers.append([round(x), round(y), round(r, 1)])
+        
 # STATISCTICS:
 
 S_med = stat.median(S)
@@ -111,6 +112,9 @@ F_med = stat.median(F)
 F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
 
+print("\n\n -----")
+for fib in Fibers:
+    print("x, y, r: ", fib[0],fib[1], fib[2])
 print("\n\n -----")
 print('WATERSHED')
 print("[INFO] {} unique contours found".format(len(cnts)))

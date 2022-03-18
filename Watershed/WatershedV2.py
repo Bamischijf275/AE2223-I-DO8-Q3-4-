@@ -35,7 +35,7 @@ localMax = peak_local_max(D, indices=False, min_distance=5,
 markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
 labels = watershed(-D, markers, mask=thresh)
 print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
-# loop over the unique labels returned by the Watershed
+# loop over the unique mask returned by the Watershed
 # algorithm
 height=232
 width=952

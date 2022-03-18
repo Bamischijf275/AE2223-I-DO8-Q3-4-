@@ -28,7 +28,7 @@ img = Image.open('/Users/ryan/PycharmProjects/scientificProject/TapeA_registrati
 img = np.asarray(img)
 
 labels, _ = model.predict_instances(normalize(img))
-np.savetxt("labels.csv", labels, delimiter=",", fmt="%.0f")
+np.savetxt("mask.csv", labels, delimiter=",", fmt="%.0f")
 
 
 plt.figure(figsize=(8,8))

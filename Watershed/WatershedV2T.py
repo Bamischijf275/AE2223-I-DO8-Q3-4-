@@ -8,6 +8,7 @@ import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import sys
 
 # CONSTANTS:
 # parameters:
@@ -107,10 +108,10 @@ for label in np.unique(labels):
         Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
         
 # OUTPUT:
-array_out = np.zeros((height,width,1), np.uint16)
+array_out = np.zeros((height,width), np.uint16)
 for fib in Fibers:
     cv.circle(array_out, (int(x), int(y)), int(r), fib[0], -1)
-    print("x, y, r: ", fib[0],fib[1], fib[2])
+    #print("x, y, r: ", fib[0],fib[1], fib[2])
     
 if Print_Output:
     path_script = os.path.dirname(__file__)
@@ -136,6 +137,7 @@ F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
 
 print("\n\n -----")
+#np.set_printoptions(threshold=sys.maxsize)
 print(array_out)
 print("\n\n -----")
 print('WATERSHED')

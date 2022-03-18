@@ -3,9 +3,10 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 from scipy import ndimage
 import numpy as np
-import argparse
+#import argparse
 import imutils
 import cv2
+from PIL import Image as uwu
 # construct the argument parse and parse the arguments
 #ap = argparse.ArgumentParser()
 #ap.add_argument("-i", "--image", required=True,
@@ -27,7 +28,7 @@ cv2.imshow("Thresh", thresh)
 # pixel to the nearest zero pixel, then find peaks in this
 # distance map
 D = ndimage.distance_transform_edt(thresh)
-localMax = peak_local_max(D, indices=False, min_distance=3,
+localMax = peak_local_max(D, indices=False, min_distance=5,
 	labels=thresh)
 # perform a connected component analysis on the local peaks,
 # using 8-connectivity, then appy the Watershed algorithm
@@ -36,6 +37,9 @@ labels = watershed(-D, markers, mask=thresh)
 print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
 # loop over the unique labels returned by the Watershed
 # algorithm
+height=232
+width=952
+blank_image = np.zeros((height,width,3), np.uint8)
 for label in np.unique(labels):
 	# if the label is zero, we are examining the 'background'
 	# so simply ignore it
@@ -52,9 +56,11 @@ for label in np.unique(labels):
 	c = max(cnts, key=cv2.contourArea)
 	# draw a circle enclosing the object
 	((x, y), r) = cv2.minEnclosingCircle(c)
-	cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
+	cv2.circle(blank_image, (int(x), int(y)), int(r), (abs(2*int(x)-0.5*int(y))*12, (int(x)+int(y))/4, 3*int(x)*int(y)/(int(x)+int(y))), -1)
+
 	#cv2.putText(image, "#{}".format(label), (int(x) - 10, int(y)),
-	#	cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+		#cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 # show the output image
 cv2.imshow("Output", image)
+cv2.imshow("no bg", blank_image)
 cv2.waitKey(0)

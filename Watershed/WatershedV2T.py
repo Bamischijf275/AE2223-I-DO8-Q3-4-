@@ -102,7 +102,6 @@ for label in np.unique(labels):
                 # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         F.add(r)
         Fibers.append([x, y, round(r, 1)])
-        hard teen
 # STATISCTICS:
         
 S_med = stat.median(S)

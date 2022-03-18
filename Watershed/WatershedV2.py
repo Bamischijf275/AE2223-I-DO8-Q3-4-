@@ -14,7 +14,7 @@ from PIL import Image as uwu
 #args = vars(ap.parse_args())
 # load the image and perform pyramid mean shift filtering
 # to aid the thresholding step
-image = cv2.imread(r"C:\Users\huege\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
+image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
 shifted = cv2.pyrMeanShiftFiltering(image, 1, 2)
 cv2.imshow("Input", image)
 # convert the mean shift image to grayscale, then apply
@@ -35,11 +35,13 @@ localMax = peak_local_max(D, indices=False, min_distance=5,
 markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
 labels = watershed(-D, markers, mask=thresh)
 print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
-# loop over the unique labels returned by the Watershed
+# loop over the unique mask returned by the Watershed
 # algorithm
-height=232
-width=952
+height,width, _ = image.shape
+#height=232
+#width=952
 blank_image = np.zeros((height,width,3), np.uint8)
+
 for label in np.unique(labels):
 	# if the label is zero, we are examining the 'background'
 	# so simply ignore it
@@ -62,5 +64,11 @@ for label in np.unique(labels):
 		#cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 # show the output image
 cv2.imshow("Output", image)
+#print(blank_image)
+
 cv2.imshow("no bg", blank_image)
+
+
+cv2.imwrite('C:/Users/mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed/Tape A after WV2.jpg', blank_image)
+
 cv2.waitKey(0)

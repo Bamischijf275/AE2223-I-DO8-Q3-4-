@@ -13,7 +13,6 @@ from skimage.morphology import watershed
 # parameters:
 F_mean = 5.4
 F_RE = 0.3  # % deviation
-F_perPixel = 0.7256  # 1)<- 2) 0.7232
 
 R_min = F_mean * (1 - F_RE)
 R_max = F_mean * (1 + F_RE)
@@ -22,22 +21,25 @@ MinDist = int(R_min - 1)
 PyrFilt1 = 10  # iterations
 PyrFilt2 = 10  # strength
 
+path_R_input = "..\Data\TapeB.tif"
+path_R_output = "..\Data Processed"
+
 # Display
-Show_In = True
-Show_Otsu = True
-Show_PyrFilt = True
+Show_In = False
+Show_Otsu = False
+Show_PyrFilt = False
 Show_Boundary = True
 Show_ShapeCenter = True
 Show_FiberCircle = True
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
+Print_Output = False
 
 # IMAGE PROCESSING
 # Open image
 path_script = os.path.dirname(__file__)
-path_relative = "..\Data\TapeB.tif"
-path = os.path.join(path_script, path_relative)
+path = os.path.join(path_script, path_R_input)
 img = cv.imread(path)
 if Show_In: cv.imshow('INPUT', img)
 
@@ -102,6 +104,20 @@ for label in np.unique(labels):
         F.add(r)
         Fibers.append([round(x), round(y), round(r, 1)])
         
+# OUTPUT:
+if Print_Output:
+    path_script = os.path.dirname(__file__)
+    path = os.path.join(path_script, path_R_output)
+    os.chdir(path)
+    print("Before saving image:")  
+    print(os.listdir(path))  
+    # Filename
+    filename = "TapeB_WT-V2.png"
+    cv.imwrite(filename, img)
+    print("After saving image:")  
+    print(os.listdir(path))
+    print('Successfully saved')
+        
 # STATISCTICS:
 
 S_med = stat.median(S)
@@ -112,9 +128,12 @@ F_med = stat.median(F)
 F_sigma = stat.stdev(F)
 F_avg = stat.mean(F)
 
-print("\n\n -----")
 for fib in Fibers:
-    print("x, y, r: ", fib[0],fib[1], fib[2])
+    #print("x, y, r: ", fib[0],fib[1], fib[2])
+    continue
+
+print("\n\n -----")
+
 print("\n\n -----")
 print('WATERSHED')
 print("[INFO] {} unique contours found".format(len(cnts)))

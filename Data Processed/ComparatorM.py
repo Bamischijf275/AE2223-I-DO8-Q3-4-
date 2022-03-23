@@ -6,7 +6,7 @@
 #import argparse
 #import imutils
 import cv2
-img = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Tape A after WV2.jpg")
+img = cv2.imread(r"C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Tape A after WV2.jpg")
 
 # convert the image to grayscale
 gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

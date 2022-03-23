@@ -69,6 +69,6 @@ cv2.imshow("Output", image)
 cv2.imshow("no bg", blank_image)
 
 
-cv2.imwrite('C:/Users/mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed/Tape B after WV2.jpg', blank_image)
+cv2.imwrite('/Data Processed/Watershed/Tape B after WV2.jpg', blank_image)
 
 cv2.waitKey(0)

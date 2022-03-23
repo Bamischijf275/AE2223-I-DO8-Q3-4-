@@ -57,7 +57,11 @@ def GTpixels(matrix,number):
     imin = len(matrix)
     jmin = len(matrix)
     for i in range(len(matrix)):
-        for j in range(len(matrix)):
+        if number in matrix[i]:
+            if i>imax:imax=i
+                if i<imin:imin=i
+    pd.transpose
+    for j in range(len(matrix)):
 
             if matrix[i][j]!=number:
                 matrix[i][j]=0

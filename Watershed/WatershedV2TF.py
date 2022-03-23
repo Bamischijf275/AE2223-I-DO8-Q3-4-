@@ -4,7 +4,7 @@ import numpy as np
 # from matplotlib import pyplot as plt
 # from matplotlib import image as mpimg
 import os
-#import statistics as stat
+import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
@@ -13,7 +13,7 @@ from skimage.segmentation import watershed
 def WATERSHED (Name, Filetype, PathIN, pathOUT):
 
     # PARAMETER DEFINITION
-    F_mean = 5.4
+    F_mean = 5
     F_RE = 0.3  # % deviation
     
     PyrFilt1 = 10  # iterations
@@ -80,14 +80,15 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
             cv.circle(arr_out, (int(x), int(y)), int(r),  len(F), -1)
             F.add(r)
             Fibers.append([len(F),round(x), round(y), round(r, 1)])
-            
+
     # OUTPUT:
     return arr_out
 
 # parameters:
-input_file = ["TapeB",".tif"]
+input_file = ["TapeA",".jpg"]
 output_file = [input_file[0], ".png"]
 path_R_input = "../Data"
 path_R_output = "../Data Processed/Watershed"
 OUTPUT = WATERSHED(input_file[0], input_file[1], path_R_input, path_R_output) #(Name, Filetype, PathIN, pathOUT)
+np.set_printoptions(threshold=np.inf)
 print(OUTPUT)

@@ -7,6 +7,7 @@ import numpy as np
 #import imutils
 import cv2
 import pandas as pd
+
 N = 3  # Rows 155
 
 M = 3 # Columns 120
@@ -57,21 +58,29 @@ def GTpixels(matrix,number):
     imin = len(matrix)
     jmin = len(matrix)
     for i in range(len(matrix)):
-        for j in range(len(matrix)):
+        if number in matrix[i]:
+            if i > imax: imax = i
+            if i < imin: imin = i
+    #matrix=pd.matrix.transpose
+    matrix = pd.DataFrame(data=matrix)
+    #print(matrix)
+    for i in range(len(matrix)):
+        if number in matrix[i]:
+            if i > jmax: jmax = i
+            if i < jmin: imin = i
 
-            if matrix[i][j]!=number:
-                matrix[i][j]=0
-            if matrix[i][j]==number:
+
+        #if matrix[][j] != number:
+            #matrix[][j] = 0
+        #if matrix[][j] == number:
+            #if j > jmax: jmax = j
+            #if j < jmin: imin = j
 
 
 
-                if i>imax:imax=i
-                if i<imin:imin=i
-                if j>jmax: jmax=j
-                if j<imin: jmin=j
-    print(imin,imax,jmax,jmin)
+    print(imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
-    print(newmatrix)
+    #print(newmatrix)
     for i in range(imin,imax):
         for j in range(jmin,jmax):
             newmatrix[i-imin][j-jmin]=matrix[i][j]
@@ -81,8 +90,9 @@ def GTpixels(matrix,number):
 
 
 csv = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
-print(csv)
+#print(csv)
 matrix=csv
+
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
 number =226
 #print(matrix)

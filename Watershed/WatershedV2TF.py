@@ -10,7 +10,7 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 #import sys
 
-def WATERSHED (Name, Filetype, PathIN, pathOUT):
+def WATERSHED (Name, Filetype, PathIN, pathOUT, PRINT):
 
     # PARAMETER DEFINITION
     F_mean = 5.4

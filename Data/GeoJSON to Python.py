@@ -3,8 +3,8 @@ import geojson as GeoJSON
 import shapely as shapely
 
 # SIZE OF IMAGE
-x_range = 1000
-y_range = 1000
+x_range = 120
+y_range = 155
 
 
 with open("Tape A 2.geojson") as f:

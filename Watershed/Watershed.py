@@ -14,7 +14,7 @@ K_dist = 0.5
 path_script = os.path.dirname(__file__)
 path_relative = "..\Data\TapeA_registration.jpg"
 path = os.path.join(path_script, path_relative)
-img = cv.imread(path)
+img = cv.imread("Data\TapeA_registration.jpg")
 
 #Otsu binarization
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)

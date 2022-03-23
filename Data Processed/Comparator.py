@@ -14,30 +14,45 @@ import cv2
 
 # CONSTANTS
 #parameters
-input_file = "TapeB"
-input_algo = ["Watershed","Ground Thruth"]
+input_file = "TapeB.png"
+
+#input_folder= "Data Processed"
+input_algo = ["Watershed","Annotated"]
 
 # Display
-Show_In = False
+Show_In = True
 Show_Out = False
 
 # IMAGE PROCESSING
 # Open image
 path_script = os.path.dirname(__file__)
+path1 = os.path.join(path_script, input_algo[0], input_file)
+img_1 = cv.imread(path1)
+cv.imshow('INPUT ONE', img_1)
 
-for image in input_compare:
-    path_R_input = "..\Data Processed\TapeB_WT-V2T.png"
-path = os.path.join(path_script, path_R_input_GT)
-img_GT = cv.imread(path)
-path = os.path.join(path_script, path_R_input_WT)
-img_WT = cv.imread(path)
-#path = os.path.join(path_script, path_R_input_AI)
-#img_AI = cv.imread(path)
+path2 = os.path.join(path_script, input_algo[1], input_file)
+img_2 = cv.imread(path2)
+cv.imshow('INPUT TWO', img_2)
+
+print("\n\n -----")
+print("path 1: ",path1)
+print("path 2: ",path2)
+im_h, im_w, _ = img_1.shape
+print("image size: ", im_w, "x", im_h, "[pix]")
+
 if Show_In: 
-    cv.imshow('INPUT Ground Truth', img_GT)
-    height_GT, width_GT, _ = img_GT.shape
+    cv.imshow('INPUT ONE', img_1)
+    cv.imshow('INPUT TWO', img_2)
 
 # COMPARISON
+
+#find centers of mass
+    
+#circle fitting
+    
+#check for 1/2 radius
+    
+#classify
 
 # STATISCTICS:
 
@@ -49,5 +64,5 @@ print("[INFO] median            :", round(1, 3))
 print("[INFO] mean              :", round(2, 3))
 print("[INFO] standard deviation:", round(3, 3))
 
-cv.imshow("Output", img)
+#cv.imshow("Output", XXX)
 cv.waitKey(0)

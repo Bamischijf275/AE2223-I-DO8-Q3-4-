@@ -42,7 +42,12 @@ if Show_In:
 
 # COMPARISON
 
-#
+#for each fiber in GT
+    #identify fiber region & ID
+    #find corresponding ID in WT & AI
+    #find true positive, false, postive, true negative, false negative
+    #compare
+    #save value
     
 #classify
 

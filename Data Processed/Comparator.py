@@ -9,6 +9,8 @@ import os
 #from skimage.feature import peak_local_max
 #from skimage.segmentation import watershed
 #import sys
+import cv2
+
 
 # CONSTANTS
 #parameters

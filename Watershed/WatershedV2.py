@@ -14,7 +14,7 @@ from PIL import Image as uwu
 #args = vars(ap.parse_args())
 # load the image and perform pyramid mean shift filtering
 # to aid the thresholding step
-image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeA_registration.jpg")
+image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeB.tif")
 shifted = cv2.pyrMeanShiftFiltering(image, 1, 2)
 cv2.imshow("Input", image)
 # convert the mean shift image to grayscale, then apply
@@ -69,6 +69,6 @@ cv2.imshow("Output", image)
 cv2.imshow("no bg", blank_image)
 
 
-cv2.imwrite('C:/Users/mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed/Tape A after WV2.jpg', blank_image)
+cv2.imwrite('C:/Users/mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed/Tape B after WV2.jpg', blank_image)
 
 cv2.waitKey(0)

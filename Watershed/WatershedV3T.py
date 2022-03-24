@@ -21,7 +21,7 @@ path_R_output = "../Data Processed/Watershed"
 # Watershed
 F_mean = 5
 F_RE = 1 / 3  # strandard deviations
-E_RE = 0.8
+E_RE = 0.85
 R_min = F_mean * (1 - F_RE)
 MinDist = int(R_min - 1)
 

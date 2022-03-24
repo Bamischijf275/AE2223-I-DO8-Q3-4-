@@ -49,25 +49,28 @@ if __name__ == '__main__':
     mat = [[0, 0, 6],
            [0, 0, 2],
            [1, 6, 6]]
-    print(majorityInMatrix(mat,greaterthanany))
+    #print(majorityInMatrix(mat,greaterthanany))
 
 
 def GTpixels(matrix,number):
     imax = 0
     jmax = 0
     imin = len(matrix)
-    jmin = len(matrix)
+    jmin = len(matrix[0])
     for i in range(len(matrix)):
-        if number in matrix[i]:
-            if i > imax: imax = i
-            if i < imin: imin = i
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == number:
+                if i > imax: imax = i
+                if i < imin: imin = i
+                if j> jmax: jmax = j
+                if j < jmin: jmin = j
     #matrix=pd.matrix.transpose
-    matrix = pd.DataFrame(data=matrix)
+    #matrix = pd.DataFrame(data=matrix)
     #print(matrix)
-    for i in range(len(matrix)):
-        if number in matrix[i]:
-            if i > jmax: jmax = i
-            if i < jmin: imin = i
+    #for i in range(len(matrix)):
+        #if number in matrix[i]:
+            #if i > jmax: jmax = i
+           # if i < jmin: imin = i
 
 
         #if matrix[][j] != number:
@@ -77,7 +80,8 @@ def GTpixels(matrix,number):
             #if j < jmin: imin = j
 
 
-
+    jmax=jmax+1
+    imax=imax+1
     print(imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
     #print(newmatrix)
@@ -94,7 +98,7 @@ csv = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.c
 matrix=csv
 
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
-number =226
+number=459
 #print(matrix)
-
+print(len(matrix[0]))
 print(GTpixels(matrix,number))

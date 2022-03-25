@@ -66,7 +66,7 @@ def GTpixels(matrix,matrix2,number):
                 if j < jmin: jmin = j
     jmax=jmax+1
     imax=imax+1
-    print(imin,imax,jmin,jmax)
+    print("pixel boundary:",imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
     newmatrix2 = np.zeros((imax - imin, jmax - jmin), dtype="int")
     #print(newmatrix)
@@ -76,7 +76,7 @@ def GTpixels(matrix,matrix2,number):
                 newmatrix[i-imin][j-jmin]=matrix[i][j]
             #if matrix[i][j] ==number:
                 newmatrix2[i-imin][j-jmin]=matrix2[i][j]
-    print(newmatrix)
+    print("cut out pixels of a specific fiber of GT:\n",newmatrix)
     return newmatrix2
 
 def CountPixels(matrix,number):
@@ -103,13 +103,14 @@ matrix2 = np.delete(matrix2,(0), axis=1)
 number=112
 #print(matrix)
 #print(len(matrix[0]))
-print(CountPixels(matrix,517))
+#print(CountPixels(matrix,517))
 gtpixel=GTpixels(matrix,matrix2,number)
-print(gtpixel)
+print("Getting the pixels from the other matrix:\n",gtpixel)
 a=majorityInMatrix(GTpixels(matrix,matrix2,number), len(matrix[0]))
-print(a)## change to number of fibers
+print("the majority number:",a)## change to number of fibers
 pixelb=CountPixels(matrix2,a)
 pixela=CountPixels(gtpixel,a)
-print(pixelb)
-print(pixela)
-print("The ratio of pixels", pixela/pixelb)
+print("pixels of te majority number on GT fiber",pixela)
+print("all pixels with the majority number on the compared matrix",pixelb)
+
+print("The ratio of pixels\n", pixela/pixelb)

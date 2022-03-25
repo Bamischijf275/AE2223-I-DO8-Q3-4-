@@ -6,7 +6,9 @@ import numpy as np
 #import argparse
 import imutils
 import cv2
+import os
 from PIL import Image as uwu
+
 # construct the argument parse and parse the arguments
 #ap = argparse.ArgumentParser()
 #ap.add_argument("-i", "--image", required=True,
@@ -14,7 +16,12 @@ from PIL import Image as uwu
 #args = vars(ap.parse_args())
 # load the image and perform pyramid mean shift filtering
 # to aid the thresholding step
-image = cv2.imread(r"C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\TapeB.tif")
+
+cwd = os.getcwd()
+files = os.listdir(cwd)
+print(cwd,files)
+
+image = cv2.imread(r"Image cropping\Cropped data\Tape_B\Tape_B_4\Tape_B_4_2.jpg")
 shifted = cv2.pyrMeanShiftFiltering(image, 1, 2)
 cv2.imshow("Input", image)
 # convert the mean shift image to grayscale, then apply
@@ -28,7 +35,7 @@ cv2.imshow("Thresh", thresh)
 # pixel to the nearest zero pixel, then find peaks in this
 # distance map
 D = ndimage.distance_transform_edt(thresh)
-localMax = peak_local_max(D, indices=False, min_distance=5,
+localMax = peak_local_max(D, indices=False, min_distance=2,
 	labels=thresh)
 # perform a connected component analysis on the local peaks,
 # using 8-connectivity, then appy the Watershed algorithm
@@ -69,6 +76,6 @@ cv2.imshow("Output", image)
 cv2.imshow("no bg", blank_image)
 
 
-cv2.imwrite('/Data Processed/Watershed/Tape B after WV2.jpg', blank_image)
+cv2.imwrite('C:Data\Tabe_B_1_1.jpg', blank_image)
 
 cv2.waitKey(0)

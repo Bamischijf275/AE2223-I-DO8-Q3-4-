@@ -13,10 +13,10 @@ print(cwd,files)
 column_crop = 5
 width_crop = 2
 
-def image_cropper(img,direc):
+def image_cropper(img,direc,tapename):
     im = Image.open(img,mode='r')
     try:
-        os.makedirs(f'Image cropping/Cropped data/Tape_B/{direc}')
+        os.makedirs(f'Image cropping/Cropped data/{tapename}/{direc}')
     except OSError:
         print("ERROR")
     else:
@@ -48,16 +48,16 @@ def image_cropper(img,direc):
     im9 = Image.fromarray(im9_ar)
     im10 = Image.fromarray(im10_ar)
 
-    im1.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_1.jpg')
-    im2.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_2.jpg')
-    im3.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_3.jpg')
-    im4.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_4.jpg')
-    im5.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_5.jpg')
-    im6.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_6.jpg')
-    im7.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_7.jpg')
-    im8.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_8.jpg')
-    im9.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_9.jpg')
-    im10.save(f'Image cropping/Cropped data/Tape_B/{direc}/{direc}_10.jpg')
+    im1.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_1.jpg')
+    im2.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_2.jpg')
+    im3.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_3.jpg')
+    im4.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_4.jpg')
+    im5.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_5.jpg')
+    im6.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_6.jpg')
+    im7.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_7.jpg')
+    im8.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_8.jpg')
+    im9.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_9.jpg')
+    im10.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_10.jpg')
 
 
 
@@ -76,4 +76,4 @@ def image_opener(direc_path):
 #image_opener(r'C:\Users\degro\OneDrive - Delft University of Technology\Aerospace engineering\Year 2\Q3-4 project\Data\Data\Training data\Tape_B_2_JPG')
 
 for i in range(1,21):
-     image_cropper(f'Image cropping/Uncropped pictures/Tape_B_2_{i}.jpg',f'Tape_B_{i}')
+     image_cropper(f'Image cropping/Uncropped pictures/Tape_B_2_{i}.jpg',f'Tape_B_{i}','Tape_B')

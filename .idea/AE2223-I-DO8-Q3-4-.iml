@@ -9,6 +9,7 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/Image cropping" />
+        <option value="$MODULE_DIR$/Watershed" />
       </list>
     </option>
   </component>

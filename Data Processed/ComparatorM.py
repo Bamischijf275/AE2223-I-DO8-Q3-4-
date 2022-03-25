@@ -18,14 +18,15 @@ M = 3 # Columns 120
 def majorityInMatrix(arr,greaterthanany):
     # we take length equal to max
     # value in array
-    mp = {i: 0 for i in range(greaterthanany)}
 
+    mp = {k: 0 for k in range(int(greaterthanany))}
+    #print(mp)
     # Store frequency of elements
     # in matrix
     maxi=0
 
     for i in range(len(arr)):
-        for j in range(len(arr)):
+        for j in range(len(arr[0])):
             if arr[i][j]!=0:
                 mp[arr[i][j]] += 1
                 if mp[arr[i][j]]>maxi:
@@ -44,12 +45,8 @@ def majorityInMatrix(arr,greaterthanany):
 
 
 # Driver Code
-#if __name__ == '__main__':
-##    greaterthanany=7
-  #  mat = [[0, 0, 6],
-   #        [0, 0, 2],
-  #         [1, 6, 6]]
-    #print(majorityInMatrix(mat,greaterthanany))
+
+
 
 
 def GTpixels(matrix,matrix2,number):
@@ -66,7 +63,7 @@ def GTpixels(matrix,matrix2,number):
                 if j < jmin: jmin = j
     jmax=jmax+1
     imax=imax+1
-    print("pixel boundary:",imin,imax,jmin,jmax)
+    #print("pixel boundary:",imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
     newmatrix2 = np.zeros((imax - imin, jmax - jmin), dtype="int")
     #print(newmatrix)
@@ -76,7 +73,7 @@ def GTpixels(matrix,matrix2,number):
                 newmatrix[i-imin][j-jmin]=matrix[i][j]
             #if matrix[i][j] ==number:
                 newmatrix2[i-imin][j-jmin]=matrix2[i][j]
-    print("cut out pixels of a specific fiber of GT:\n",newmatrix)
+    #print("cut out pixels of a specific fiber of GT:\n",newmatrix)
     return newmatrix2
 
 def CountPixels(matrix,number):
@@ -87,30 +84,47 @@ def CountPixels(matrix,number):
                 pixelnumber=pixelnumber+1
     return pixelnumber
 
-
-
-
+def findlargestIDnumber(matrix):
+    numero=0
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j]>numero: numero=matrix[i][j]
+    return numero
 
 
 matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
 matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Watershed.csv', delimiter=',')
 matrix2 = np.delete(matrix2, (0), axis=0)
 matrix2 = np.delete(matrix2,(0), axis=1)
-#print(csv)
 
+#print(csv)
+numero=findlargestIDnumber(matrix)
+identified=0
+misidentified=0
+#print(majorityInMatrix(matrix,1000))
 #print(matrix2)
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
-number=112
+
+for number in (1,numero):
 #print(matrix)
 #print(len(matrix[0]))
 #print(CountPixels(matrix,517))
-gtpixel=GTpixels(matrix,matrix2,number)
-print("Getting the pixels from the other matrix:\n",gtpixel)
-a=majorityInMatrix(GTpixels(matrix,matrix2,number), len(matrix[0]))
-print("the majority number:",a)## change to number of fibers
-pixelb=CountPixels(matrix2,a)
-pixela=CountPixels(gtpixel,a)
-print("pixels of te majority number on GT fiber",pixela)
-print("all pixels with the majority number on the compared matrix",pixelb)
+    gtpixel=GTpixels(matrix,matrix2,number)
 
-print("The ratio of pixels\n", pixela/pixelb)
+    #print("numero",numero)
+#print("Getting the pixels from the other matrix:\n",gtpixel)
+    a=majorityInMatrix(GTpixels(matrix,matrix2,number), numero)
+    #print("the majority number:",a)## change to number of fibers
+    pixelb=CountPixels(matrix2,a)
+    pixela=CountPixels(gtpixel,a)
+    ratio=pixela/pixelb
+    #print("pixels of te majority number on GT fiber",pixela)
+    #print("all pixels with the majority number on the compared matrix",pixelb)
+    print(ratio)
+    if ratio>0.8:
+        identified=identified+1
+    else:
+        misidentified=misidentified+1
+    #print("The ratio of pixels\n", pixela/pixelb)
+print("identified",identified)
+print("misidentified",misidentified)

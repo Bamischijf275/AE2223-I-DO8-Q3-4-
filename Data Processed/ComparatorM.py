@@ -44,15 +44,15 @@ def majorityInMatrix(arr,greaterthanany):
 
 
 # Driver Code
-if __name__ == '__main__':
-    greaterthanany=7
-    mat = [[0, 0, 6],
-           [0, 0, 2],
-           [1, 6, 6]]
+#if __name__ == '__main__':
+##    greaterthanany=7
+  #  mat = [[0, 0, 6],
+   #        [0, 0, 2],
+  #         [1, 6, 6]]
     #print(majorityInMatrix(mat,greaterthanany))
 
 
-def GTpixels(matrix,number):
+def GTpixels(matrix,matrix2,number):
     imax = 0
     jmax = 0
     imin = len(matrix)
@@ -64,41 +64,45 @@ def GTpixels(matrix,number):
                 if i < imin: imin = i
                 if j> jmax: jmax = j
                 if j < jmin: jmin = j
-    #matrix=pd.matrix.transpose
-    #matrix = pd.DataFrame(data=matrix)
-    #print(matrix)
-    #for i in range(len(matrix)):
-        #if number in matrix[i]:
-            #if i > jmax: jmax = i
-           # if i < jmin: imin = i
-
-
-        #if matrix[][j] != number:
-            #matrix[][j] = 0
-        #if matrix[][j] == number:
-            #if j > jmax: jmax = j
-            #if j < jmin: imin = j
-
-
     jmax=jmax+1
     imax=imax+1
     print(imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
+    newmatrix2 = np.zeros((imax - imin, jmax - jmin), dtype="int")
     #print(newmatrix)
     for i in range(imin,imax):
         for j in range(jmin,jmax):
             newmatrix[i-imin][j-jmin]=matrix[i][j]
+            if matrix[i][j] != 0:
+                newmatrix2[i-imin][j-jmin]=matrix2[i][j]
+    #print(newmatrix)
+    return newmatrix2
 
-    return newmatrix
+def CountPixels(matrix,number):
+    pixelnumber=0
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == number:
+                pixelnumber=pixelnumber+1
+    return pixelnumber
 
 
 
-csv = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
+
+
+
+matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
+matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Watershed.csv', delimiter=',')
+matrix2 = np.delete(matrix2, (0), axis=0)
+matrix2 = np.delete(matrix2,(0), axis=1)
 #print(csv)
-matrix=csv
 
+print(matrix2)
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
-number=459
+number=111
 #print(matrix)
-print(len(matrix[0]))
-print(GTpixels(matrix,number))
+#print(len(matrix[0]))
+print(CountPixels(matrix,517))
+print(GTpixels(matrix,matrix2,number))
+
+print(majorityInMatrix(GTpixels(matrix,matrix2,number), len(matrix[0])))## change to number of fibers

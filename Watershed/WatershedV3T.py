@@ -8,13 +8,14 @@ import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import pandas as pd
 
 # import sys
 
 # PARAMETERS:
 # System:
 input_file = ["TapeA", ".jpg"]
-output_file = [input_file[0], ".png"]
+output_file = [input_file[0], ".png", ".csv"]
 path_R_input = "../Data"
 path_R_output = "../Data Processed/Watershed"
 
@@ -47,7 +48,7 @@ Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
 Col_Background = (100, 100, 100)
 
-Print_Matrix = False
+Print_Matrix = True
 Print_Output = False
 
 # IMAGE PROCESSING
@@ -61,7 +62,6 @@ height, width, _ = img.shape
 # Smoothing / de-noising
 imgPMSF = cv.pyrMeanShiftFiltering(img, PyrFilt1, PyrFilt2)
 if Show_PyrFilt: cv.imshow('imagePMSF', imgPMSF)
-
 # Otsu binarization
 gray = cv.cvtColor(imgPMSF, cv.COLOR_BGR2GRAY)
 imgTSH = cv.threshold(gray, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
@@ -198,7 +198,7 @@ if FitEllipse:
     E_avg = stat.mean(E)
     E_med = stat.median(E)
     E_sigma = stat.stdev(E)
-
+ 
 # OUTPUT:
 if Print_Output:
     print("\n\n -----")
@@ -215,7 +215,16 @@ if Print_Output:
 
 if Print_Matrix:
     np.set_printoptions(threshold=np.inf)
-    print(arr_out)
+    #print(arr_out)
+    path_script = os.path.dirname(__file__)
+    path = os.path.join(path_script, path_R_output, ("Waterhsed" + output_file[2]))
+    path=(r"C:/Users/huege/Documents/GitHub/AE2223-I-DO8-Q3-4-/Data Processed/Watershed/Watershed.csv")
+    print("\n\n -----")
+    print(path)
+    #os.chdir(path)
+    print("\n\n -----")
+    #numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
+    pd.DataFrame(arr_out).to_csv(path, header="none",index="none")
 
 print("\n\n -----")
 print('WATERSHED')

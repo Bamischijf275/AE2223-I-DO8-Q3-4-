@@ -129,12 +129,12 @@ for label in np.unique(labels):
             img_S = cv.ellipse(img_S, ((x, y), (w, h), Agl), Col, 1)
             img_S = cv.drawContours(img_S, [box], 0, Col, 1)
             # compute eccentricty
-            if w > h:
-                c = ((w ** 2) - (h ** 2)) ** (1 / 2)
-                e = c / w
-            else:
-                c = ((h ** 2) - (w ** 2)) ** (1 / 2)
-                e = c / h
+        if w > h:
+            c = ((w ** 2) - (h ** 2)) ** (1 / 2)
+            e = c / w
+        else:
+            c = ((h ** 2) - (w ** 2)) ** (1 / 2)
+            e = c / h
         Shapes.append([x, y, w, h, Agl, c, e])
         S.add(c)
 
@@ -180,8 +180,7 @@ for shape in Shapes:
         a, b, Agl, c, e = shape[2:]
         if (a + b) > 2 * R_min and abs(e) < E_RE:
             F.add(c)
-            cv.ellipse(arr_out, ((x, y), (a, b), Agl), Fx, -1)
-            Fx += 1
+            cv.ellipse(arr_out, ((x, y), (a, b), Agl), len(F), -1)
             if Show_Fitted:
                 Col = (int((x / width) * 255), int((y / height) * 255), int(500 * (c) ** 2))
                 cv.ellipse(img_F, ((x, y), (a, b), Agl), Col, -1)

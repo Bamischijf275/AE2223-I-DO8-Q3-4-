@@ -66,16 +66,17 @@ def GTpixels(matrix,matrix2,number):
                 if j < jmin: jmin = j
     jmax=jmax+1
     imax=imax+1
-    print(imin,imax,jmin,jmax)
+    print("pixel boundary:",imin,imax,jmin,jmax)
     newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
     newmatrix2 = np.zeros((imax - imin, jmax - jmin), dtype="int")
     #print(newmatrix)
     for i in range(imin,imax):
         for j in range(jmin,jmax):
-            newmatrix[i-imin][j-jmin]=matrix[i][j]
-            if matrix[i][j] != 0:
+            if matrix[i][j]==number:
+                newmatrix[i-imin][j-jmin]=matrix[i][j]
+            #if matrix[i][j] ==number:
                 newmatrix2[i-imin][j-jmin]=matrix2[i][j]
-    #print(newmatrix)
+    print("cut out pixels of a specific fiber of GT:\n",newmatrix)
     return newmatrix2
 
 def CountPixels(matrix,number):
@@ -97,12 +98,19 @@ matrix2 = np.delete(matrix2, (0), axis=0)
 matrix2 = np.delete(matrix2,(0), axis=1)
 #print(csv)
 
-print(matrix2)
+#print(matrix2)
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
-number=111
+number=112
 #print(matrix)
 #print(len(matrix[0]))
-print(CountPixels(matrix,517))
-print(GTpixels(matrix,matrix2,number))
+#print(CountPixels(matrix,517))
+gtpixel=GTpixels(matrix,matrix2,number)
+print("Getting the pixels from the other matrix:\n",gtpixel)
+a=majorityInMatrix(GTpixels(matrix,matrix2,number), len(matrix[0]))
+print("the majority number:",a)## change to number of fibers
+pixelb=CountPixels(matrix2,a)
+pixela=CountPixels(gtpixel,a)
+print("pixels of te majority number on GT fiber",pixela)
+print("all pixels with the majority number on the compared matrix",pixelb)
 
-print(majorityInMatrix(GTpixels(matrix,matrix2,number), len(matrix[0])))## change to number of fibers
+print("The ratio of pixels\n", pixela/pixelb)

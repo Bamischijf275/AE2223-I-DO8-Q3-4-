@@ -9,6 +9,7 @@ from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 #import sys
+import math
 
 def WATERSHED (Name, Filetype, PathIN, pathOUT):
 
@@ -16,7 +17,7 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
    # Watershed
     F_mean = 5
     F_RE = 1 / 3  # strandard deviations
-    E_RE = 0.85
+    E_RE = math.exp(-F_RE)
     R_min = F_mean * (1 - F_RE)
     MinDist = int(R_min - 1)
     
@@ -60,7 +61,6 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
     markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
     labels = watershed(-D, markers, mask=imgTSH)
     
-    # FIBERS
     # setup
     S = set([])  # shapes stats (radius)
     Shapes = []
@@ -78,14 +78,14 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
         mask[labels == label] = 255
     
         # find contours
-        cnts = cv.findContours(mask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
+        Cnts = cv.findContours(mask.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        cnts = imutils.grab_contours(Cnts)
         c = max(cnts, key=cv.contourArea)
     
         # SHAPE FITTING
         # draw enclosing circle 
         if not FitEllipse:
-            circle = ((x, y), r) = cv.minEnclosingCircle(c)
+            ((x, y), r) = cv.minEnclosingCircle(c)
             Shapes.append([x, y, r])
             Shapes.append(r)
         # draw inscribed-bound ellipse
@@ -95,7 +95,8 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
             box = cv.boxPoints(rect)
             box = np.int0(box)
             # ellipse
-            # compute eccentricty
+            # (x,y),(a,b),Agl = cv.fitEllipse(box)
+                # compute eccentricty
             if w > h:
                 c = ((w ** 2) - (h ** 2)) ** (1 / 2)
                 e = c / w
@@ -105,12 +106,33 @@ def WATERSHED (Name, Filetype, PathIN, pathOUT):
             Shapes.append([x, y, w, h, Agl, c, e])
             S.add(c)
     
-        # fiber ID and appending
-        S.add(r)
-        if R_min < r < R_max:
-            cv.circle(arr_out, (int(x), int(y)), int(r),  len(F), -1)
-            F.add(r)
-            Fibers.append([len(F),round(x), round(y), round(r, 1)])
+    # Discriminator
+    S_med = stat.median(S)
+    
+    F = set([])  # same but filtered
+    Fibers = []
+    
+    F_mean = S_med
+    R_min = F_mean * (1 - F_RE)
+    R_max = F_mean * (1 + F_RE)
+    
+    for shape in Shapes:
+        # fit enclosing circle
+        x, y = shape[0], shape[1]
+        if not FitEllipse:
+            r = shape[2]
+            if R_min < r < R_max:
+                F.add(r)
+                cv.circle(arr_out, (int(x), int(y)), int(r), len(F), -1)
+                # fiber ID and appending
+                Fibers.append([len(F), round(x), round(y), round(r, 3)])
+        if FitEllipse:
+            a, b, Agl, c, e = shape[2:]
+            if (a + b) > 2 * R_min and abs(e) < E_RE:
+                F.add(c)
+                cv.ellipse(arr_out, ((x, y), (a, b), Agl), len(F), -1)
+                # fiber ID and appending
+                Fibers.append([len(F), round(x), round(y), round(c, 3), round(e, 3)])
 
     # OUTPUT:
     return arr_out

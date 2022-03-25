@@ -9,20 +9,21 @@ from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 import pandas as pd
+import math
 
 # import sys
 
 # PARAMETERS:
 # System:
 input_file = ["TapeA", ".jpg"]
-output_file = [input_file[0], ".png", ".csv"]
+output_file = [input_file[0], ".png", "Watershed.csv"]
 path_R_input = "../Data"
 path_R_output = "../Data Processed/Watershed"
 
 # Watershed
 F_mean = 5
 F_RE = 1 / 3  # strandard deviations
-E_RE = 0.85
+E_RE = math.exp(-F_RE)
 R_min = F_mean * (1 - F_RE)
 MinDist = int(R_min - 1)
 
@@ -49,7 +50,7 @@ Col_FiberCircle = (0, 0, 255)
 Col_Background = (100, 100, 100)
 
 Print_Matrix = True
-Print_Output = False
+Print_Output = True
 
 # IMAGE PROCESSING
 # Open image
@@ -156,6 +157,8 @@ F_mean = S_med
 R_min = F_mean * (1 - F_RE)
 R_max = F_mean * (1 + F_RE)
 
+Fx = 1
+
 for shape in Shapes:
     # fit enclosing circle
     x, y = shape[0], shape[1]
@@ -163,7 +166,8 @@ for shape in Shapes:
         r = shape[2]
         if R_min < r < R_max:
             F.add(r)
-            cv.circle(arr_out, (int(x), int(y)), int(r), len(F), -1)
+            cv.circle(arr_out, (int(x), int(y)), int(r), Fx, -1)
+            Fx += 1
             if Show_Fitted:
                 Col = (int((x / width) * 255), int((y / height) * 255), int(500 * (r - F_mean) ** 2))
                 cv.circle(img_F, (int(x), int(y)), int(r), Col, -1)
@@ -176,7 +180,8 @@ for shape in Shapes:
         a, b, Agl, c, e = shape[2:]
         if (a + b) > 2 * R_min and abs(e) < E_RE:
             F.add(c)
-            cv.ellipse(arr_out, ((x, y), (a, b), Agl), len(F), -1)
+            cv.ellipse(arr_out, ((x, y), (a, b), Agl), Fx, -1)
+            Fx += 1
             if Show_Fitted:
                 Col = (int((x / width) * 255), int((y / height) * 255), int(500 * (c) ** 2))
                 cv.ellipse(img_F, ((x, y), (a, b), Agl), Col, -1)
@@ -214,17 +219,18 @@ if Print_Output:
     print('Successfully saved')
 
 if Print_Matrix:
+    print("\n\n -----")
+    print('MATRIX TO FILE')
     np.set_printoptions(threshold=np.inf)
     #print(arr_out)
     path_script = os.path.dirname(__file__)
-    path = os.path.join(path_script, path_R_output, ("Waterhsed" + output_file[2]))
-    path=(r"C:/Users/huege/Documents/GitHub/AE2223-I-DO8-Q3-4-/Data Processed/Watershed/Watershed.csv")
-    print("\n\n -----")
+    path = os.path.join(path_script, path_R_output)
+    os.chdir(path)
+    print(os.listdir(path))
     print(path)
-    #os.chdir(path)
-    print("\n\n -----")
     #numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
-    pd.DataFrame(arr_out).to_csv(path, header="none",index="none")
+    pd.DataFrame(arr_out).to_csv((path+output_file[2]), header="none",index="none")
+    print('Successfully saved')
 
 print("\n\n -----")
 print('WATERSHED')
@@ -251,4 +257,4 @@ if FitEllipse:
 if Show_Shapes: cv.imshow("Shapes", img_S)
 if Show_Fibers: cv.imshow("Fibers", img_F)
 cv.imshow("OUTPUT", img_out)
-cv.waitKey(0)
+#cv.waitKey(0)

@@ -28,8 +28,8 @@ def majorityInMatrix(arr,greaterthanany):
     for i in range(len(arr)):
         for j in range(len(arr[0])):
             if arr[i][j]!=0:
-                mp[arr[i][j]] += 1
-                if mp[arr[i][j]]>maxi:
+                mp[int(arr[i][j])] += 1
+                if mp[int(arr[i][j])]>maxi:
                     maxi=arr[i][j]
     # loop to iteratre through map
     #countMajority = 0
@@ -92,10 +92,12 @@ def findlargestIDnumber(matrix):
     return numero
 
 
-matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
-matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Watershed.csv', delimiter=',')
+matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\ TapeA.csv', delimiter=",")
+matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\ TapeA.csv', delimiter=',')
 matrix2 = np.delete(matrix2, (0), axis=0)
 matrix2 = np.delete(matrix2,(0), axis=1)
+matrix = np.delete(matrix, (0), axis=0)
+matrix = np.delete(matrix,(0), axis=1)
 
 #print(csv)
 numero=findlargestIDnumber(matrix)
@@ -104,27 +106,27 @@ misidentified=0
 #print(majorityInMatrix(matrix,1000))
 #print(matrix2)
 #matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
-
-for number in (1,numero):
+number=145
+#for number in (1,int(numero)):
 #print(matrix)
 #print(len(matrix[0]))
 #print(CountPixels(matrix,517))
-    gtpixel=GTpixels(matrix,matrix2,number)
+gtpixel=GTpixels(matrix,matrix2,number)
 
     #print("numero",numero)
 #print("Getting the pixels from the other matrix:\n",gtpixel)
-    a=majorityInMatrix(GTpixels(matrix,matrix2,number), numero)
+a=majorityInMatrix(GTpixels(matrix,matrix2,number), numero)
     #print("the majority number:",a)## change to number of fibers
-    pixelb=CountPixels(matrix2,a)
-    pixela=CountPixels(gtpixel,a)
-    ratio=pixela/pixelb
+pixelb=CountPixels(matrix2,a)
+pixela=CountPixels(gtpixel,a)
+ratio=pixela/pixelb
     #print("pixels of te majority number on GT fiber",pixela)
     #print("all pixels with the majority number on the compared matrix",pixelb)
-    print(ratio)
-    if ratio>0.8:
-        identified=identified+1
-    else:
-        misidentified=misidentified+1
+print(ratio)
+if ratio>0.8:
+    identified=identified+1
+else:
+    misidentified=misidentified+1
     #print("The ratio of pixels\n", pixela/pixelb)
 print("identified",identified)
 print("misidentified",misidentified)

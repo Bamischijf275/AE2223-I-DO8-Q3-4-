@@ -8,7 +8,7 @@ import statistics as stat
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
-#import sys
+import sys
 
 # CONSTANTS:
 # parameters:
@@ -31,9 +31,9 @@ path_R_output = "../Data Processed/Watershed"
 Show_In = False
 Show_Otsu = False
 Show_PyrFilt = False
-Show_Boundary = False
-Show_ShapeCenter = False
-Show_FiberCircle = False
+Show_Boundary = True
+Show_ShapeCenter = True
+Show_FiberCircle = True
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
@@ -82,6 +82,8 @@ S = set([]) #shapes stats (radius)
 F = set([]) #same but filtered
 Fibers = []
 img_out = np.zeros((height,width,3), np.uint8)
+arr_out = np.zeros((height,width), dtype=int)
+
 for label in np.unique(labels):
     # eliminate background
     if label == 0:
@@ -107,13 +109,11 @@ for label in np.unique(labels):
         if Show_FiberCircle:
             cv.circle(img, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2)),-1)
         cv.circle(img_out, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2)),-1)
+        cv.circle(arr_out, (int(x), int(y)), int(r),  len(F), -1)
         F.add(r)
-        Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
+        Fibers.append([len(F),round(x), round(y), round(r, 1)])
         
 # OUTPUT:
-#array_out = np.zeros((height,width), np.uint16)
-#for fib in Fibers:
-    #print("x, y, r: ", fib[0],fib[1], fib[2])
     
 if Print_Output:
     print("\n\n -----")
@@ -127,6 +127,9 @@ if Print_Output:
     print(filename)
     cv.imwrite(filename, img_out)
     print('Successfully saved')
+    
+np.set_printoptions(threshold=np.inf)
+print(arr_out)
     
 # STATISCTICS:
 

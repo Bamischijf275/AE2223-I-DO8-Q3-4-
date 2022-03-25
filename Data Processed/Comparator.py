@@ -4,11 +4,11 @@ import imutils
 # from matplotlib import pyplot as plt
 # from matplotlib import image as mpimg
 import os
-#import statistics as stat
-#from scipy import ndimage
-#from skimage.feature import peak_local_max
-#from skimage.segmentation import watershed
-#import sys
+import statistics as stat
+from scipy import ndimage
+from skimage.feature import peak_local_max
+from skimage.segmentation import watershed
+import sys
 
 
 # CONSTANTS

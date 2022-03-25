@@ -2,30 +2,103 @@
 #from skimage.feature import peak_local_max
 #from skimage.segmentation import watershed
 #from scipy import ndimage
-#import numpy as np
+import numpy as np
 #import argparse
 #import imutils
 import cv2
-img = cv2.imread(r"C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Tape A after WV2.jpg")
+import pandas as pd
 
-# convert the image to grayscale
-gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-cv2.imshow("gray", gray_image)
-# convert the grayscale image to binary image
-ret, thresh = cv2.threshold(gray_image, 127, 255, 0)
-# find contours in the binary image
-contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-#print(contours)
-for c in contours:
-# calculate moments for each contour
-    M = cv2.moments(c)
-# calculate x,y coordinate of center
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    print(cX,cY)
-    cv2.circle(img, (cX, cY), 5, (20, 20, 20), -1)
-    cv2.putText(img, "centroid", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-# display the image
+N = 3  # Rows 155
 
-    cv2.imshow("Image", img)
-    cv2.waitKey(0)
+M = 3 # Columns 120
+
+
+# Function to find count of all
+# majority elements in a Matrix
+def majorityInMatrix(arr,greaterthanany):
+    # we take length equal to max
+    # value in array
+    mp = {i: 0 for i in range(greaterthanany)}
+
+    # Store frequency of elements
+    # in matrix
+    maxi=0
+
+    for i in range(len(arr)):
+        for j in range(len(arr)):
+            if arr[i][j]!=0:
+                mp[arr[i][j]] += 1
+                if mp[arr[i][j]]>maxi:
+                    maxi=arr[i][j]
+    # loop to iteratre through map
+    #countMajority = 0
+    #for key, value in mp.items():
+
+        # check if frequency is greater than
+        # or equal to (N*M)/2
+    #    if (value >= (int((N * M) / 2))):
+     #       countMajority += 1
+
+    return maxi
+
+
+
+# Driver Code
+if __name__ == '__main__':
+    greaterthanany=7
+    mat = [[0, 0, 6],
+           [0, 0, 2],
+           [1, 6, 6]]
+    #print(majorityInMatrix(mat,greaterthanany))
+
+
+def GTpixels(matrix,number):
+    imax = 0
+    jmax = 0
+    imin = len(matrix)
+    jmin = len(matrix[0])
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == number:
+                if i > imax: imax = i
+                if i < imin: imin = i
+                if j> jmax: jmax = j
+                if j < jmin: jmin = j
+    #matrix=pd.matrix.transpose
+    #matrix = pd.DataFrame(data=matrix)
+    #print(matrix)
+    #for i in range(len(matrix)):
+        #if number in matrix[i]:
+            #if i > jmax: jmax = i
+           # if i < jmin: imin = i
+
+
+        #if matrix[][j] != number:
+            #matrix[][j] = 0
+        #if matrix[][j] == number:
+            #if j > jmax: jmax = j
+            #if j < jmin: imin = j
+
+
+    jmax=jmax+1
+    imax=imax+1
+    print(imin,imax,jmin,jmax)
+    newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
+    #print(newmatrix)
+    for i in range(imin,imax):
+        for j in range(jmin,jmax):
+            newmatrix[i-imin][j-jmin]=matrix[i][j]
+
+    return newmatrix
+
+
+
+csv = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
+#print(csv)
+matrix=csv
+
+#matrix = np.read_csv (r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv')   #read the csv file (put 'r' before the path string to address any special characters in the path, such as '\'). Don't forget to put the file name at the end of the path + ".csv"
+number=459
+#print(matrix)
+print(len(matrix[0]))
+print(GTpixels(matrix,number))

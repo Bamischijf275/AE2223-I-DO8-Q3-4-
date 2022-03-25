@@ -28,12 +28,12 @@ path_R_input = "../Data"
 path_R_output = "../Data Processed/Watershed"
 
 # Display
-Show_In = True
+Show_In = False
 Show_Otsu = False
 Show_PyrFilt = False
 Show_Boundary = False
 Show_ShapeCenter = False
-Show_FiberCircle = True
+Show_FiberCircle = False
 Col_ShapeCenter = (255, 0, 0)
 Col_Boundary = (0, 255, 0)
 Col_FiberCircle = (0, 0, 255)
@@ -46,7 +46,7 @@ path_script = os.path.dirname(__file__)
 path = os.path.join(path_script, path_R_input,(input_file[0]+input_file[1]))
 #print (path)
 img = cv.imread(path)
-if Show_In: cv.imshow('INPUT', img)
+if Show_In: cv.imshow('input', img)
 height, width, _ = img.shape
 
 # Smoothing / de-noising
@@ -81,6 +81,7 @@ labels = watershed(-D, markers, mask=imgTSH)
 S = set([]) #shapes stats (radius)
 F = set([]) #same but filtered
 Fibers = []
+img_out = np.zeros((height,width,3), np.uint8)
 for label in np.unique(labels):
     # eliminate background
     if label == 0:
@@ -104,13 +105,10 @@ for label in np.unique(labels):
     S.add(r)
     if R_min < r < R_max:
         if Show_FiberCircle:
-            cv.circle(img, (int(x), int(y)), int(r), 
-                      (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2))
-                      ,-1)
-            # cv.putText(img, "#{}".format(label), (int(x) - 10, int(y)),
-                # cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-            F.add(r)
-            Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
+            cv.circle(img, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2)),-1)
+        cv.circle(img_out, (int(x), int(y)), int(r), (int((x/width)*255),int((y/height)*255),int(500*(r-F_mean)**2)),-1)
+        F.add(r)
+        Fibers.append([len(Fibers),round(x), round(y), round(r, 1)])
         
 # OUTPUT:
 #array_out = np.zeros((height,width), np.uint16)
@@ -122,13 +120,12 @@ if Print_Output:
     print('IMAGE TO FILE')
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_output)
-    path = os.path.join(path_script, path_R_output)
     os.chdir(path)
     print(os.listdir(path))
     print(path)
     filename = (output_file[0]+output_file[1])
     print(filename)
-    cv.imwrite(filename, img)
+    cv.imwrite(filename, img_out)
     print('Successfully saved')
     
 # STATISCTICS:

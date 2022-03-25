@@ -18,8 +18,9 @@ warnings.filterwarnings('ignore')
 import time
 
 
-# complete, comprehensive version (3000-5000ms)
-def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10):
+# complete, comprehensive version (3000-10,000ms)
+def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
+                     #F_mean   Dist FibR Ecc.         IT, 1  2         Substeps
     T0 = time.time()
 
     # FUNCTIONS 
@@ -99,13 +100,13 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
     Print_Output = False
 
     print('INITIAL PARAMETERS')
-    print("[INIT] mean fiber radius     :", format(round(F_mean, 3)))
-    print("[INIT] distance T. factor     :", format(round(D_RE * 100)), "%")
-    print("[INIT] radius error factor    :", format(round(F_RE, 3)))
+    print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
+    print("[INFO] distance T. factor    :", format(round(D_RE * 100)), "%")
+    print("[INFO] radius error factor   :", format(round(F_RE, 3)))
     if FitEllipse:
-        print("[INIT] fiber ecc. error      :", format(round(E_RE, 3)))
-    print("[INIT] PMS filter            :", PyrFiltIT, PyrFilt1, PyrFilt2)
-    print("[INIT] Noise Kernel Radius   :", format(ke))
+        print("[INFO] fiber ecc. error      :", format(round(E_RE, 3)))
+    print("[INFO] PMS filter            :", PyrFiltIT, PyrFilt1, PyrFilt2)
+    print("[INFO] Noise Kernel Radius   :", format(ke))
 
     print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
 
@@ -117,6 +118,7 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_input, (input_file[0] + input_file[1]))
     img = cv.imread(path)
+    print(path)
     if Show_In:
         cv.imshow('Input', img)
         cv.waitKey(1)
@@ -125,17 +127,20 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
     # Smoothing / de-noising
     print("Pyramid Mean Shift Filter ...")  # replace 1 by PytFilt1 <> progress bar
     p = PyrFiltIT
-    D_SSp = SSp = math.floor(p / S_SSp)
+    
+    SSp_0 = time.time()
     imgPMSF = img
     while p > 0:
         p -= 1
         PROGRESS(PyrFiltIT - p, PyrFiltIT, prefix='', suffix='', length=30)
         imgPMSF = cv.pyrMeanShiftFiltering(imgPMSF, PyrFilt1, PyrFilt2)
-        SSp -= 1
-        if Show_PyrFilt and SSp <= 0:
+        
+        SSp_1  =time.time()
+        D_SSp = (SSp_1 - SSp_0)*1000
+        if Show_PyrFilt and (D_SSp >= SSp):
+            SSp_0 = SSp_1
             cv.imshow('imagePMSF', imgPMSF)
             cv.waitKey(1)
-            SSp = D_SSp
 
     # Otsu
     print("Otsu binarization ...")
@@ -181,7 +186,8 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
         print("  Shape == Circle")
     Progress = len(np.unique(labels))
     progress = 1
-    D_SSp = SSp = math.floor(Progress / S_SSp)
+    SSp_0  = time.time()
+    
     for label in np.unique(labels):
         progress += 1
         PROGRESS(progress, Progress, prefix='', suffix='', length=30)
@@ -244,12 +250,14 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
         if Show_Center:
             cv.circle(img_S, (int(x), int(y)), 1, Col_ShapeCenter, -1)
 
-        SSp -= 1
-        if SSp <= 0:
-            SSp = D_SSp
-            if Show_Boundary: cv.imshow("Boundaries", img_B)
-            if Show_Shapes: cv.imshow("Shapes", img_S)
-            cv.waitKey(1)
+        if (Show_Boundary or Show_Shapes):
+            SSp_1 = time.time()
+            D_SSp = (SSp_1 - SSp_0)*1000
+            if (D_SSp > SSp or progress>=Progress):
+                SSp_0 = SSp_1
+                if Show_Boundary: cv.imshow("Boundaries", img_B)
+                if Show_Shapes: cv.imshow("Shapes", img_S)
+                cv.waitKey(1)
 
     print("> " + str(round((T3 - T2) * 1000)) + "[ms] <")
 
@@ -275,7 +283,7 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
     print("sizing > test > drawing and appending")
     Progress = len(Shapes)
     progress = 1
-    D_SSp = SSp = math.floor(Progress / S_SSp)
+    SSp_0 = time.time()
     for shape in Shapes:
         PROGRESS(progress, Progress, prefix='', suffix='', length=30)
         progress += 1
@@ -308,9 +316,10 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
                 # fiber ID and appending
                 Fibers.append([len(F), round(x), round(y), round(c, 3), round(e, 3)])
 
-        SSp -= 1
-        if SSp <= 0:
-            SSp = D_SSp
+        SSp_1 = time.time()
+        D_SSp = (SSp_1 - SSp_0)*1000
+        if (D_SSp > SSp or progress>=Progress):
+            SSp_0 = SSp_1
             if Show_Fibers: cv.imshow("Fibers", img_F)
             if Show_Output: cv.imshow("OUTPUT", img_out)
             cv.waitKey(1)
@@ -387,12 +396,32 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3, S_SSp=10)
     print("\n\n -----")
     print("> " + str(round((T5 - T0) * 1000)) + "[ms] <")
 
-    return arr_out
+    return arr_out,T_0
 
+print("----- START PROGRAM ----- \n")
+T_00 = time.time()
+Dir = "Tape_B/Images/"
+Type=".jpg"
+Name = "Tape_B"
+N=n=2
+M=m=20
+I = 0
+while m > 1:
+    print("\n\n\n ----- STARTFILE -----")
+    I+=1
+    print("Number :" + str(I))
+    name = Name+"_"+str(n)+"_"+str(m)
+    print(str(name))
+    path = Dir+name+Type
+    print(str(path))
+    m -= 1
+    input_file = [Dir+name, ".jpg"]
+    OUTPUT,T_0 = WATERSHED(input_file)  # (Name, Filetype)
+    T_6 = time.time()
+    print("> " + str(round((T_6 - T_0)*1000)) + "[s] <")
+    print("----- ENDFILE -----\n\n\n")
+T_11 = time.time()
+print("----- END PROGRAM ----- \n")
+print("> " + str(round((T_11 - T_00),1)) + "[s] <")
 
-input_file = ["TapeB", ".tif"]
-OUTPUT = WATERSHED(input_file)  # (Name, Filetype)
-# print matrix
-# np.set_printoptions(threshold=np.inf)
-# print(OUTPUT)
 cv.waitKey(0)

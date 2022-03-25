@@ -19,7 +19,7 @@ import time
 
 
 # V4=barebones, fast version (900-1200ms)
-def WATERSHED(FileIN):
+def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
     T0 = time.time()
 
     # FUNCTIONS 
@@ -39,19 +39,16 @@ def WATERSHED(FileIN):
     path_R_output = "../Data Processed/Watershed"
 
     # Watershed
-    F_mean = 5
-    D_RE = 2 / 3
-    F_RE = 2.5
-    E_RE = 0.85
+    F_mean = R
+    D_RE, F_RE, E_RE = RE
     R_min = F_mean * (1 - D_RE)
     MinDist = math.floor(R_min)
-    # 5,4,5
-    PyrFiltIT = 4  # iterations
-    PyrFilt1 = 3  # spatial radius
-    PyrFilt2 = 4  # color radius
+
+    # PMSF - iterations,spatial radius,color radius
+    PyrFiltIT, PyrFilt1, PyrFilt2 = PMSF
 
     # Extra Processing
-    ke = 3  # kernel
+    if ke < 0: ke = 0  # kernel (0==none)
     FitEllipse = True
 
     # Display
@@ -205,10 +202,28 @@ def WATERSHED(FileIN):
 
     return arr_out, T0
 
-
-input_file = ["TapeB", ".tif"]
-OUTPUT, T0 = WATERSHED(input_file)  # (Name, Filetype)
-np.set_printoptions(threshold=np.inf)
-# print(OUTPUT)
-T5 = time.time()
-print("> " + str(round((T5 - T0) * 1000)) + "[ms] <")
+print("----- START PROGRAM ----- \n")
+T_00 = time.time()
+Dir = "Tape_B/Images/"
+Type=".jpg"
+Name = "Tape_B"
+N=n=2
+M=m=20
+I = 0
+while m > 1:
+    print("\n\n\n ----- STARTFILE -----")
+    I+=1
+    print("Number :" + str(I))
+    name = Name+"_"+str(n)+"_"+str(m)
+    print(str(name))
+    path = Dir+name+Type
+    print(str(path))
+    m -= 1
+    input_file = [Dir+name, ".jpg"]
+    OUTPUT,T_0 = WATERSHED(input_file)  # (Name, Filetype)
+    T_6 = time.time()
+    print("> " + str(round((T_6 - T_0)*1000)) + "[s] <")
+    print("----- ENDFILE -----\n\n\n")
+T_11 = time.time()
+print("----- END PROGRAM ----- \n")
+print("> " + str(round((T_11 - T_00),1)) + "[s] <")

@@ -12,7 +12,6 @@ N = 3  # Rows 155
 
 M = 3 # Columns 120
 
-
 # Function to find count of all
 # majority elements in a Matrix
 def majorityInMatrix(arr,greaterthanany):
@@ -87,13 +86,8 @@ def CountPixels(matrix,number):
                 pixelnumber=pixelnumber+1
     return pixelnumber
 
-
-
-
-
-
-matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
-matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Watershed.csv', delimiter=',')
+matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
+matrix2= np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\TapeA.csv', delimiter=',')
 matrix2 = np.delete(matrix2, (0), axis=0)
 matrix2 = np.delete(matrix2,(0), axis=1)
 #print(csv)

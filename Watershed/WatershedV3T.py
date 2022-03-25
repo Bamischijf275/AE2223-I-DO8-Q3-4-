@@ -36,12 +36,13 @@ FitEllipse = True
 
 # Display
 Show_In = True
-Show_Otsu = True
 Show_PyrFilt = True
+Show_Otsu = True
+Show_Boundary = True
 Show_Shapes = True
 Show_Fibers = True
+Show_Output = True
 
-Show_Boundary = True
 Show_Fitted = True
 Show_Center = True
 Col_ShapeCenter = (255, 255, 255)
@@ -255,5 +256,5 @@ if FitEllipse:
 
 if Show_Shapes: cv.imshow("Shapes", img_S)
 if Show_Fibers: cv.imshow("Fibers", img_F)
-cv.imshow("OUTPUT", img_out)
-#cv.waitKey(0)
+if Show_Output: cv.imshow("OUTPUT", img_out)
+cv.waitKey(0)

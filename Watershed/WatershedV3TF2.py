@@ -36,11 +36,13 @@ def WATERSHED (PathIN):
     
     # Display
     Show_In = False
-    Show_Otsu = False
     Show_PyrFilt = False
+    Show_Otsu = False
+    Show_Boundary = False
     Show_Shapes = False
     Show_Fibers = False
-    Show_Boundary = False
+    Show_Output = False
+    
     Show_Fitted = True
     Show_Center = True
     
@@ -264,10 +266,10 @@ def WATERSHED (PathIN):
     
     if Show_Shapes: cv.imshow("Shapes", img_S)
     if Show_Fibers: cv.imshow("Fibers", img_F)
-    cv.imshow("OUTPUT", img_out)
-    #cv.waitKey(0)
+    if Show_Output: cv.imshow("OUTPUT", img_out)
+    cv.waitKey(1)
 
-input_file = ["TapeA", ".jpg"]
+input_file = ["TapeB", ".tif"]
 OUTPUT = WATERSHED(input_file) #(Name, Filetype, PathIN, pathOUT)
 np.set_printoptions(threshold=np.inf)
 #print(OUTPUT)

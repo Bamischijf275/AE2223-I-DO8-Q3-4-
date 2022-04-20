@@ -11,6 +11,7 @@ from skimage.segmentation import watershed
 import sys
 
 
+
 # CONSTANTS
 #parameters
 input_file = "TapeB.png"

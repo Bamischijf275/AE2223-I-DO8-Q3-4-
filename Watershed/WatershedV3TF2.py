@@ -391,10 +391,10 @@ print("----- START PROGRAM ----- \n")
 T00 = time.time()
 Dir = "Tape_B/Images/"
 Name = "Tape_B"
-Type=".tif"
-N=1
-M=20
-m = n = 1
+Type=".jpg.tif"
+N=n=9
+M=11
+m = 1
 while m < M:
     print("\n\n\n ----- STARTFILE -----")
     print("Number :" + str(m))
@@ -412,4 +412,4 @@ T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
 
-cv.waitKey(0)
+cv.waitKey(1)

@@ -50,8 +50,8 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
     PRINT("INIT :")
     T1 = time.time()
     # System:
-    input_file = FileIN  # name, filetype
-    output_file = [input_file[0], ".png", ".csv"]
+    input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
+    output_file = [FileIN[1], ".png", ".csv"]
     path_R_input = "../Data"
     path_R_output = "../Data Processed/Watershed"
 
@@ -84,8 +84,8 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
     Col_Boundary = (0, 255, 0)
     Col_Background = (100, 100, 100)
 
-    Print_Matrix = False
-    Print_Output = False
+    Print_Matrix = True
+    Print_Output = True
 
     print('INITIAL PARAMETERS')
     print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
@@ -351,13 +351,14 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
-        path = path + "\ " + input_file[0] + output_file[2]
+        path = path + "\ " + output_file[0] +  output_file[2]
         print(path)
         # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
         pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
         print('Successfully saved')
 
     # print stats
+    print('\n')
     print('WATERSHED')
     print("[INFO] unique contours found :", format(CX))
     print("[INFO] unique shapes found   :", format(max(len(R), len(A))))
@@ -389,11 +390,11 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 Dir = "Tape_B/Images/"
-Type=".jpg"
 Name = "Tape_B"
-N=n=2
+Type=".tif"
+N=1
 M=20
-m = 19
+m = n = 1
 while m < M:
     print("\n\n\n ----- STARTFILE -----")
     print("Number :" + str(m))
@@ -401,7 +402,7 @@ while m < M:
     print(str(name))
     path = Dir+name+Type
     print(str(path))
-    input_file = [Dir+name, ".jpg"]
+    input_file = [Dir, name, Type]
     OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
     m+=1
     T6 = time.time()

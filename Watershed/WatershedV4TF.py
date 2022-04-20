@@ -57,7 +57,7 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
 
     Col_Background = (100, 100, 100)
 
-    Print_Matrix = False
+    Print_Matrix = True
     Print_Output = False
 
     # IMAGE PROCESSING
@@ -205,10 +205,10 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 Dir = "Tape_B/Images/"
-Type=".jpg"
+Type=".jpg.tif"
 Name = "Tape_B"
-N=n=2
-M=20
+N=n=1
+M=10
 m = 1
 while m < M:
     print("\n\n\n ----- STARTFILE -----")

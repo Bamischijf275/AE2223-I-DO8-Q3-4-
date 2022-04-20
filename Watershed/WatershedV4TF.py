@@ -57,7 +57,7 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
 
     Col_Background = (100, 100, 100)
 
-    Print_Matrix = False
+    Print_Matrix = True
     Print_Output = False
 
     # IMAGE PROCESSING
@@ -203,27 +203,28 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
     return arr_out, T0
 
 print("----- START PROGRAM ----- \n")
-T_00 = time.time()
+T00 = time.time()
 Dir = "Tape_B/Images/"
-Type=".jpg"
+Type=".jpg.tif"
 Name = "Tape_B"
-N=n=2
-M=m=20
-I = 0
-while m > 1:
+N=n=1
+M=10
+m = 1
+while m < M:
     print("\n\n\n ----- STARTFILE -----")
-    I+=1
-    print("Number :" + str(I))
+    print("Number :" + str(m))
     name = Name+"_"+str(n)+"_"+str(m)
     print(str(name))
     path = Dir+name+Type
     print(str(path))
-    m -= 1
     input_file = [Dir+name, ".jpg"]
-    OUTPUT,T_0 = WATERSHED(input_file)  # (Name, Filetype)
-    T_6 = time.time()
-    print("> " + str(round((T_6 - T_0)*1000)) + "[s] <")
-    print("----- ENDFILE -----\n\n\n")
-T_11 = time.time()
+    OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
+    m+=1
+    T6 = time.time()
+    print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
+    print("------ ENDFILE ------")
+T11 = time.time()
 print("----- END PROGRAM ----- \n")
-print("> " + str(round((T_11 - T_00),1)) + "[s] <")
+print("> " + str(round((T11 - T00),1)) + "[s] <")
+
+cv.waitKey(0)

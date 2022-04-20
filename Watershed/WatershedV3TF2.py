@@ -17,9 +17,8 @@ from skimage.segmentation import watershed
 warnings.filterwarnings('ignore')
 import time
 
-
 # complete, comprehensive version (3000-10,000ms)
-def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
+def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
                      #F_mean   Dist FibR Ecc.         IT, 1  2         Substeps
     T0 = time.time()
 
@@ -38,18 +37,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
         print(text)
 
     def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
-        """
-        Call in a loop to create terminal progress bar
-        @params:
-            iteration   - Required  : current iteration (Int)
-            total       - Required  : total iterations (Int)
-            prefix      - Optional  : prefix string (Str)
-            suffix      - Optional  : suffix string (Str)
-            decimals    - Optional  : positive number of decimals in percent complete (Int)
-            length      - Optional  : character length of bar (Int)
-            fill        - Optional  : bar fill character (Str)
-            printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-        """
+        # Print Progress bar
         percent = ("{0:." + str(decimals) + "f}").format(100 * ((iteration) / float(total)))
         filledLength = int(length * iteration // total)
         bar = fill * filledLength + '-' * (length - filledLength)
@@ -62,8 +50,8 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
     PRINT("INIT :")
     T1 = time.time()
     # System:
-    input_file = FileIN  # name, filetype
-    output_file = [input_file[0], ".png", ".csv"]
+    input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
+    output_file = [FileIN[1], ".png", ".csv"]
     path_R_input = "../Data"
     path_R_output = "../Data Processed/Watershed"
 
@@ -96,8 +84,8 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
     Col_Boundary = (0, 255, 0)
     Col_Background = (100, 100, 100)
 
-    Print_Matrix = False
-    Print_Output = False
+    Print_Matrix = True
+    Print_Output = True
 
     print('INITIAL PARAMETERS')
     print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
@@ -125,7 +113,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
     height, width, _ = img.shape
 
     # Smoothing / de-noising
-    print("Pyramid Mean Shift Filter ...")  # replace 1 by PytFilt1 <> progress bar
+    print("Pyramid Mean Shift Filter ...")
     p = PyrFiltIT
     
     SSp_0 = time.time()
@@ -137,7 +125,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
         
         SSp_1  =time.time()
         D_SSp = (SSp_1 - SSp_0)*1000
-        if Show_PyrFilt and (D_SSp >= SSp):
+        if Show_PyrFilt and (D_SSp >= SSp or p==1):
             SSp_0 = SSp_1
             cv.imshow('imagePMSF', imgPMSF)
             cv.waitKey(1)
@@ -185,7 +173,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
     else:
         print("  Shape == Circle")
     Progress = len(np.unique(labels))
-    progress = 1
+    progress = 0
     SSp_0  = time.time()
     
     for label in np.unique(labels):
@@ -260,7 +248,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
                 cv.waitKey(1)
 
     print("> " + str(round((T3 - T2) * 1000)) + "[ms] <")
-
+    
     PRINT("FIBER IDENTIFICATION :")
     T4 = time.time()
     # Discriminator
@@ -363,13 +351,14 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
-        path = path + "\ " + input_file[0] + output_file[2]
+        path = path + "\ " + output_file[0] +  output_file[2]
         print(path)
         # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
         pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
         print('Successfully saved')
 
     # print stats
+    print('\n')
     print('WATERSHED')
     print("[INFO] unique contours found :", format(CX))
     print("[INFO] unique shapes found   :", format(max(len(R), len(A))))
@@ -396,32 +385,31 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[5, 5, 6], ke=3, SSp=200):
     print("\n\n -----")
     print("> " + str(round((T5 - T0) * 1000)) + "[ms] <")
 
-    return arr_out,T_0
+    return arr_out,T0
 
 print("----- START PROGRAM ----- \n")
-T_00 = time.time()
+T00 = time.time()
 Dir = "Tape_B/Images/"
-Type=".jpg"
 Name = "Tape_B"
-N=n=2
-M=m=20
-I = 0
-while m > 1:
+Type=".jpg.tif"
+N=n=9
+M=11
+m = 1
+while m < M:
     print("\n\n\n ----- STARTFILE -----")
-    I+=1
-    print("Number :" + str(I))
+    print("Number :" + str(m))
     name = Name+"_"+str(n)+"_"+str(m)
     print(str(name))
     path = Dir+name+Type
     print(str(path))
-    m -= 1
-    input_file = [Dir+name, ".jpg"]
-    OUTPUT,T_0 = WATERSHED(input_file)  # (Name, Filetype)
-    T_6 = time.time()
-    print("> " + str(round((T_6 - T_0)*1000)) + "[s] <")
-    print("----- ENDFILE -----\n\n\n")
-T_11 = time.time()
+    input_file = [Dir, name, Type]
+    OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
+    m+=1
+    T6 = time.time()
+    print("> " + str(round((T6 - T0)*1000)) + "[s] <")
+    print("------ ENDFILE ------")
+T11 = time.time()
 print("----- END PROGRAM ----- \n")
-print("> " + str(round((T_11 - T_00),1)) + "[s] <")
+print("> " + str(round((T11 - T00),1)) + "[s] <")
 
-cv.waitKey(0)
+cv.waitKey(1)

@@ -88,7 +88,7 @@ def GTpixels(matrix,matrix2,number): #Finds the corresponding id number in the o
             #if matrix[i][j] ==number:
                 newmatrix2[i-imin][j-jmin]=matrix2[i][j]
     #if number == 15:
-    print(newmatrix,"\n", newmatrix2)
+    #print(newmatrix,"\n", newmatrix2)
     #print("cut out pixels of a specific fiber of GT:\n",newmatrix)
     return newmatrix2
 
@@ -141,17 +141,17 @@ def ComparatorOf2(matrix,matrix2): ###compares 2 matrices, returnes the number o
     exist2 = existingFiberIds(matrix2, numero)
     numberoffibers2=len(exist)
     numberoffibers22 = len(exist2)
-    for number in {76}:#exist
+    for number in exist:#exist
 
         gtpixel=GTpixels(matrix,matrix2,number)
         a=majorityInMatrix(gtpixel, numero)
         #print(number, a)
         if a!=0:
-            pixelb=CountPixels(matrix2,a)
-            pixela=CountPixels(gtpixel,a)
-
+            pixelb=CountPixels(matrix2,a) ##########number of pixels of ID2 in the compared matrix
+            pixela=CountPixels(gtpixel,a) ##########number of pixels of ID2 in the original fiber
+            #pixelc=CountPixels(matrix, number) ##########number of pixels of ID1 in the original fiber
             ratio=pixela/pixelb
-            print(pixela, pixelb, ratio, number)
+            #print(pixela, pixelb, ratio, number)
             if ratio>0.80:
                 identified=identified+1
             #print(number, "identified")

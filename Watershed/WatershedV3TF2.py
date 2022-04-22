@@ -392,24 +392,27 @@ T00 = time.time()
 Dir = "Tape_B/Images/"
 Name = "Tape_B"
 Type=".jpg.tif"
-N=n=9
-M=11
-m = 1
-while m < M:
-    print("\n\n\n ----- STARTFILE -----")
-    print("Number :" + str(m))
-    name = Name+"_"+str(n)+"_"+str(m)
-    print(str(name))
-    path = Dir+name+Type
-    print(str(path))
-    input_file = [Dir, name, Type]
-    OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
-    m+=1
-    T6 = time.time()
-    print("> " + str(round((T6 - T0)*1000)) + "[s] <")
-    print("------ ENDFILE ------")
+M=10
+N=[1,2,3,4,6,8,9,10]
+n=0
+m0 = 1
+while n+1 < len(N):
+    m=m0
+    while m <= M:
+        print("\n\n ----- STARTFILE -----")
+        print("Number :" + str(N[n]) + "_" + str(m))
+        name = Name+"_"+str(N[n])+"_"+str(m)
+        path = Dir+name+Type
+        print(str(path))
+        input_file = [Dir, name, Type]
+        OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
+        T6 = time.time()
+        print("> " + str(round((T6 - T0)*1000)) + "[s] <")
+        print("------ ENDFILE ------")
+        m+=1
+    n+=1
 T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
 
-cv.waitKey(1)
+cv.waitKey(0)

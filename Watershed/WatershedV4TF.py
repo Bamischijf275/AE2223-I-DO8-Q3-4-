@@ -33,8 +33,8 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
 
     # PARAMETERS:
     # System:
-    input_file = FileIN  # name, filetype
-    output_file = [input_file[0], ".png", ".csv"]
+    input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
+    output_file = [FileIN[1], ".png", ".csv"]
     path_R_input = "../Data"
     path_R_output = "../Data Processed/Watershed"
 
@@ -205,24 +205,27 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 Dir = "Tape_B/Images/"
-Type=".jpg.tif"
 Name = "Tape_B"
-N=n=1
+Type=".jpg.tif"
 M=10
+N=[1,2,3,4,6,8,9,10]
+n=0
 m = 1
-while m < M:
-    print("\n\n\n ----- STARTFILE -----")
-    print("Number :" + str(m))
-    name = Name+"_"+str(n)+"_"+str(m)
-    print(str(name))
-    path = Dir+name+Type
-    print(str(path))
-    input_file = [Dir+name, ".jpg"]
-    OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
-    m+=1
-    T6 = time.time()
-    print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
-    print("------ ENDFILE ------")
+while n+1 < len(N):
+    while m <= M:
+        print("\n\n ----- STARTFILE -----")
+        print("Number :" + str(N[n]) + "_" + str(m))
+        name = Name+"_"+str(N[n])+"_"+str(m)
+        print(str(name))
+        path = Dir+name+Type
+        print(str(path))
+        input_file = [Dir, name, Type]
+        OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
+        T6 = time.time()
+        print("> " + str(round((T6 - T0)*1000)) + "[s] <")
+        print("------ ENDFILE ------")
+        m+=1
+    n+=1
 T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")

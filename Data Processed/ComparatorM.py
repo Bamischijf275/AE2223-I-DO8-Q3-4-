@@ -7,13 +7,12 @@ import numpy as np
 #import imutils
 import cv2
 import pandas as pd
-
-N = 3  # Rows 155
-
-M = 3 # Columns 120
+import time
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are actually existing, returns array of the ids
-    mp = {k: 0 for k in range(int(greaterthanany)+1)}
+    mp = {k: 0 for k in range(int(greaterthanany)+10)}
     #print(mp)
     # Store frequency of elements
     # in matrix
@@ -23,7 +22,8 @@ def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are act
     for i in range(len(arr)):
         for j in range(len(arr[0])):
             if arr[i][j]!=0:
-                mp[int(arr[i][j])] += 1
+                #print(arr[i][j], i,j)
+                mp[arr[i][j]] += 1
 
     for i in range(int(greaterthanany)+1):
         if mp[i]!=0:
@@ -36,18 +36,22 @@ def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are act
 def majorityInMatrix(arr,greaterthanany):  ###### Returns the number that happens the most times in a matrix
     # we take length equal to max
     # value in array
-
+    greaterthanany=findlargestIDnumber(arr)
     mp = {k: 0 for k in range(int(greaterthanany)+1)}
     #print(mp)
     # Store frequency of elements
     # in matrix
+    #print(arr, "arr")
+    #print(mp)
     maxi=0
     #print(greaterthanany,"bruh")
     for i in range(len(arr)):
         for j in range(len(arr[0])):
             if arr[i][j]!=0:
+                #print(arr[i][j])
+                #print(mp[arr[i][j]])
                 mp[int(arr[i][j])] += 1
-                #print(mp)
+
                 if mp[int(arr[i][j])]>maxi:
                     maxi=arr[i][j]
 
@@ -83,6 +87,8 @@ def GTpixels(matrix,matrix2,number): #Finds the corresponding id number in the o
                 newmatrix[i-imin][j-jmin]=matrix[i][j]
             #if matrix[i][j] ==number:
                 newmatrix2[i-imin][j-jmin]=matrix2[i][j]
+    #if number == 15:
+    #print(newmatrix,"\n", newmatrix2)
     #print("cut out pixels of a specific fiber of GT:\n",newmatrix)
     return newmatrix2
 
@@ -109,41 +115,62 @@ def findlowestIDnumber(matrix): ### lowest id number in the matrix
     return numero
 
 
-matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=",")
-matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\labels.csv', delimiter=',')
+matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\Tape_B\CSV_Masks\Tape_B_1_1.jpg.tif.csv', delimiter=",")
+matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\ Tape_B_1_1.csv', delimiter=',')
 ###### Delete only if watershed
-#matrix2 = np.delete(matrix2, (0), axis=0)
-#matrix2 = np.delete(matrix2,(0), axis=1)
+matrix2 = np.delete(matrix2, (0), axis=0)
+matrix2 = np.delete(matrix2,(0), axis=1)
 #matrix = np.delete(matrix, (0), axis=0)
 #matrix = np.delete(matrix,(0), axis=1)
+
+#matrix2 = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\Tape_B\CSV_Masks\Tape_B_1_1.jpg.tif.csv', delimiter=",")
+matrix2 = np.pad(matrix2, ((0, 2), (0, 2)))
+matrix = matrix.astype(int)
+
+#matrix2= matrix.astype(int)
 
 def ComparatorOf2(matrix,matrix2): ###compares 2 matrices, returnes the number of identified and misidentified fibers
     numero=findlargestIDnumber(matrix)
     identified=0
     misidentified=0
     mini=findlowestIDnumber(matrix)
-    number=mini
+    number=int(mini)
     print(numero)
     numero=numero+1
-    thereisanumber=0
     exist=existingFiberIds(matrix,numero)
-    for number in exist:
+    exist2 = existingFiberIds(matrix2, numero)
+    numberoffibers2=len(exist)
+    numberoffibers22 = len(exist2)
+    for number in exist:#exist
+
         gtpixel=GTpixels(matrix,matrix2,number)
-        a=majorityInMatrix(GTpixels(matrix,matrix2,number), numero)
-        pixelb=CountPixels(matrix2,a)
-        pixela=CountPixels(gtpixel,a)
-        ratio=pixela/pixelb
-        if ratio>0.8:
-            identified=identified+1
-        else:
-            misidentified=misidentified+1
+        a=majorityInMatrix(gtpixel, numero)
+        #print(number, a)
+        if a!=0:
+            pixelb=CountPixels(matrix2,a) ##########number of pixels of ID2 in the compared matrix
+            pixela=CountPixels(gtpixel,a) ##########number of pixels of ID2 in the original fiber
+            #pixelc=CountPixels(matrix, number) ##########number of pixels of ID1 in the original fiber
+            ratio=pixela/pixelb
+            #print(pixela, pixelb, ratio, number)
+            if ratio>0.80:
+                identified=identified+1
+            #print(number, "identified")
+            else:
+                misidentified=misidentified+1
+            #print(number, "misidentified")
+        else: misidentified=misidentified+1
+
     #print(number)
     #number=number+1
     #print("The ratio of pixels\n", pixela/pixelb)
 
-    return identified, misidentified
+    return identified, misidentified, numero, numberoffibers2, numberoffibers22
+
+start = time.time()
 comparatorW=ComparatorOf2(matrix,matrix2)
-print(" For Watershed: identified", comparatorW[0],"misidentified",comparatorW[1])
+print("For Watershed: identified", comparatorW[0],"misidentified",comparatorW[1],"Number of fibers in GT", comparatorW[3],"Number of fibers detected by watershed ",comparatorW[4] )
+end = time.time()
+print(end - start)
 #comparatorS=ComparatorOf2(matrix,matrix3)
 #print(" For Stardist: identified", comparatorS[0],"misidentified",comparatorS[1])
 

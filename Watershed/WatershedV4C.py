@@ -352,7 +352,7 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
-        path = path + "\ " + output_file[0] +  output_file[2]
+        path = path + "\" + output_file[0] +  output_file[2]
         print(path)
         # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
         pd.DataFrame(arr_out).to_csv((path), header="none", index="none")

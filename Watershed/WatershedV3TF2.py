@@ -343,15 +343,18 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
 
     if Print_Matrix:  # ID'ed Fibers only matrix
         # delete first col & row
-        arr_out = np.delete(arr_out, 0, 0)
-        arr_out = np.delete(arr_out, 0, 1)
+        arr_out = np.delete(arr_out, (0), axis=0)
+        arr_out = np.delete(arr_out, (0), axis=1)
+        arr_out = np.delete(arr_out, (1), axis=0)
+        arr_out = np.delete(arr_out, (1), axis=1)
+        #arr_out = np.pad(arr_out, ((0, 2), (0, 2)))
         # save to .csv
         print("\n")
         print('matrix to file :')
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
-        path = path + "\ " + output_file[0] +  output_file[2]
+        path = path + "/" + output_file[0] +  output_file[2]
         print(path)
         # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
         pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
@@ -392,7 +395,7 @@ T00 = time.time()
 Dir = "Tape_B/Images/"
 Name = "Tape_B"
 Type=".jpg.tif"
-M=10
+M=1
 N=[1,2,3,4,6,8,9,10]
 n=0
 m0 = 1

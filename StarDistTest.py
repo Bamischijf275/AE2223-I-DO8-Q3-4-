@@ -30,4 +30,3 @@ plt.imshow(labels, cmap=lbl_cmap, alpha=0.5)
 plt.axis('off')
 
 plt.show()
-

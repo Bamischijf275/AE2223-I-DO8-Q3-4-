@@ -48,14 +48,19 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
             print('\n')
 
     # PARAMETERS:
-    if RUN[0] == "full":
+    P_runtime = RUN[0]  #fast , full
+    P_shape= RUN[1]     #boundary, circle, ellipse
+    P_out = RUN[2]      #save
+    P_folder= RUN[3]    #Watershed, Test
+    
+    if P_runtime == "full":
         PRINT("INIT :")
         T1 = time.time()
     # System:
     input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
     output_file = [FileIN[1], ".png", ".csv"]
     path_R_input = "../Data"
-    path_R_output = "../Data Processed/Watershed"
+    path_R_output = "../Data Processed/"+P_folder
 
     # Watershed
     F_mean = R
@@ -68,10 +73,10 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
 
     # Extra Processing
     if ke < 0: ke = 0  # kernel (0==none)
-    FitShape = RUN[1] #ellipse circle boundary
+    FitShape = P_shape #ellipse circle boundary
 
     # Display
-    if RUN[0] == "full":
+    if P_runtime == "full":
         Show_In = True
         Show_PyrFilt = True
         Show_Otsu = True
@@ -83,7 +88,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         Show_Fitted = True
         Show_Center = True
 
-    elif RUN[0] == "fast":
+    elif P_runtime == "fast":
         Show_In = False
         Show_PyrFilt = False
         Show_Otsu = False
@@ -98,7 +103,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
     Col_Boundary = (0, 255, 0)
     Col_Background = (100, 100, 100)
         
-    if RUN[2] == "save":
+    if P_out == "save":
         Print_Matrix = True
         Print_Output = True
         print('SAVE')
@@ -106,7 +111,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         Print_Matrix = False
         Print_Output = False
         
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print('INITIAL PARAMETERS')
         print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
         print("[INFO] distance T. factor    :", format(round(D_RE * 100)), "%")
@@ -126,7 +131,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_input, (input_file[0] + input_file[1]))
     img = cv.imread(path)
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print(path)
         if Show_In:
             cv.imshow('Input', img)
@@ -134,7 +139,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
     height, width, _ = img.shape
 
     # Smoothing / de-noising
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("Pyramid Mean Shift Filter ...")
     SSp_0 = time.time()
     imgPMSF = img
@@ -142,7 +147,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
     
     while p > 0:
         p -= 1
-        if RUN[0] == "full":
+        if P_runtime == "full":
             PROGRESS(PyrFiltIT - p, PyrFiltIT, prefix='', suffix='', length=30)
         imgPMSF = cv.pyrMeanShiftFiltering(imgPMSF, PyrFilt1, PyrFilt2)
         
@@ -154,13 +159,13 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
             cv.waitKey(1)
 
     # Otsu
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("Otsu binarization ...")
     gray = cv.cvtColor(imgPMSF, cv.COLOR_BGR2GRAY)
     imgTSH = cv.threshold(gray, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
 
     # erode-dilate
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("Noise Reduction...")
     if ke != 0:
         kernel = np.ones((ke, ke), np.uint8)
@@ -169,7 +174,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         cv.imshow("Thresh", imgTSH)
         cv.waitKey(1)
     
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("> " + str(round((T2 - T1) * 1000)) + "[ms] <")
 
     # WATERSHED
@@ -193,7 +198,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
     CX = 0
 
     # identification
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("  mask > label > find contours > shape fitting")
         if FitShape == "ellipse":
             print("  Shape == Ellipse")
@@ -204,7 +209,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         SSp_0  = time.time()
     
     for label in np.unique(labels):
-        if RUN[0] == "full":
+        if P_runtime == "full":
             progress += 1
             PROGRESS(progress, Progress, prefix='', suffix='', length=30)
         # eliminate background
@@ -275,7 +280,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
                 if Show_Shapes: cv.imshow("Shapes", img_S)
                 cv.waitKey(1)
                 
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("> " + str(round((T3 - T2) * 1000)) + "[ms] <")
         
         PRINT("FIBER IDENTIFICATION :")
@@ -297,13 +302,13 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
 
     ID = 1
     
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("sizing > test > drawing and appending")
         Progress = len(Shapes)
         progress = 1
         SSp_0 = time.time()
     for shape in Shapes:
-        if RUN[0] == "full":
+        if P_runtime == "full":
             PROGRESS(progress, Progress, prefix='', suffix='', length=30)
             progress += 1
         # fit enclosing circle
@@ -334,7 +339,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
                     cv.circle(img_F, (int(x), int(y)), 1, Col_ShapeCenter, -1)
                 # fiber ID and appending
                 Fibers.append([len(F), round(x), round(y), round(c, 3), round(e, 3)])
-        if RUN[0] == "full":
+        if P_runtime == "full":
             SSp_1 = time.time()
             D_SSp = (SSp_1 - SSp_0)*1000
             if (D_SSp > SSp or progress>=Progress):
@@ -342,11 +347,11 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
                 if Show_Fibers: cv.imshow("Fibers", img_F)
                 if Show_Output: cv.imshow("OUTPUT", img_out)
                 cv.waitKey(1)
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print("> " + str(round((T4 - T3) * 1000)) + "[ms] <")
 
     # OUTPUT
-    if RUN[0] == "full":
+    if P_runtime == "full":
         PRINT("OUTPUT")
         print("statisctics ...")
         # statistics:
@@ -359,8 +364,8 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
             E_med = stat.median(E)
 
     # save:
-    if (Print_Output or Print_Matrix) and RUN[0] == "full": print("save results ...")
-    if Print_Output and RUN[0]!="fast":  # ID'ed Fibers only image
+    if (Print_Output or Print_Matrix) and P_runtime == "full": print("save results ...")
+    if Print_Output and P_runtime!="fast":  # ID'ed Fibers only image
         # save to .png
         print("\n")
         print('image to file :')
@@ -392,7 +397,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         print('Successfully saved')
 
     # print stats
-    if RUN[0] == "full":
+    if P_runtime == "full":
         print('\n')
         print('WATERSHED')
         print("[INFO] unique contours found :", format(CX))
@@ -425,15 +430,28 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 
-Dir = "Tape_B/Images/"
-Name = "Tape_B"
-Type=".jpg"
-M=10
-N=20
-n=1
-mm=1
+if False: #Cropped images
+    Dir = "Tape_B/Images/"
+    Name = "Tape_B"
+    Type=".jpg"
+    M=10
+    N=2
+    n=1
+    mm=1
+else: #Full Tapes
+    Dir = "Tape_B/"
+    Name = "Tape_B"
+    Type=".jpg"
+    M=20
+    N=2
+    n=2
+    mm=1
 
-RUN=["fast","ellipse","save"] #full, fast - circle,ellipse
+P_runtime = "full"      #fast , full
+P_shape= "circle"      #boundary, circle, ellipse
+P_out = "save"              #save
+P_folder= "Test"   #Watershed, Test
+parameters=[P_runtime, P_shape, P_out, P_folder]
 
 while n <= N:
     m=mm
@@ -444,14 +462,15 @@ while n <= N:
         path = Dir+name+Type
         print(str(path))
         input_file = [Dir, name, Type]
-        OUTPUT,T0 = WATERSHED(input_file,RUN)  # (Name, Filetype)
+        OUTPUT,T0 = WATERSHED(input_file, parameters)  # (Name, Filetype)
         T6 = time.time()
-        print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
+        print("> " + str(round((T6 - T0)*1000)) + "[s] <")
         print("------ ENDFILE ------")
         m+=1
     n+=1
 T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
-if RUN[0]=="full":cv.waitKey(0)
-cv.waitKey(1)
+
+if parameters[0] != "fast":
+    cv.waitKey(0)

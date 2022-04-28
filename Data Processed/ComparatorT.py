@@ -21,13 +21,18 @@ np.set_printoptions(threshold=sys.maxsize)
 import time
 
 def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
-    #setup
+            
+    #SETUP
+    #parameters
     T0 = time.time()
     Col_CM = [(0, 255, 0),(110,110,110),(0,0,255),(255,0,0,0)] #TP-G,TN-,FP-B,FN-R
     Col_Background = (100, 100, 100)
-    Cutoff = PARAMETERS[0]
     
-    Result = [0,0,0,0, 0,0,0,0 ,0,0] #TP,TN,FP,FN (fractions, ID), TrueFib, ResultFib
+    Cutoff = PARAMETERS[0]
+    Show = PARAMETERS[1]
+    ShowTime = PARAMETERS[2]
+    
+    Result = [0,0,0,0, 0,0,0,0 ,0,0] #TP,TN,FP,FN (pixels, fibers), TrueFib, ResultFib
     
     height, width = MatrixT.shape
     img_out = np.zeros((height, width, 3), np.uint8)
@@ -43,18 +48,17 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     MatrixR = np.delete(MatrixR, (0), axis=0)
     MatrixR = np.delete(MatrixR, (0), axis=1)
     SizeR = MatrixR.shape
-    
-    print(SizeT,SizeR)
+
+    print("Matrix Size T,R :", SizeT,SizeR)
     if SizeT != SizeR:
         Matrix = np.zeros(SizeT)
         Matrix[:MatrixR.shape[0],:MatrixR.shape[1]]
         MatrixR = Matrix
-        print(SizeT,SizeR)
     if SizeT != SizeR:
         Matrix = np.zeros(SizeR)
         Matrix[:MatrixT.shape[0],:MatrixT.shape[1]]
         MatrixT = Matrix
-    print(SizeT,SizeR)
+    print("Matrix Size T,R :", SizeT,SizeR)
     
     #identify fibers list
     FibersT = MatrixID(MatrixT)
@@ -64,8 +68,17 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     Result[9] += len(FibersR)
     
     #Loop through every TRUE fiber
-    if PARAMETERS[1]=="DRAW":cv.waitKey(10)
+    if Show =="DRAW":cv.waitKey(1)
+    Ti = time.time()
+    Progress = len(FibersT)
+    progress = 0
+    print("Fiber Comparison Progress:")
+    
     for ID_T in FibersT:
+        
+        progress += 1
+        PROGRESS(progress, Progress, prefix='', suffix='', length=30)
+        
         #rectangle fiber (truth)
         RectT = SubRect(MatrixT, ID_T)
         #find correspodance T to R (ID)
@@ -122,7 +135,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
             Result[5]+=1
         
         #Image
-        if PARAMETERS[1] == "DRAW":
+        if Show == "DRAW":
             for i in range(len(SubMatrixR)):
                 for j in range(len(SubMatrixR[0])):
                     m = MUL_Matrix[i][j]
@@ -133,7 +146,10 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
                     else: Col=False
                     if Col != False:
                         cv.circle(img_out, (int(RectTR[0]+i),int(RectTR[1]+j)),0,Col,-1)
-            cv.imshow("Accuracy",img_out)
+            Tf = time.time()
+            if Tf-Ti >= ShowTime:
+                cv.imshow("Accuracy",img_out)
+                Ti = Tf
         #debug
         if ID_T == 15 and False:
             print(ID_T)
@@ -145,12 +161,12 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
             print(MUL_Matrix)
             print("result:")
             print(TP,TN,FP,FN)
-        if PARAMETERS[1]=="DRAW":cv.waitKey(10)
-    if PARAMETERS[1]=="DRAW":cv.waitKey(10)
+        if Show =="DRAW":cv.waitKey(1)
+    if Show =="DRAW":cv.waitKey(1)
     
     #format results
     T6 = time.time()
-    print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
+    print("> " + str(round((T6 - T0))) + "[s] <")
     return(Result)
 
 #FUNCTIONS
@@ -196,20 +212,42 @@ def MatrixBin(matrix, ID):
             else: matrixBIN[i][j] = 1
     return(matrixBIN)
     
+def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
+        # Print Progress bar
+        percent = ("{0:." + str(decimals) + "f}").format(100 * ((iteration) / float(total)))
+        filledLength = int(length * iteration // total)
+        bar = fill * filledLength + '-' * (length - filledLength)
+        print(f'\r  {prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+        # Print New Line on Complete
+        if iteration == total:
+            print('\n')
+    
 # MAIN LOOP
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 #name convention
-Dir = ["Test","Watershed"]
-Name = "Tape_B"
-Type=[".csv",".csv"]
-N=1
-M=10
-n = 1
-mm = 1
+
+if False: #Cropped images
+    Dir = ["Test","Watershed"]
+    Name = "Tape_B"
+    Type=[".csv",".csv"]
+    N=10
+    M=10
+    n = 1
+    mm = 1
+else: #Full Tapes
+    Dir = ["Test","Watershed"]
+    Name = "Tape_B"
+    Type=[".csv",".csv"]
+    N=2
+    M=1
+    n = 2
+    mm = 1
+    
 Results=[0,0,0,0]
+
 while n <= N:
-    m = mm
+    m=mm
     while m <= M:
         print("\n NEWFILE")
         name = Name+"_"+str(n)+"_"+str(m)
@@ -229,8 +267,9 @@ while n <= N:
         MatrixR = np.genfromtxt(pathR, delimiter=",")
         #MatrixR = np.loadtxt(open(pathT, "rb"), delimiter=",")
 
-        result = COMPARATOR(MatrixT, MatrixR, [0.8,"DRAW"])
+        result = COMPARATOR(MatrixT, MatrixR, [0.8,"DRAW",1])
         
+        #TP,TN,FP,FN
         Results[0] += result[4]
         Results[1] += result[5]
         Results[2] += result[6]

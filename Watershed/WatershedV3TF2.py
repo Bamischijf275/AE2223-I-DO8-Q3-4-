@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 import time
 
 # complete, comprehensive version (3000-10,000ms)
-def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
+def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250, PARAMETERS):
                      #F_mean   Dist FibR Ecc.         IT, 1  2         Substeps
     T0 = time.time()
 
@@ -53,7 +53,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
     input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
     output_file = [FileIN[1], ".png", ".csv"]
     path_R_input = "../Data"
-    path_R_output = "../Data Processed/Watershed"
+    path_R_output = "../Data Processed/"+PARAMETERS[0]
 
     # Watershed
     F_mean = R
@@ -66,7 +66,7 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
 
     # Extra Processing
     if ke < 0: ke = 0  # kernel (0==none)
-    FitEllipse = True
+    FitEllipse = PARAMETERS[1]
 
     # Display
     Show_In = True
@@ -392,13 +392,23 @@ def WATERSHED(FileIN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[4, 5, 6], ke=3, SSp=250):
 
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
-Dir = "Tape_B/Images/"
-Name = "Tape_B"
-Type=".jpg"
-M=10
-N=2
-n=1
-m=1
+if False:
+    Dir = "Tape_B/Images/"
+    Name = "Tape_B"
+    Type=".jpg"
+    M=10
+    N=2
+    n=1
+    m=1
+else:
+    Dir = "Tape_B/"
+    Name = "Tape_B"
+    Type=".jpg"
+    M=20
+    N=3
+    n=2
+    m=1
+    parameters = ["Watershed","circle"]
 while n < N:
     m=1
     while m <= M:

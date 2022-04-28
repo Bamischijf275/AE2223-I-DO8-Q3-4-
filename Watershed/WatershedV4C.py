@@ -443,7 +443,7 @@ else: #Full Tapes
     Name = "Tape_B"
     Type=".jpg"
     M=20
-    N=3
+    N=2
     n=2
     mm=1
 
@@ -453,7 +453,7 @@ P_out = "save"              #save
 P_folder= "Test"   #Watershed, Test
 parameters=[P_runtime, P_shape, P_out, P_folder]
 
-while n < N:
+while n <= N:
     m=mm
     while m <= M:
         print("\n\n ----- STARTFILE -----")

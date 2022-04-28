@@ -115,8 +115,8 @@ def findlowestIDnumber(matrix): ### lowest id number in the matrix
     return numero
 
 
-matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data\Tape_B\CSV_Masks\Tape_B_1_1.jpg.tif.csv', delimiter=",")
-matrix2= np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\ Tape_B_1_1.csv', delimiter=',')
+matrix = np.genfromtxt('C:/Users/huege/Documents/GitHub/AE2223-I-DO8-Q3-4-/Data Processed\Watershed/Tape_B_9_10.csv', delimiter=",")
+matrix2= np.genfromtxt('C:/Users/huege/Documents/GitHub/AE2223-I-DO8-Q3-4-/Data Processed\Watershed/Tape_B_9_10.csv', delimiter=',')
 ###### Delete only if watershed
 matrix2 = np.delete(matrix2, (0), axis=0)
 matrix2 = np.delete(matrix2,(0), axis=1)

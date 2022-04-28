@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 #import imutils
 import math
+import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import image as mpimg
@@ -16,12 +17,15 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 
 warnings.filterwarnings('ignore')
+np.set_printoptions(threshold=sys.maxsize)
 import time
 
 def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     #setup
-    Col_CM = [(0, 255, 0),(110,110,110),(0,0,255),(255,0,0,0)] #TP,TN,FP,FN
+    T0 = time.time()
+    Col_CM = [(0, 255, 0),(110,110,110),(0,0,255),(255,0,0,0)] #TP-G,TN-,FP-B,FN-R
     Col_Background = (100, 100, 100)
+    Cutoff = PARAMETERS[0]
     
     Result = [0,0,0,0, 0,0,0,0 ,0,0] #TP,TN,FP,FN (fractions, ID), TrueFib, ResultFib
     
@@ -30,10 +34,27 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     img_out[:] = Col_Background
     
     #format matrices
-    #MatrixT = np.pad(MatrixT, ((0, 2), (0, 2)))
-    #MatrixR = np.pad(MatrixR, ((0, 2), (0, 2)))
     MatrixT = MatrixT.astype(int)
+    MatrixT = np.delete(MatrixT, (0), axis=0)
+    MatrixT = np.delete(MatrixT, (0), axis=1)
+    SizeT = MatrixT.shape
+    
     MatrixR = MatrixR.astype(int)
+    MatrixR = np.delete(MatrixR, (0), axis=0)
+    MatrixR = np.delete(MatrixR, (0), axis=1)
+    SizeR = MatrixR.shape
+    
+    print(SizeT,SizeR)
+    if SizeT != SizeR:
+        Matrix = np.zeros(SizeT)
+        Matrix[:MatrixR.shape[0],:MatrixR.shape[1]]
+        MatrixR = Matrix
+        print(SizeT,SizeR)
+    if SizeT != SizeR:
+        Matrix = np.zeros(SizeR)
+        Matrix[:MatrixT.shape[0],:MatrixT.shape[1]]
+        MatrixT = Matrix
+    print(SizeT,SizeR)
     
     #identify fibers list
     FibersT = MatrixID(MatrixT)
@@ -43,12 +64,12 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     Result[9] += len(FibersR)
     
     #Loop through every TRUE fiber
+    if PARAMETERS[1]=="DRAW":cv.waitKey(10)
     for ID_T in FibersT:
         #rectangle fiber (truth)
         RectT = SubRect(MatrixT, ID_T)
         #find correspodance T to R (ID)
         SubMatrixR = MatrixR[RectT[0]:RectT[2],RectT[1]:RectT[3]]
-        
         Nmax = 0
         for ID in FibersR:
             if MatrixCount(SubMatrixR, ID) > Nmax:
@@ -90,20 +111,31 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
         Result[3]+=FN
         
         if TP == 0:
-                        Result[7]+=1
-        elif TP/(FP+FN+TP) >= 0.5:
-                        Result[4]+=1
-        elif FP > FN:   Result[6]+=1
-        elif FN > FP:   Result[7]+=1 
-        else:           Result[5]+=1
+            Result[7]+=1
+        elif TP/(FP+FN+TP) >= Cutoff:
+            Result[4]+=1
+        elif FP > FN:   
+            Result[6]+=1
+        elif FN > FP:   
+            Result[7]+=1 
+        else:          
+            Result[5]+=1
         
         #Image
-        
-        
-        
+        if PARAMETERS[1] == "DRAW":
+            for i in range(len(SubMatrixR)):
+                for j in range(len(SubMatrixR[0])):
+                    m = MUL_Matrix[i][j]
+                    n = DIF_Matrix[i][j]
+                    if m == 1: Col=Col_CM[0]
+                    elif n == -1: Col=Col_CM[2]
+                    elif n == 1 : Col=Col_CM[3]
+                    else: Col=False
+                    if Col != False:
+                        cv.circle(img_out, (int(RectTR[0]+i),int(RectTR[1]+j)),0,Col,-1)
+            cv.imshow("Accuracy",img_out)
         #debug
-        if ID_T == 1 and True:
-            np.set_printoptions(threshold=sys.maxsize)
+        if ID_T == 15 and False:
             print(ID_T)
             print("Sub-Matrices:")
             print(SubMatrixT)
@@ -113,9 +145,12 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
             print(MUL_Matrix)
             print("result:")
             print(TP,TN,FP,FN)
-        
+        if PARAMETERS[1]=="DRAW":cv.waitKey(10)
+    if PARAMETERS[1]=="DRAW":cv.waitKey(10)
     
     #format results
+    T6 = time.time()
+    print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
     return(Result)
 
 #FUNCTIONS
@@ -165,16 +200,19 @@ def MatrixBin(matrix, ID):
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 #name convention
-Dir = ["GroundTruth","Watershed"]
+Dir = ["Test","Watershed"]
 Name = "Tape_B"
-Type=[".jpg.tif.csv",".csv"]
-N=[1,2,3,4,5,6,7,8,9]
-M=[1,2,3,4,5,6,7,8,9,10]
-n = 8
-m = 9
-while n < len(N):
-    while m < len(M):
-        name = Name+"_"+str(N[n])+"_"+str(M[m])
+Type=[".csv",".csv"]
+N=1
+M=10
+n = 1
+mm = 1
+Results=[0,0,0,0]
+while n <= N:
+    m = mm
+    while m <= M:
+        print("\n NEWFILE")
+        name = Name+"_"+str(n)+"_"+str(m)
         print(str(name))
         #extract matrices
         pathScript=os.path.dirname(__file__)
@@ -189,13 +227,25 @@ while n < len(N):
         
         MatrixT = np.genfromtxt(pathT, delimiter=",")
         MatrixR = np.genfromtxt(pathR, delimiter=",")
-        result = COMPARATOR(MatrixT, MatrixR,0.8)
+        #MatrixR = np.loadtxt(open(pathT, "rb"), delimiter=",")
+
+        result = COMPARATOR(MatrixT, MatrixR, [0.8,"DRAW"])
+        
+        Results[0] += result[4]
+        Results[1] += result[5]
+        Results[2] += result[6]
+        Results[3] += result[7]
+        
         print("area: ", result[0:4])
         print("fibers :",result[4:8])
         print("totals T,R:",result[8:])
+        
+        print("\n ENDFILE \n")
         m+=1
-    m=0
     n+=1
+print("\n\n --- STATS --- \n")
+print(Results)
+
 T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")

@@ -8,17 +8,18 @@ import os
 import pandas as pd
 import statistics as stat
 # from tqdm import tqdm
-# import sys
+import sys
 import warnings
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 
 warnings.filterwarnings('ignore')
+#np.set_printoptions(threshold=sys.maxsize)
 import time
 
 # complete, comprehensive version (3000-10,000ms)
-def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
+def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
                      #F_mean     Dist FibR Ecc.         IT, 1  2         Substeps
     T0 = time.time()
 
@@ -47,8 +48,9 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
             print('\n')
 
     # PARAMETERS:
-    PRINT("INIT :")
-    T1 = time.time()
+    if RUN[0] == "full":
+        PRINT("INIT :")
+        T1 = time.time()
     # System:
     input_file = [FileIN[0]+FileIN[1],FileIN[2]]  # name, filetype
     output_file = [FileIN[1], ".png", ".csv"]
@@ -66,62 +68,82 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
 
     # Extra Processing
     if ke < 0: ke = 0  # kernel (0==none)
-    FitEllipse = True
-    #FitShape = [ellipse] #ellipse circle boundary
+    FitShape = RUN[1] #ellipse circle boundary
 
     # Display
-    Show_In = True
-    Show_PyrFilt = True
-    Show_Otsu = True
-    Show_Boundary = True
-    Show_Shapes = True
-    Show_Fibers = True
-    Show_Output = True
+    if RUN[0] == "full":
+        Show_In = True
+        Show_PyrFilt = True
+        Show_Otsu = True
+        Show_Boundary = True
+        Show_Shapes = True
+        Show_Fibers = True
+        Show_Output = True
+    
+        Show_Fitted = True
+        Show_Center = True
 
-    Show_Fitted = True
-    Show_Center = True
-
+    elif RUN[0] == "fast":
+        Show_In = False
+        Show_PyrFilt = False
+        Show_Otsu = False
+        Show_Boundary = False
+        Show_Shapes = False
+        Show_Fibers = False
+        Show_Output = False
+        Show_Fitted = False
+        Show_Center = False
+    
     Col_ShapeCenter = (255, 255, 255)
     Col_Boundary = (0, 255, 0)
     Col_Background = (100, 100, 100)
-
-    Print_Matrix = False
-    Print_Output = False
-
-    print('INITIAL PARAMETERS')
-    print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
-    print("[INFO] distance T. factor    :", format(round(D_RE * 100)), "%")
-    print("[INFO] radius error factor   :", format(round(F_RE, 3)))
-    if FitEllipse:
-        print("[INFO] fiber ecc. error      :", format(round(E_RE, 3)))
-    print("[INFO] PMS filter            :", PyrFiltIT, PyrFilt1, PyrFilt2)
-    print("[INFO] Noise Kernel Radius   :", format(ke))
-
-    print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
+        
+    if RUN[2] == "save":
+        Print_Matrix = True
+        Print_Output = True
+        print('SAVE')
+    else:
+        Print_Matrix = False
+        Print_Output = False
+        
+    if RUN[0] == "full":
+        print('INITIAL PARAMETERS')
+        print("[INFO] mean fiber radius     :", format(round(F_mean, 3)))
+        print("[INFO] distance T. factor    :", format(round(D_RE * 100)), "%")
+        print("[INFO] radius error factor   :", format(round(F_RE, 3)))
+        if FitShape == "ellipse":
+            print("[INFO] fiber ecc. error      :", format(round(E_RE, 3)))
+        print("[INFO] PMS filter            :", PyrFiltIT, PyrFilt1, PyrFilt2)
+        print("[INFO] Noise Kernel Radius   :", format(ke))
+    
+        print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
 
     # IMAGE PROCESSING
-    PRINT("IMAGE PROCESSING : ")
-    T2 = time.time()
+        PRINT("IMAGE PROCESSING : ")
+        T2 = time.time()
     # Open image
-    print("Open image ...")
+        print("Open image ...")
     path_script = os.path.dirname(__file__)
     path = os.path.join(path_script, path_R_input, (input_file[0] + input_file[1]))
     img = cv.imread(path)
-    print(path)
-    if Show_In:
-        cv.imshow('Input', img)
-        cv.waitKey(1)
+    if RUN[0] == "full":
+        print(path)
+        if Show_In:
+            cv.imshow('Input', img)
+            cv.waitKey(1)
     height, width, _ = img.shape
 
     # Smoothing / de-noising
-    print("Pyramid Mean Shift Filter ...")
-    p = PyrFiltIT
-    
+    if RUN[0] == "full":
+        print("Pyramid Mean Shift Filter ...")
     SSp_0 = time.time()
     imgPMSF = img
+    p = PyrFiltIT
+    
     while p > 0:
         p -= 1
-        PROGRESS(PyrFiltIT - p, PyrFiltIT, prefix='', suffix='', length=30)
+        if RUN[0] == "full":
+            PROGRESS(PyrFiltIT - p, PyrFiltIT, prefix='', suffix='', length=30)
         imgPMSF = cv.pyrMeanShiftFiltering(imgPMSF, PyrFilt1, PyrFilt2)
         
         SSp_1  =time.time()
@@ -132,26 +154,29 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
             cv.waitKey(1)
 
     # Otsu
-    print("Otsu binarization ...")
+    if RUN[0] == "full":
+        print("Otsu binarization ...")
     gray = cv.cvtColor(imgPMSF, cv.COLOR_BGR2GRAY)
     imgTSH = cv.threshold(gray, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
 
     # erode-dilate
-    print("Noise Reduction...")
+    if RUN[0] == "full":
+        print("Noise Reduction...")
     if ke != 0:
         kernel = np.ones((ke, ke), np.uint8)
         imgTSH = cv.dilate(cv.erode(imgTSH, kernel), kernel)
     if Show_Otsu:
         cv.imshow("Thresh", imgTSH)
         cv.waitKey(1)
-
-    print("> " + str(round((T2 - T1) * 1000)) + "[ms] <")
+    
+    if RUN[0] == "full":
+        print("> " + str(round((T2 - T1) * 1000)) + "[ms] <")
 
     # WATERSHED
-    PRINT("WATERSHED : ")
-    T3 = time.time()
+        PRINT("WATERSHED : ")
+        T3 = time.time()
     # labelling
-    print("Labelling ...")
+        print("Labelling ...")
     D = ndimage.distance_transform_edt(imgTSH)
     localMax = peak_local_max(D, indices=False, min_distance=MinDist, labels=imgTSH)
     markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
@@ -168,18 +193,20 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
     CX = 0
 
     # identification
-    print("  mask > label > find contours > shape fitting")
-    if FitEllipse:
-        print("  Shape == Ellipse")
-    else:
-        print("  Shape == Circle")
-    Progress = len(np.unique(labels))
-    progress = 0
-    SSp_0  = time.time()
+    if RUN[0] == "full":
+        print("  mask > label > find contours > shape fitting")
+        if FitShape == "ellipse":
+            print("  Shape == Ellipse")
+        else:
+            print("  Shape == Circle")
+        Progress = len(np.unique(labels))
+        progress = 0
+        SSp_0  = time.time()
     
     for label in np.unique(labels):
-        progress += 1
-        PROGRESS(progress, Progress, prefix='', suffix='', length=30)
+        if RUN[0] == "full":
+            progress += 1
+            PROGRESS(progress, Progress, prefix='', suffix='', length=30)
         # eliminate background
         if label == 0:
             continue
@@ -202,16 +229,16 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
         # SHAPE FITTING
         # draw enclosing circle 
         ID = 1
-        if not FitEllipse:
+        if FitShape == "circle":
             ((x, y), r) = cv.minEnclosingCircle(c)
             Col, ID = COL(x, y, r, ID)
             Shapes.append([x, y, r])
-            if Show_Shapes and Show_Fitted and not FitEllipse:
+            if Show_Shapes and Show_Fitted and FitShape == "circle":
                 cv.circle(img_S, (int(x), int(y)), int(r), Col, 1)
             Shapes.append([x, y, r])
             R.add(r)
         # draw inscribed-bound ellipse
-        if FitEllipse:
+        if FitShape == "ellipse":
             # bounding box
             rect = (x, y), (w, h), Agl = cv.minAreaRect(c)
             Col, ID = COL(x, y, Agl, ID)
@@ -247,14 +274,15 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
                 if Show_Boundary: cv.imshow("Boundaries", img_B)
                 if Show_Shapes: cv.imshow("Shapes", img_S)
                 cv.waitKey(1)
-
-    print("> " + str(round((T3 - T2) * 1000)) + "[ms] <")
-    
-    PRINT("FIBER IDENTIFICATION :")
-    T4 = time.time()
+                
+    if RUN[0] == "full":
+        print("> " + str(round((T3 - T2) * 1000)) + "[ms] <")
+        
+        PRINT("FIBER IDENTIFICATION :")
+        T4 = time.time()
     # Discriminator
-    print("Defining discriminator ...")
-    if not FitEllipse:
+        print("Defining discriminator ...")
+    if FitShape == "circle":
         R_med = stat.median(R)
         R_avg = stat.mean(R)
     else:
@@ -268,17 +296,19 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
     img_F = cv.imread(path)
 
     ID = 1
-
-    print("sizing > test > drawing and appending")
-    Progress = len(Shapes)
-    progress = 1
-    SSp_0 = time.time()
+    
+    if RUN[0] == "full":
+        print("sizing > test > drawing and appending")
+        Progress = len(Shapes)
+        progress = 1
+        SSp_0 = time.time()
     for shape in Shapes:
-        PROGRESS(progress, Progress, prefix='', suffix='', length=30)
-        progress += 1
+        if RUN[0] == "full":
+            PROGRESS(progress, Progress, prefix='', suffix='', length=30)
+            progress += 1
         # fit enclosing circle
         x, y = shape[0], shape[1]
-        if not FitEllipse:
+        if FitShape == "circle":
             r = shape[2]
             if R_med / F_RE < r < R_med * F_RE:
                 F.add(r)
@@ -291,7 +321,7 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
                     cv.circle(img_F, (int(x), int(y)), 1, Col_ShapeCenter, -1)
                 # fiber ID and appending
                 Fibers.append([len(F), round(x), round(y), round(r, 3)])
-        if FitEllipse:
+        if FitShape == "ellipse":
             a, b, Agl, c, e = shape[2:]
             if abs(e) < E_RE and B_med / F_RE < min(a, b) and max(a, b) < A_med * F_RE:
                 F.add(c)
@@ -304,32 +334,33 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
                     cv.circle(img_F, (int(x), int(y)), 1, Col_ShapeCenter, -1)
                 # fiber ID and appending
                 Fibers.append([len(F), round(x), round(y), round(c, 3), round(e, 3)])
-
-        SSp_1 = time.time()
-        D_SSp = (SSp_1 - SSp_0)*1000
-        if (D_SSp > SSp or progress>=Progress):
-            SSp_0 = SSp_1
-            if Show_Fibers: cv.imshow("Fibers", img_F)
-            if Show_Output: cv.imshow("OUTPUT", img_out)
-            cv.waitKey(1)
-
-    print("> " + str(round((T4 - T3) * 1000)) + "[ms] <")
+        if RUN[0] == "full":
+            SSp_1 = time.time()
+            D_SSp = (SSp_1 - SSp_0)*1000
+            if (D_SSp > SSp or progress>=Progress):
+                SSp_0 = SSp_1
+                if Show_Fibers: cv.imshow("Fibers", img_F)
+                if Show_Output: cv.imshow("OUTPUT", img_out)
+                cv.waitKey(1)
+    if RUN[0] == "full":
+        print("> " + str(round((T4 - T3) * 1000)) + "[ms] <")
 
     # OUTPUT
-    PRINT("OUTPUT")
-    print("statisctics ...")
-    # statistics:
-
-    if FitEllipse:
-        E = []
-        for ellipse in Fibers:
-            E.append(ellipse[-1])
-        E_avg = stat.mean(E)
-        E_med = stat.median(E)
+    if RUN[0] == "full":
+        PRINT("OUTPUT")
+        print("statisctics ...")
+        # statistics:
+    
+        if FitShape == "ellipse":
+            E = []
+            for ellipse in Fibers:
+                E.append(ellipse[-1])
+            E_avg = stat.mean(E)
+            E_med = stat.median(E)
 
     # save:
-    if Print_Output or Print_Matrix: print("save results ...")
-    if Print_Output:  # ID'ed Fibers only image
+    if (Print_Output or Print_Matrix) and RUN[0] == "full": print("save results ...")
+    if Print_Output and RUN[0]!="fast":  # ID'ed Fibers only image
         # save to .png
         print("\n")
         print('image to file :')
@@ -344,74 +375,83 @@ def WATERSHED(FileIN, R=4, RE=[0.66, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
 
     if Print_Matrix:  # ID'ed Fibers only matrix
         # delete first col & row
-        arr_out = np.delete(arr_out, 0, 0)
-        arr_out = np.delete(arr_out, 0, 1)
+        #print(len(arr_out),"x",len(arr_out[0]))
+        arr_out = np.delete(arr_out, (0), axis=0)
+        arr_out = np.delete(arr_out, (0), axis=1)
+        #print(len(arr_out),"x",len(arr_out[0]))
         # save to .csv
         print("\n")
         print('matrix to file :')
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
-        path = path + "\" + output_file[0] +  output_file[2]
+        path = path + "/" + output_file[0] +  output_file[2]
         print(path)
         # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
         pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
         print('Successfully saved')
 
     # print stats
-    print('\n')
-    print('WATERSHED')
-    print("[INFO] unique contours found :", format(CX))
-    print("[INFO] unique shapes found   :", format(max(len(R), len(A))))
-    print("[INFO] unique fibers found   :", format(len(F)))
-    print("\n\n -----")
-    print('MEAN VALUES')
-    if FitEllipse:
-        print("[INFO] semi-major axis   :", format(round(A_avg / 2, 3)))
-        print("[INFO] semi-minor axis   :", format(round(B_avg / 2, 3)))
-        print("[INFO] eccentricity      :", format(round(E_avg, 3)))
-    else:
-        print("[INFO] radius    :", format(R_avg))
-    print("\n\n -----")
-    print('MEDIAN VALUES')
-    if FitEllipse:
-        print("[INFO] semi-major axis   :", format(round(A_med / 2, 3)))
-        print("[INFO] semi-minor axis   :", format(round(B_med / 2, 3)))
-        print("[INFO] eccentricity      :", format(round(E_med, 3)))
-    else:
-        print("[INFO] radius   :", format(R_med))
-
-    T5 = time.time()
-    print("> " + str(round((T5 - T4) * 1000)) + "[ms] <")
-    print("\n\n -----")
-    print("> " + str(round((T5 - T0) * 1000)) + "[ms] <")
+    if RUN[0] == "full":
+        print('\n')
+        print('WATERSHED')
+        print("[INFO] unique contours found :", format(CX))
+        print("[INFO] unique shapes found   :", format(max(len(R), len(A))))
+        print("[INFO] unique fibers found   :", format(len(F)))
+        print("\n\n -----")
+        print('MEAN VALUES')
+        if FitShape == "ellipse":
+            print("[INFO] semi-major axis   :", format(round(A_avg / 2, 3)))
+            print("[INFO] semi-minor axis   :", format(round(B_avg / 2, 3)))
+            print("[INFO] eccentricity      :", format(round(E_avg, 3)))
+        else:
+            print("[INFO] radius    :", format(R_avg))
+        print("\n\n -----")
+        print('MEDIAN VALUES')
+        if FitShape == "ellipse":
+            print("[INFO] semi-major axis   :", format(round(A_med / 2, 3)))
+            print("[INFO] semi-minor axis   :", format(round(B_med / 2, 3)))
+            print("[INFO] eccentricity      :", format(round(E_med, 3)))
+        else:
+            print("[INFO] radius   :", format(R_med))
+    
+        T5 = time.time()
+        print("> " + str(round((T5 - T4) * 1000)) + "[ms] <")
+        print("\n\n -----")
+        print("> " + str(round((T5 - T0) * 1000)) + "[ms] <")
 
     return arr_out,T0
 
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
-Dir = "Tape_B/"
+
+Dir = "Tape_B/Images/"
 Name = "Tape_B"
 Type=".jpg"
 M=10
-n=2
-m = 1
+N=20
+n=1
+mm=1
 
-while m <= M:
-    print("\n\n ----- STARTFILE -----")
-    print("Number :" + str(n) + "_" + str(m))
-    name = Name+"_"+str(n)+"_"+str(m)
-    path = Dir+name+Type
-    print(str(path))
-    input_file = [Dir, name, Type]
-    OUTPUT,T0 = WATERSHED(input_file)  # (Name, Filetype)
-    T6 = time.time()
-    print("> " + str(round((T6 - T0)*1000)) + "[s] <")
-    print("------ ENDFILE ------")
-    m+=1
-    cv.waitKey(0)
+RUN=["fast","ellipse","save"] #full, fast - circle,ellipse
+
+while n <= N:
+    m=mm
+    while m <= M:
+        print("\n\n ----- STARTFILE -----")
+        print("Number :" + str(n) + "_" + str(m))
+        name = Name+"_"+str(n)+"_"+str(m)
+        path = Dir+name+Type
+        print(str(path))
+        input_file = [Dir, name, Type]
+        OUTPUT,T0 = WATERSHED(input_file,RUN)  # (Name, Filetype)
+        T6 = time.time()
+        print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
+        print("------ ENDFILE ------")
+        m+=1
+    n+=1
 T11 = time.time()
 print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
-
-cv.waitKey(0)
+if RUN[0]=="full":cv.waitKey(0)
+cv.waitKey(1)

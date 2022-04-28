@@ -394,17 +394,17 @@ print("----- START PROGRAM ----- \n")
 T00 = time.time()
 Dir = "Tape_B/Images/"
 Name = "Tape_B"
-Type=".jpg.tif"
-M=1
-N=[1,2,3,4,6,8,9,10]
-n=0
-m0 = 1
-while n+1 < len(N):
-    m=m0
+Type=".jpg"
+M=10
+N=2
+n=1
+m=1
+while n < N:
+    m=1
     while m <= M:
         print("\n\n ----- STARTFILE -----")
-        print("Number :" + str(N[n]) + "_" + str(m))
-        name = Name+"_"+str(N[n])+"_"+str(m)
+        print("Number :" + str(n) + "_" + str(m))
+        name = Name+"_"+str(n)+"_"+str(m)
         path = Dir+name+Type
         print(str(path))
         input_file = [Dir, name, Type]

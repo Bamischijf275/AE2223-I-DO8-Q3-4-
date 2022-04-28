@@ -190,9 +190,6 @@ def WATERSHED(FileIN, R=5, RE=[2 / 3, 2, 0.85], PMSF=[10, 4, 5], ke=3):
         cv.imwrite(filename, img_out)
 
     if Print_Matrix:  # ID'ed Fibers only matrix
-        # delete first col & row
-        arr_out = np.delete(arr_out, 0, 0)
-        arr_out = np.delete(arr_out, 0, 1)
         # save to .csv
         path_script = os.path.dirname(__file__)
         path = os.path.join(path_script, path_R_output)

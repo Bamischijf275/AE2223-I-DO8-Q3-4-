@@ -21,7 +21,7 @@ np.set_printoptions(threshold=sys.maxsize)
 import time
 
 def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
-            
+
     #SETUP
     #parameters
     T0 = time.time()
@@ -49,7 +49,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     MatrixR = np.delete(MatrixR, (0), axis=1)
     SizeR = MatrixR.shape
 
-    print("Matrix Size T,R :", SizeT,SizeR)
+    print("Matrix Size T,R Input:", SizeT,SizeR)
     if SizeT != SizeR:
         Matrix = np.zeros(SizeT)
         Matrix[:MatrixR.shape[0],:MatrixR.shape[1]]
@@ -58,7 +58,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
         Matrix = np.zeros(SizeR)
         Matrix[:MatrixT.shape[0],:MatrixT.shape[1]]
         MatrixT = Matrix
-    print("Matrix Size T,R :", SizeT,SizeR)
+    print("Matrix Size T,R Trimmed:", SizeT,SizeR)
     
     #identify fibers list
     FibersT = MatrixID(MatrixT)
@@ -125,9 +125,9 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
         
         if TP == 0:
             Result[7]+=1
-        elif TP/(FP+FN+TP) >= Cutoff:
+        elif TP/(FP+TP) >= Cutoff:
             Result[4]+=1
-        elif FP > FN:   
+        elif FP > FN:
             Result[6]+=1
         elif FN > FP:   
             Result[7]+=1 
@@ -236,7 +236,7 @@ if False: #Cropped images
     n = 1
     mm = 1
 else: #Full Tapes
-    Dir = ["Test","Watershed"]
+    Dir = ["Watershed","Watershed"]
     Name = "Tape_B"
     Type=[".csv",".csv"]
     N=2
@@ -278,12 +278,15 @@ while n <= N:
         print("area: ", result[0:4])
         print("fibers :",result[4:8])
         print("totals T,R:",result[8:])
+        print("Accuracy TP:", round(result[4]/(result[4]+result[7]),3), "%")
+        print("Accuracy FP:", round(1-(result[2]/(result[4]+result[7])),3), "%")
         
         print("\n ENDFILE \n")
         m+=1
     n+=1
 print("\n\n --- STATS --- \n")
 print(Results)
+print("True Result:", Results[0]/(Results[0]+Results[3]))
 
 T11 = time.time()
 print("----- END PROGRAM ----- \n")

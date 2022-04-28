@@ -373,7 +373,7 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
         path = os.path.join(path_script, path_R_output)
         os.chdir(path)
         print(path)
-        filename = (output_file[0] + output_file[1])
+        filename = (output_file[0] + output_file[1] + ".tiff")
         print(filename)
         cv.imwrite(filename, img_out)
         print('Successfully saved')

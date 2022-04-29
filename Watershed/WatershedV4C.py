@@ -19,7 +19,7 @@ warnings.filterwarnings('ignore')
 import time
 
 # complete, comprehensive version (3000-10,000ms)
-def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp=250):
+def WATERSHED(FileIN, RUN, R=5, RE=[2/3, 2.5, 0.85], PMSF=[7, 8, 3], ke=3, SSp=250):
                      #F_mean     Dist FibR Ecc.         IT, 1  2         Substeps
     T0 = time.time()
 
@@ -430,12 +430,12 @@ def WATERSHED(FileIN, RUN, R=4.5, RE=[2/3, 2.5, 0.85], PMSF=[3, 4, 5], ke=3, SSp
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
 
-if False: #Cropped images
+if True: #Cropped images
     Dir = "Tape_B/Images/"
     Name = "Tape_B"
     Type=".jpg"
     M=10
-    N=2
+    N=20
     n=1
     mm=1
 else: #Full Tapes

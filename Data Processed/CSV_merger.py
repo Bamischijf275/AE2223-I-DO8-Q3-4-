@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import csv
+import matplotlib.pyplot as plt
 
 directory = "GroundTruth"
 
@@ -34,4 +35,10 @@ def combine_csv(j):
 #Comment = File has been executed, but several numbers are still missing here.
 for o in range(1,10):
     a = combine_csv(o)
+
+#   Visual check whether the pictures are "Correct"\
+
+#   max = np.max(a)
+#   plt.imshow(a,cmap = "gray")
+#   plt.show()
     np.savetxt(f'GroundTruth/Merged CSV/Tape_B_{o}.csv',a,delimiter=",")

@@ -39,6 +39,10 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     img_out[:] = Col_Background
     
     #format matrices
+    SizeT = MatrixT.shape
+    SizeR = MatrixR.shape
+    print("Matrix Size T,R Input:", SizeT,SizeR)
+    
     MatrixT = MatrixT.astype(int)
     MatrixT = np.delete(MatrixT, (0), axis=0)
     MatrixT = np.delete(MatrixT, (0), axis=1)
@@ -49,7 +53,6 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
     MatrixR = np.delete(MatrixR, (0), axis=1)
     SizeR = MatrixR.shape
 
-    print("Matrix Size T,R Input:", SizeT,SizeR)
     if SizeT != SizeR:
         Matrix = np.zeros(SizeT)
         Matrix[:MatrixR.shape[0],:MatrixR.shape[1]]
@@ -123,14 +126,16 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
         Result[2]+=FP
         Result[3]+=FN
         
-        if TP == 0:
-            Result[7]+=1
+        if (TP+FP)==0:
+            result[3]+=1
         elif TP/(FP+TP) >= Cutoff:
             Result[4]+=1
         elif FP > FN:
             Result[6]+=1
+            print(ID_T)
         elif FN > FP:   
-            Result[7]+=1 
+            Result[7]+=1
+            print(ID_T)
         else:          
             Result[5]+=1
         
@@ -145,13 +150,15 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
                     elif n == 1 : Col=Col_CM[3]
                     else: Col=False
                     if Col != False:
+                        if ID_T==61: 
+                            Col=(255,255,255)
                         cv.circle(img_out, (int(RectTR[0]+i),int(RectTR[1]+j)),0,Col,-1)
             Tf = time.time()
             if Tf-Ti >= ShowTime:
                 cv.imshow("Accuracy",img_out)
                 Ti = Tf
         #debug
-        if ID_T == 15 and False:
+        if ID_T == 61 and True:
             print(ID_T)
             print("Sub-Matrices:")
             print(SubMatrixT)
@@ -236,7 +243,7 @@ if False: #Cropped images
     n = 1
     mm = 1
 else: #Full Tapes
-    Dir = ["Watershed","Watershed"]
+    Dir = ["Test","Test"]
     Name = "Tape_B"
     Type=[".csv",".csv"]
     N=2
@@ -274,19 +281,21 @@ while n <= N:
         Results[1] += result[5]
         Results[2] += result[6]
         Results[3] += result[7]
+        totalFib = result[4]+result[6]
         
         print("area: ", result[0:4])
         print("fibers :",result[4:8])
         print("totals T,R:",result[8:])
-        print("Accuracy TP:", round(result[4]/(result[4]+result[7]),3), "%")
-        print("Accuracy FP:", round(1-(result[2]/(result[4]+result[7])),3), "%")
+        print("Accuracy TP:", round(result[4]/totalFib,3), "%")
+        print("Accuracy TN:", round(result[5]/totalFib,3), "%")
+        print("Accuracy FP:", round(result[6]/totalFib,3), "%")
+        print("Accuracy FN:", round(result[7]/totalFib,3), "%")
         
         print("\n ENDFILE \n")
         m+=1
     n+=1
 print("\n\n --- STATS --- \n")
 print(Results)
-print("True Result:", Results[0]/(Results[0]+Results[3]))
 
 T11 = time.time()
 print("----- END PROGRAM ----- \n")

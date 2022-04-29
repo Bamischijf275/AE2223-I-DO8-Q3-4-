@@ -469,7 +469,7 @@ while n <= N:
         m+=1
     n+=1
 T11 = time.time()
-print("----- END PROGRAM ----- \n")
+print("\n ----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
 
 if parameters[0] != "fast":

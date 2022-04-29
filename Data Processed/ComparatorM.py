@@ -10,6 +10,8 @@ import pandas as pd
 import time
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import Plotting
+from Plotting import generateResultsChart
 
 def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are actually existing, returns array of the ids
     mp = {k: 0 for k in range(int(greaterthanany)+5)}
@@ -206,6 +208,9 @@ def ComparatorOf2(matrix,matrix2): ###compares 2 matrices, returnes the number o
 start = time.time()
 comparatorW=ComparatorOf2(matrix,matrix2)
 print("For Watershed: identified", comparatorW[0],"misidentified",comparatorW[1],"Number of fibers in GT", comparatorW[3],"Number of fibers detected by watershed ",comparatorW[4], "notdetected", comparatorW[5] )
+#plotting = Plotting()
+generateResultsChart([0.6,0.7,0.8,0.4],[0.6,0.5,0.8,0.6],[0.6,0.6,0.8,0.4],[0.9,0.9,0.9,0.4])
+#plotting.generateResultsChart
 end = time.time()
 print(end - start)
 #comparatorS=ComparatorOf2(matrix,matrix3)

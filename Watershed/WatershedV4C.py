@@ -449,7 +449,7 @@ else: #Full Tapes
 
 P_runtime = "full"      #fast , full
 P_shape= "circle"      #boundary, circle, ellipse
-P_out = "save"          #save
+P_out = "save"              #save
 P_folder= "Test"   #Watershed, Test
 parameters=[P_runtime, P_shape, P_out, P_folder]
 
@@ -469,7 +469,7 @@ while n <= N:
         m+=1
     n+=1
 T11 = time.time()
-print("\n ----- END PROGRAM ----- \n")
+print("----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00),1)) + "[s] <")
 
 if parameters[0] != "fast":

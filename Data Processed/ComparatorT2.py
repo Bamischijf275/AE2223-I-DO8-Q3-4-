@@ -246,12 +246,12 @@ if False: #Cropped images
     n = 1
     mm = 1
 else: #Full Tapes
-    Dir = ["Watershed","Watershed"] #Truth , Comp
+    Dir = ["GroundTruth","Watershed"] #Truth , Comp
     Name = "Tape_B"
     Type=[".csv",".csv"]
-    N=2
+    N=1
     M=1
-    n = 2
+    n = 1
     mm = 1
     
 Results=[0,0,0,0]

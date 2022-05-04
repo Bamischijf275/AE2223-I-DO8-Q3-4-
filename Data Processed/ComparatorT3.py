@@ -220,7 +220,7 @@ print("----- START PROGRAM -----")
 print("----- *-* -----")
 
 T00 = time.time()
-Parameters = [0.8, "", 1] #cutoff, DRAW, Dt
+Parameters = [0.8, "DRAW", 1] #cutoff, DRAW, Dt
 RESULTS = []
 
 #Algos
@@ -230,10 +230,8 @@ GroundTruth = "Test"
 #files
 Name = "Tape_B"
 Type=[".csv",".csv"]
-N=[2,11]
-M=[2,11]
-n = N[0]
-mm = M[0]
+N=[2,15]
+M=[2,15]
 
 for Alg in Algorithms:
     print("\n ----- * -----")

@@ -56,7 +56,12 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     F_OUT_path = FILE[2][0]
     F_OUT_img_type = FILE[2][1][1]
     F_OUT_mat_type = FILE[2][2][1]
-
+    
+    if FILE[2][1][2] == "crop":
+        F_OUT_Crop = FILE[2][1][3]
+    else:
+        F_OUT_Crop = [""]
+        
     Print_Image = False
     Print_Matrix = False
     if FILE[2][1][0] == "save": Print_Image = True
@@ -380,8 +385,14 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
             E_med = stat.median(E)
 
     # save:
-    if (Print_Image or Print_Matrix) and P_runtime == ("full" or "print"):
-        print("save results ...")
+    if (Print_Image or Print_Matrix):
+        if P_runtime == ("full" or "print"):
+            print("save results ...")
+        if F_OUT_Crop != [""]:
+            height, width, _ = img_out.shape
+            X, Y = F_OUT_Crop[1]
+            n, m =height/Y, width/X
+            
     if Print_Image and P_runtime ==("full"or"img"):  # ID'ed Fibers only image
         # save to .type
         print("\n")
@@ -393,7 +404,15 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         os.chdir(path)
         path=str(path+name)
         print(path)
-        cv.imwrite(path, img_out)
+        
+        if F_OUT_Crop != [""]:
+            #crop
+            
+            #save
+            
+        else:
+            cv.imwrite(path, img_out)
+        
         print('Successfully saved')
 
     if Print_Matrix:  # ID'ed Fibers only matrix
@@ -407,8 +426,14 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         os.chdir(path)
         path=str(path+name)
         print(path)
-        # numpy.savetxt((outpit_file[0]+output_file[2]),a,delimiter="")
-        pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
+        
+        if F_OUT_Crop != [""]:
+            #crop
+            #save
+            
+        else:
+            pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
+        
         print('Successfully saved')
 
     # print stats
@@ -453,11 +478,11 @@ T00 = time.time()
 
 # SETUP
 File = [
-    ["Tape_B", [2, 2], [1, 1], "name"],  # File
-    ["../Data/Tape_B/", ".jpg"],  # IN
-    ["../Data Processed/Watershed/Parameters Tuning/",  # OUT
-     ["save", ".tif"],  # Image save
-     ["", ".csv"]  # Matrix save
+    ["Tape_B", [2, 2], [17, 37], "name"],  # File
+    ["../Data/Tape_B/Tape_B_2/", ".jpg"],  # IN
+    ["../Data Processed/Watershed/Training/",  # OUT
+     ["save", ".jpg", "crop", [120,155]],  # Image save
+     ["save", ".csv", "crop", [120,155]]  # Matrix save
      ]
 ]
 Program = ["full",  # fast-print-img-full-wait
@@ -466,7 +491,7 @@ Program = ["full",  # fast-print-img-full-wait
            ]
 
 
-Parameters = [5, [0.5, 1.5, 10], [5, 5, 5], 3]  # Radius, Relative errors, Filter, kernel
+Parameters = [5, [2/3, 2.5, 0.85], [7, 8, 3], 3]  # Radius, Relative errors, Filter, kernel
 # LOOP
 N = File[0][1]
 M = File[0][2]
@@ -476,7 +501,7 @@ while n <= N[1]:
     m = M[0]
     while m <= M[1]:
         print("\n ----- NEWFILE -----")
-        name = File[0][0] + "_" + str(n) + "_" + str(m)
+        name = File[0][0] + "_" + str(n) + "_-" + str(m)
         File[0][3] = name
         print("Image : ", name)
 

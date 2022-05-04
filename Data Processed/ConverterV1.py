@@ -14,6 +14,7 @@ import warnings
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import PIL
 
 warnings.filterwarnings('ignore')
 np.set_printoptions(threshold=sys.maxsize)
@@ -34,8 +35,8 @@ Algorithms = ["Test","Watershed"]
 #files
 Name = "Tape_B"
 
-N=[1,1]
-M=[4,4]
+N=[11,11]
+M=[6,6]
 
 Info = ["Training/comparing/masks",
         "Annotated"]
@@ -55,9 +56,7 @@ while n <= N[1]:
         path =  os.path.join(pathScript,path)
         print(path)
         
-        Img = cv.imread(path)
-        cv.imshow('Image', Img)
-        cv.waitKey(1)
+        Img = PIL.Image.open(path)
         
         Arr = np.array(Img)
         
@@ -65,11 +64,13 @@ while n <= N[1]:
         path =  os.path.join(pathScript,path)
         print(path)
         
+        #Arr_csv = np.genfromtxt(Arr, delimiter=",")
+        
         pd.DataFrame(Arr).to_csv((path), header="none", index="none")
         
-    print("\n ENDFILE \n")
-    m+=1
-n+=1
+        print("\n ENDFILE \n")
+        m+=1
+    n+=1
         
 T11 = time.time()
 print("> " + str(round((T11 - T00),1)) + "[s] <")

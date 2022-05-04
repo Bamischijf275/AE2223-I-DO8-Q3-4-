@@ -11,11 +11,12 @@ import os
 #     i_new = i.replace('.jpg','')
 #     a.save(f'Tape_B/Image_tif/{i_new}.tif')
 
-directory = os.listdir('Tape_B/Masks')
-
-for i in directory:
-    a=Image.open(f'Tape_B/Masks/{i}')
-    i_new = i.replace(".jpg","")
-    print(i_new)
-    a.save(f'Tape_B/Masks_tif/{i_new}')
+directory = os.listdir('Tape_B/Images')
+a = Image.open("Tape_B/Images/Tape_B_11_1.jpg.tif")
+a.save("Tape_B/Image_tif/Tape_B_11_1.tif")
+# for i in directory:
+#         print(i)
+#         a=Image.open(f'Tape_B/Images/{i}')
+#         i_new = i.replace(".jpg","")
+#         a.save(f'Tape_B/Image_tif/{i_new}.tif')
 

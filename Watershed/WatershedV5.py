@@ -409,6 +409,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
             #crop
             
             #save
+            print("a")
             
         else:
             cv.imwrite(path, img_out)
@@ -429,7 +430,9 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         
         if F_OUT_Crop != [""]:
             #crop
+            
             #save
+            print("b")
             
         else:
             pd.DataFrame(arr_out).to_csv((path), header="none", index="none")

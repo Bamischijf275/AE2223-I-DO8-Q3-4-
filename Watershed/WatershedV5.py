@@ -14,9 +14,11 @@ import warnings
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import numpy.random as rnd
 
 warnings.filterwarnings('ignore')
 np.set_printoptions(threshold=sys.maxsize)
+rnd.seed(1)
 
 
 # complete, comprehensive version (3000-10,000ms)
@@ -481,11 +483,11 @@ T00 = time.time()
 
 # SETUP
 File = [
-    ["Tape_B", [2, 2], [17, 37], "name"],  # File
-    ["../Data/Tape_B/Tape_B_2/", ".jpg"],  # IN
+    ["Tape_B", [2, 2], [21, 2000], "name"],  # File
+    ["../Data/Tape_B/Tape_B_2_JPG/", ".jpg"],  # IN
     ["../Data Processed/Watershed/Training/",  # OUT
-     ["save", ".jpg", "crop", [120,155]],  # Image save
-     ["save", ".csv", "crop", [120,155]]  # Matrix save
+     ["", ".jpg", "", [120,155]],  # Image save
+     ["save", ".csv", "", [120,155]]  # Matrix save
      ]
 ]
 Program = ["full",  # fast-print-img-full-wait
@@ -509,7 +511,7 @@ while n <= N[1]:
         print("Image : ", name)
 
         Result = WATERSHED(File, Program, Parameters)
-        m += 1
+        m = rnd.randint(M[0], M[1])
     n += 1
 T11 = time.time()
 print("\n ----- END PROGRAM ----- \n")

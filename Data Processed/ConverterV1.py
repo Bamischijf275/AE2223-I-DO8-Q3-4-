@@ -18,8 +18,14 @@ from skimage.segmentation import watershed
 warnings.filterwarnings('ignore')
 np.set_printoptions(threshold=sys.maxsize)
 
+T00 = time.time()
+
+def CONVERT(FILE, PROGRAM):
+    F_name = FILE[0][3]
+    
+
 File = [
-    ["Tape_B", [2, 2], [17, 37], "name"],  # File
+    ["Tape_B", [2, 2], [17, 17], "name"],  # File
     ["../Data/Tape_B/Tape_B_2/",                ".tiff"], # IN
     ["../Data Processed/Watershed/Training/",   ".csv"]  #OUT
 ]

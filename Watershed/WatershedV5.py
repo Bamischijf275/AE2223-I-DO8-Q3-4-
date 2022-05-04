@@ -14,9 +14,11 @@ import warnings
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import numpy.random as rnd
 
 warnings.filterwarnings('ignore')
 np.set_printoptions(threshold=sys.maxsize)
+rnd.seed(1)
 
 
 # complete, comprehensive version (3000-10,000ms)
@@ -57,11 +59,6 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     F_OUT_img_type = FILE[2][1][1]
     F_OUT_mat_type = FILE[2][2][1]
     
-    if FILE[2][1][2] == "crop":
-        F_OUT_Crop = FILE[2][1][3]
-    else:
-        F_OUT_Crop = [""]
-        
     Print_Image = False
     Print_Matrix = False
     if FILE[2][1][0] == "save": Print_Image = True
@@ -388,10 +385,6 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     if (Print_Image or Print_Matrix):
         if P_runtime == ("full" or "print"):
             print("save results ...")
-        if F_OUT_Crop != [""]:
-            height, width, _ = img_out.shape
-            X, Y = F_OUT_Crop[1]
-            n, m =height/Y, width/X
             
     if Print_Image and P_runtime ==("full"or"img"):  # ID'ed Fibers only image
         # save to .type
@@ -404,14 +397,8 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         os.chdir(path)
         path=str(path+name)
         print(path)
-        
-        if F_OUT_Crop != [""]:
-            #crop
-            
-            #save
-            
-        else:
-            cv.imwrite(path, img_out)
+
+        cv.imwrite(path, img_out)
         
         print('Successfully saved')
 
@@ -427,12 +414,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         path=str(path+name)
         print(path)
         
-        if F_OUT_Crop != [""]:
-            #crop
-            #save
-            
-        else:
-            pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
+        pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
         
         print('Successfully saved')
 
@@ -478,36 +460,59 @@ T00 = time.time()
 
 # SETUP
 File = [
-    ["Tape_B", [2, 2], [17, 37], "name"],  # File
-    ["../Data/Tape_B/Tape_B_2/", ".jpg"],  # IN
-    ["../Data Processed/Watershed/Training/",  # OUT
-     ["save", ".jpg", "crop", [120,155]],  # Image save
-     ["save", ".csv", "crop", [120,155]]  # Matrix save
+    ["Tape_B", [6, 6], [6, 6], "name"],  # File
+    ["../Data/Tape_B/Images/", ".jpg"],  # IN
+    ["../Data Processed/Watershed/",  # OUT
+     ["", ".jpg"],  # Image save
+     ["save", ".csv"]  # Matrix save
      ]
 ]
-Program = ["full",  # fast-print-img-full-wait
+    
+Program = ["fast",  # fast-print-img-full-wait
            250,  # Substeps
            "ellipse"  # shape=circle,ellipse,contour
            ]
 
 
-Parameters = [5, [2/3, 2.5, 0.85], [7, 8, 3], 3]  # Radius, Relative errors, Filter, kernel
+Parameters = [3, [0.4, 3, 1], [5, 5, 3], 3]  # Radius, Relative errors, Filter, kernel
 # LOOP
 N = File[0][1]
 M = File[0][2]
 
-n = N[0]
-while n <= N[1]:
-    m = M[0]
-    while m <= M[1]:
+Loop = ""
+
+
+if Loop == "RANDOM":
+    IT = 20
+    it = 0
+    
+    n = rnd.randint(N[0], N[1])
+    while it <= IT:
+        m = rnd.randint(M[0], M[1])
+        n = rnd.randint(N[0], N[1])
+
         print("\n ----- NEWFILE -----")
         name = File[0][0] + "_" + str(n) + "_-" + str(m)
         File[0][3] = name
         print("Image : ", name)
-
+    
         Result = WATERSHED(File, Program, Parameters)
-        m += 1
-    n += 1
+        
+    
+else:
+    n = N[0]
+    while n <= N[1]:
+        m = M[0]
+        while m <= M[1]:
+            print("\n ----- NEWFILE -----")
+            name = File[0][0] + "_" + str(n) + "_" + str(m)
+            File[0][3] = name
+            print("Image : ", name)
+    
+            Result = WATERSHED(File, Program, Parameters)
+            m += 1
+        n += 1
+    
 T11 = time.time()
 print("\n ----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00), 1)) + "[s] <")

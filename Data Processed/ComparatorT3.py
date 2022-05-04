@@ -175,9 +175,12 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
             print("result:")
             print(TP,TN,FP,FN)
         if Show =="DRAW":cv.waitKey(1)
-    if Show =="DRAW":cv.waitKey(1)
+    if Show =="DRAW":
+        cv.imshow("Accuracy",img_out)
+        cv.waitKey(1)
     
     #format results
+    
     T6 = time.time()
     print("> " + str(round((T6 - T0)*1000)) + "[ms] <")
     return(Result)
@@ -224,14 +227,14 @@ Parameters = [0.8, "DRAW", 1] #cutoff, DRAW, Dt
 RESULTS = []
 
 #Algos
-Algorithms = ["Test","Watershed"]
-GroundTruth = "Test"
+Algorithms = ["Watershed"]
+GroundTruth = "Annotated"
 
 #files
 Name = "Tape_B"
 Type=[".csv",".csv"]
-N=[2,15]
-M=[2,15]
+N=[6,6]
+M=[6,6]
 
 for Alg in Algorithms:
     print("\n ----- * -----")

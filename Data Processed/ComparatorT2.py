@@ -90,7 +90,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
         SubMatrixR = MatrixR[RectT[0]:RectT[2],RectT[1]:RectT[3]]
         Nmax = 0
         for ID in FibersR:
-            if MatrixCount(SubMatrixR, ID) > Nmax:
+            if MatrixCount(SubMatrixR, ID) >= Nmax:
                 ID_R = ID
                 Nmax = MatrixCount(SubMatrixR, ID_R)
     
@@ -162,7 +162,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
                 Ti = Tf
         #debug
         if ID_T == ID_p and True:
-            print(ID_T)
+            print("\n DEBUG")
+            print("Fiber ID : ", ID_T)
             print("Sub-Matrices:")
             print(SubMatrixT)
             print(SubMatrixR)
@@ -221,6 +222,7 @@ def MatrixBin(matrix, ID):
             if matrix[i][j] != ID: matrixBIN[i][j] = 0
             else: matrixBIN[i][j] = 1
     return(matrixBIN)
+
     
 def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
         # Print Progress bar
@@ -231,7 +233,7 @@ def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill
         # Print New Line on Complete
         if iteration == total:
             print('\n')
-    
+
 # MAIN LOOP
 print("----- START PROGRAM ----- \n")
 T00 = time.time()
@@ -246,12 +248,12 @@ if False: #Cropped images
     n = 1
     mm = 1
 else: #Full Tapes
-    Dir = ["GroundTruth","Watershed"] #Truth , Comp
+    Dir = ["Watershed","Watershed"] #Truth , Comp
     Name = "Tape_B"
     Type=[".csv",".csv"]
-    N=1
+    N=2
     M=1
-    n = 1
+    n = 2
     mm = 1
     
 Results=[0,0,0,0]
@@ -277,7 +279,7 @@ while n <= N:
         MatrixR = np.genfromtxt(pathR, delimiter=",")
         #MatrixR = np.loadtxt(open(pathT, "rb"), delimiter=",")
 
-        result = COMPARATOR(MatrixT, MatrixR, [0.8,"DRAW",1])
+        result = COMPARATOR(MatrixT, MatrixR, [0.75,"DRAW",1])
         
         #TP,TN,FP,FN
         Results[0] += result[4]
@@ -289,10 +291,10 @@ while n <= N:
         print("area: ", result[0:4])
         print("fibers :",result[4:8])
         print("totals T,R:",result[8:])
-        print("Accuracy TP:", round(result[4]/totalFib,3)*100, "%")
-        print("Accuracy TN:", round(result[5]/totalFib,3)*100, "%")
-        print("Accuracy FP:", round(result[6]/totalFib,3)*100, "%")
-        print("Accuracy FN:", round(result[7]/totalFib,3)*100, "%")
+        print("Accuracy TP:", round(100*result[4]/totalFib,1), "%")
+        print("Accuracy TN:", round(100*result[5]/totalFib,1), "%")
+        print("Accuracy FP:", round(100*result[6]/totalFib,1), "%")
+        print("Accuracy FN:", round(100*result[7]/totalFib,1), "%")
         
         print("\n ENDFILE \n")
         m+=1

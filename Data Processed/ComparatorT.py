@@ -152,7 +152,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS):
                     if Col != False:
                         if ID_T==61: 
                             Col=(255,255,255)
-                        cv.circle(img_out, (int(RectTR[0]+i),int(RectTR[1]+j)),0,Col,-1)
+                        cv.circle(img_out, (int(RectTR[1]+j),int(RectTR[0]+i)),0,Col,-1)
             Tf = time.time()
             if Tf-Ti >= ShowTime:
                 cv.imshow("Accuracy",img_out)

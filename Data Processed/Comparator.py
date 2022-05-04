@@ -10,8 +10,6 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 import sys
 
-
-
 # CONSTANTS
 #parameters
 input_file = "TapeB.png"

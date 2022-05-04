@@ -19,42 +19,58 @@ warnings.filterwarnings('ignore')
 np.set_printoptions(threshold=sys.maxsize)
 
 T00 = time.time()
-
-def CONVERT(FILE, PROGRAM):
-    F_name = FILE[0][3]
     
 
-File = [
-    ["Tape_B", [2, 2], [17, 17], "name"],  # File
-    ["../Data/Tape_B/Tape_B_2/",                ".tiff"], # IN
-    ["../Data Processed/Watershed/Training/",   ".csv"]  #OUT
-]
+# MAIN LOOP
+print("----- *-* -----")
+print("----- START PROGRAM -----")
+print("----- *-* -----")
 
-Program = ["full",  # fast-print-img-full-wait
-           250,  # Substeps
-           "ellipse"  # shape=circle,ellipse,contour
-           ]
+T00 = time.time()
 
-# LOOP
-N = File[0][1]
-M = File[0][2]
+#Algos
+Algorithms = ["Test","Watershed"]
+
+#files
+Name = "Tape_B"
+
+N=[1,1]
+M=[4,4]
+
+Info = ["Training/comparing/masks",
+        "Annotated"]
+Type=[".tif",".csv"]
 
 n = N[0]
 while n <= N[1]:
-    m = M[0]
+    m=M[0]
     while m <= M[1]:
-        print("\n ----- NEWFILE -----")
-        name = File[0][0] + "_" + str(n) + "_-" + str(m)
-        File[0][3] = name
-        print("Image : ", name)
-
-        Result = CONVERT(File, Program)
-        m += 1
-    n += 1
+        print("\n NEWFILE")
+        name = Name+"_"+str(n)+"_"+str(m)
+        print(str(name))
+        #extract matrices
+        pathScript=os.path.dirname(__file__)
+        
+        path = Info[0] + "/" + name + Type[0]
+        path =  os.path.join(pathScript,path)
+        print(path)
+        
+        Img = cv.imread(path)
+        cv.imshow('Image', Img)
+        cv.waitKey(1)
+        
+        Arr = np.array(Img)
+        
+        path = Info[1] + "/" + name + Type[1]
+        path =  os.path.join(pathScript,path)
+        print(path)
+        
+        pd.DataFrame(Arr).to_csv((path), header="none", index="none")
+        
+    print("\n ENDFILE \n")
+    m+=1
+n+=1
+        
 T11 = time.time()
-print("\n ----- END PROGRAM ----- \n")
-print("> " + str(round((T11 - T00), 1)) + "[s] <")
-
-if Program[0] == "wait":
-    cv.waitKey(0)
-else: cv.waitKey(1)
+print("> " + str(round((T11 - T00),1)) + "[s] <")
+print("\n----- END PROGRAM ----- \n")

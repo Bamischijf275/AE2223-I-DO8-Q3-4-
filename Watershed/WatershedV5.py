@@ -58,11 +58,6 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     F_OUT_path = FILE[2][0]
     F_OUT_img_type = FILE[2][1][1]
     F_OUT_mat_type = FILE[2][2][1]
-    
-    if FILE[2][1][2] == "crop":
-        F_OUT_Crop = FILE[2][1][3]
-    else:
-        F_OUT_Crop = [""]
         
     Print_Image = False
     Print_Matrix = False
@@ -406,15 +401,8 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         os.chdir(path)
         path=str(path+name)
         print(path)
-        
-        if F_OUT_Crop != [""]:
-            #crop
-            
-            #save
-            print("a")
-            
-        else:
-            cv.imwrite(path, img_out)
+
+        cv.imwrite(path, img_out)
         
         print('Successfully saved')
 
@@ -430,14 +418,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         path=str(path+name)
         print(path)
         
-        if F_OUT_Crop != [""]:
-            #crop
-            
-            #save
-            print("b")
-            
-        else:
-            pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
+        pd.DataFrame(arr_out).to_csv((path), header="none", index="none")
         
         print('Successfully saved')
 
@@ -483,11 +464,11 @@ T00 = time.time()
 
 # SETUP
 File = [
-    ["Tape_B", [2, 2], [21, 2000], "name"],  # File
+    ["Tape_B", [2, 2], [1, 20], "name"],  # File
     ["../Data/Tape_B/Tape_B_2_JPG/", ".jpg"],  # IN
     ["../Data Processed/Watershed/Training/",  # OUT
-     ["", ".jpg", "", [120,155]],  # Image save
-     ["save", ".csv", "", [120,155]]  # Matrix save
+     ["", ".jpg"]],  # Image save
+     ["save", ".csv"]  # Matrix save
      ]
 ]
 Program = ["full",  # fast-print-img-full-wait

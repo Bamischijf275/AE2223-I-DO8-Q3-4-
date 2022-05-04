@@ -230,10 +230,10 @@ GroundTruth = "Test"
 #files
 Name = "Tape_B"
 Type=[".csv",".csv"]
-N=[1,20]
-M=[1,10]
-n = 1
-mm = 1
+N=[2,11]
+M=[2,11]
+n = N[0]
+mm = M[0]
 
 for Alg in Algorithms:
     print("\n ----- * -----")

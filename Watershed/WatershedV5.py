@@ -25,31 +25,6 @@ rnd.seed(1)
 def WATERSHED(FILE, PROGRAM, PARAMETERS):
     T0 = time.time()
 
-    # FUNCTIONS 
-    def COL(x, y, z, ID):
-        X = int((x / width) * 255)
-        Y = int((y / height) * 255)
-        Z = int(z ** 2)
-    
-        Col = (X, Y, Z)
-        ID += 1
-        return Col, ID
-
-    # Quality of Life
-    def PRINT(text):
-        print("\n")
-        print(text)
-
-    def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
-        # Print Progress bar
-        percent = ("{0:." + str(decimals) + "f}").format(100 * ((iteration) / float(total)))
-        filledLength = int(length * iteration // total)
-        bar = fill * filledLength + '-' * (length - filledLength)
-        print(f'\r  {prefix} |{bar}| {percent}% {suffix}', end=printEnd)
-        # Print New Line on Complete
-        if iteration >= total:
-            print('\n')
-
     # PARAMETERS:
     # file
     F_name = FILE[0][3]
@@ -58,7 +33,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     F_OUT_path = FILE[2][0]
     F_OUT_img_type = FILE[2][1][1]
     F_OUT_mat_type = FILE[2][2][1]
-        
+    
     Print_Image = False
     Print_Matrix = False
     if FILE[2][1][0] == "save": Print_Image = True
@@ -244,7 +219,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         ID = 1
         if P_shape == "circle":
             ((x, y), r) = cv.minEnclosingCircle(c)
-            Col, ID = COL(x, y, r, ID)
+            Col, ID = COL(x, y, r, ID, width, height)
             Shapes.append([x, y, r])
             if P_runtime == ("full" or "img") and Show_Shapes:
                 cv.circle(img_S, (int(x), int(y)), int(r), Col, 1)
@@ -255,7 +230,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         if P_shape == "ellipse":
             # bounding box
             rect = (x, y), (w, h), Agl = cv.minAreaRect(c)
-            Col, ID = COL(x, y, Agl, ID)
+            Col, ID = COL(x, y, Agl, ID, width, height)
             box = cv.boxPoints(rect)
             box = np.int0(box)
             if P_runtime == ("full" or "img") and Show_Shapes:
@@ -331,7 +306,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
             r = shape[2]
             if R_med / F_RE < r < R_med * F_RE:
                 F.add(r)
-                Col, ID = COL(x, y, r, ID)
+                Col, ID = COL(x, y, r, ID, width, height)
                 cv.circle(arr_out, (int(x), int(y)), int(r), ID, -1)
                 if Show_Fitted:
                     cv.circle(img_F, (int(x), int(y)), int(r), Col, -1)
@@ -345,7 +320,7 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
             a, b, Agl, c, e = shape[2:]
             if abs(e) < E_RE and B_med / F_RE < min(a, b) and max(a, b) < A_med * F_RE:
                 F.add(c)
-                Col, ID = COL(x, y, c, ID)
+                Col, ID = COL(x, y, c, ID, width, height)
                 cv.ellipse(arr_out, ((x, y), (a, b), Agl), ID, -1)
                 if Show_Shapes:
                     cv.ellipse(img_F, ((x, y), (a, b), Agl), Col, -1)
@@ -385,10 +360,6 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
     if (Print_Image or Print_Matrix):
         if P_runtime == ("full" or "print"):
             print("save results ...")
-        if F_OUT_Crop != [""]:
-            height, width, _ = img_out.shape
-            X, Y = F_OUT_Crop[1]
-            n, m =height/Y, width/X
             
     if Print_Image and P_runtime ==("full"or"img"):  # ID'ed Fibers only image
         # save to .type
@@ -457,6 +428,25 @@ def WATERSHED(FILE, PROGRAM, PARAMETERS):
         print("> " + str(round((T6 - T0) * 1)) + "[s] <")
     return arr_out
 
+# FUNCTIONS 
+def COL(x, y, z, ID, width, height):
+    X = int((x / width) * 255)
+    Y = int((y / height) * 255)
+    Z = int(z ** 2)
+    
+    Col = (X, Y, Z)
+    ID += 1
+    return Col, ID
+
+def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
+    # Print Progress bar
+    percent = ("{0:." + str(decimals) + "f}").format(100 * ((iteration) / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r  {prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+    # Print New Line on Complete
+    if iteration >= total:
+        print('\n')
 
 # MAIN
 print("----- START PROGRAM ----- \n")
@@ -464,36 +454,79 @@ T00 = time.time()
 
 # SETUP
 File = [
-    ["Tape_B", [2, 2], [1, 20], "name"],  # File
-    ["../Data/Tape_B/Tape_B_2_JPG/", ".jpg"],  # IN
-    ["../Data Processed/Watershed/Training/",  # OUT
-     ["", ".jpg"]],  # Image save
+    ["Tape_B", [1, 1], [1, 1], "name"],  # File
+    ["../Data/Tape_B/Images/", ".jpg"],  # IN
+    ["../Data Processed/Watershed/",  # OUT
+     ["", ".jpg"],  # Image save
      ["save", ".csv"]  # Matrix save
      ]
 ]
-Program = ["full",  # fast-print-img-full-wait
+    
+Program = ["fast",  # fast-print-img-full-wait
            250,  # Substeps
            "ellipse"  # shape=circle,ellipse,contour
            ]
 
 
-Parameters = [5, [2/3, 2.5, 0.85], [7, 8, 3], 3]  # Radius, Relative errors, Filter, kernel
+Parameters = [3.5, [0.4, 3, 1], [5, 5, 3], 3]  # Radius, Relative errors, Filter, kernel
 # LOOP
 N = File[0][1]
 M = File[0][2]
 
-n = N[0]
-while n <= N[1]:
-    m = M[0]
-    while m <= M[1]:
+Loop = "LIST"
+
+
+if Loop == "RANDOM":
+    
+    IT = 20
+    it = 0
+    
+    n = rnd.randint(N[0], N[1])
+    while it <= IT:
+        m = rnd.randint(M[0], M[1])
+        n = rnd.randint(N[0], N[1])
+
         print("\n ----- NEWFILE -----")
         name = File[0][0] + "_" + str(n) + "_-" + str(m)
         File[0][3] = name
         print("Image : ", name)
-
+    
         Result = WATERSHED(File, Program, Parameters)
-        m = rnd.randint(M[0], M[1])
-    n += 1
+
+elif Loop == "LIST":
+    N = [1,1,2,3,5,6,7,8,8,11]
+    M = [4,7,3,8,7,6,3,5,9,6]
+    
+    i = 0
+    I = len(N)
+     
+    while i < I:
+        n = N[i]
+        m = M[i]
+        
+        print("\n ----- NEWFILE -----")
+        name = File[0][0] + "_" + str(n) + "_" + str(m)
+        File[0][3] = name
+        print("Image : ", name)
+        
+        Result = WATERSHED(File, Program, Parameters)
+        
+        i += 1
+
+else:
+    n = N[0]
+    while n <= N[1]:
+        m = M[0]
+        while m <= M[1]:
+            print("\n ----- NEWFILE -----")
+            name = File[0][0] + "_" + str(n) + "_" + str(m)
+            File[0][3] = name
+            print("Image : ", name)
+    
+            Result = WATERSHED(File, Program, Parameters)
+            m += 1
+        n += 1
+    
 T11 = time.time()
 print("\n ----- END PROGRAM ----- \n")
 print("> " + str(round((T11 - T00), 1)) + "[s] <")

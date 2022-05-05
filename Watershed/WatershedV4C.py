@@ -447,8 +447,8 @@ else: #Full Tapes
     n=2
     mm=1
 
-P_runtime = "full"      #fast , full
-P_shape= "circle"      #boundary, circle, ellipse
+P_runtime = "fast"      #fast , full
+P_shape= "ellipse"      #boundary, circle, ellipse
 P_out = "save"          #save
 P_folder= "Test"   #Watershed, Test
 parameters=[P_runtime, P_shape, P_out, P_folder]

@@ -13,10 +13,10 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 #
-# for name in os.listdir("Watershed/Training"):
+# for name in os.listdir("Data Processed/Watershed/Training"):
 #     print(f"{name}")
 #     if name != str("TIF"):
-#         ar = np.genfromtxt(f"Watershed/Training/{name}",delimiter=",")
+#         ar = np.genfromtxt(f"Data Processed/Watershed/Training/{name}",delimiter=",")
 #         filename = name.replace(".csv","")
 #         ar = ar[1:,1:]
 #         ar = ar
@@ -32,31 +32,55 @@ def ID_renamer(ar):
 #             ar_bot = ID_renamer(ar_bot)
 #             ar_top_im = Image.fromarray(ar_top,)
 #             ar_bot_im = Image.fromarray(ar_bot)
-#             ar_top_im.save(f'Watershed/Training/TIF/{filename}_{top}.tif')
-#             ar_bot_im.save(f'Watershed/Training/TIF/{filename}_{bot}.tif')
+#             ar_top_im.save(f'Data Processed/Training/dataset4/masks/{filename}_{top}.tif')
+#             ar_bot_im.save(f'Data Processed/Training/dataset4/masks/{filename}_{bot}.tif')
 #             top +=1
 #             bot +=1
 
+print(len(os.listdir("Data Processed/Training/dataset4/masks")))
 
 
+#
+ID=0
+for name in os.listdir("Data Processed/AI results/dataset4/images"):
+    a_m = Image.open(f'Data Processed/AI results/dataset4/masks/{name}')
+    a_im = Image.open(f'Data Processed/AI results/dataset4/images/{name}')
+    a_m_ar = np.array(a_m)
+    a_im_ar = np.array(a_im)
+    if np.shape(a_m_ar) != np.shape(a_im_ar):
+        print(np.shape(a_m_ar),np.shape(a_im_ar))
+        print(f"Placeholder {ID},{name}")
+    fig = plt.figure(figsize=(5,6))
+    fig.add_subplot(1,5,1)
+    plt.imshow(a_m_ar,cmap = "gray")
+    fig.add_subplot(2,1,2)
+    plt.imshow(a_im_ar,cmap = "gray")
+    plt.show()
+    input(f"{name}")
+    ID +=1
 
-
-# ID=0
-# for name in os.listdir("Data Processed/Training/watershed/images"):
-#     a_m = Image.open(f'Data Processed/Training/watershed/masks/{name}')
-#     a_im = Image.open(f'Data Processed/Training/watershed/images/{name}')
-#     a_m_ar = np.array(a_m)
-#     a_im_ar = np.array(a_im)
-#     if np.shape(a_m_ar) != np.shape(a_im_ar):
-#         print(np.shape(a_m_ar),np.shape(a_im_ar))
-#         print(f"Placeholder {ID},{name}")
-#     # fig = plt.figure(figsize=(5,6))
-#     # fig.add_subplot(2,1,1)
-#     # plt.imshow(a_m_ar,cmap = "gray")
-#     # fig.add_subplot(2,1,2)
-#     # plt.imshow(a_im_ar,cmap = "gray")
-#     # plt.show()
-#     ID +=1
+def add_im_mask():
+    for name in os.listdir("Data Processed/Watershed/Training"):
+        if name != str("TIF"):
+            name = name.replace(".csv", "")
+            im = Image.open(f"Data/Tape_B/Tape_B_2_JPG/{name}.jpg")
+            ar = np.array(im)
+            ar_split = np.array_split(ar, 5, axis=1)
+            top = 1
+            bot = 6
+            for j in range(0,5):
+                ar_topbot = ar_split[j]
+                ar_topbot = np.array_split(ar_topbot,2,axis=0)
+                ar_top = ar_topbot[0].astype("uint8")
+                ar_bot = ar_topbot[1].astype("uint8")
+                ar_top = ID_renamer(ar_top)
+                ar_bot = ID_renamer(ar_bot)
+                ar_top_im = Image.fromarray(ar_top,)
+                ar_bot_im = Image.fromarray(ar_bot)
+                ar_top_im.save(f'Data Processed/Training/dataset4/images/{name}_{top}.tif')
+                ar_bot_im.save(f'Data Processed/Training/dataset4/images/{name}_{bot}.tif')
+                top +=1
+                bot +=1
 
 
 def random_dataset2():
@@ -86,19 +110,40 @@ def random_dataset2():
 
 def dim_checker():
     ID=0
-    for filename in os.listdir("Data Processed/Training/manual/masks"):
-        mask_im = Image.open(f"Data Processed/Training/manual/masks/{filename}")
-        im_im = Image.open(f"Data Processed/Training/manual/images/{filename}")
+    for filename in os.listdir("Data Processed/Training/dataset4/masks"):
+        mask_im = Image.open(f"Data Processed/Training/dataset4/masks/{filename}")
+        im_im = Image.open(f"Data Processed/Training/dataset4/images/{filename}")
         mask_ar = np.array(mask_im)
         im_ar = np.array(im_im)
-        ID +=1
-        print(ID)
-
         if np.shape(im_ar) != np.shape(mask_ar):
             print(f"{filename}, {np.shape(mask_ar),np.shape(im_ar)}")
+            ID += 1
+    if ID == 0:
+        print("all dimensions are correct")
+
+
 # im = Image.open(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)
 # im_ar = im_ar[:,2:]
 # im = Image.fromarray(im_ar)
 # im.save(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
-print(len(os.listdir("Data Processed/Training/watershed/images")))
+# print(len(os.listdir("Data Processed/Watershed/Training")))
+# ar = []
+# running = True
+# ID = 0
+# while running:
+#     number = random.randint(1,len(os.listdir("Data Processed/Training/watershed/images")))
+#     list = os.listdir("Data Processed/Training/watershed/images")
+#     if number in ar:
+#         print("Dupe")
+#     else:
+#         im = Image.open(f"Data Processed/Training/watershed/images/{list[number]}")
+#         mas = Image.open(f"Data Processed/Training/watershed/masks/{list[number]}")
+#         im.save(f'Data Processed/Training/dataset3/images/{list[number]}')
+#         mas.save(f'Data Processed/Training/dataset3/masks/{list[number]}')
+#         ar.append(number)
+#         ID +=1
+#     if ID >= 100:
+#         running = False
+# print(len(os.listdir("Data Processed/Training/dataset3/images")))
+#

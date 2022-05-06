@@ -45,11 +45,11 @@ N,M,K = [],[],[50,1]
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["", "print", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["print", "", "save"], 250]  # draw/print/save, substep Dt
 TypeOUT = [".jpg", ".csv"]
 Save = ["", "Matrix", ""]
 
-Compute = ["","CV","CP"] #WT,CP,CV
+Compute = ["WT","CV","CP"] #WT,CV,CP
 CV = ["CROP"]
 
 errorMin = 10**(-3)
@@ -149,23 +149,30 @@ if "CV" in Compute:
         print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
         T0 = time.time()
         
-        # parameters
-        CV_PathIN = ""
-        CV_PathOUT = "../Data Processed/Watershed/"
-        CV_Type=[".tif",".csv"]
-        
         # various converters
         if "TIFtoCSV" in CV:
-            path = os.path.join(path_script, CV_PathIN, name + CV_Type[0])
-            CONVERT_TIFtoCSV(CV_PathIN, CV_PathOUT)
+            CV_PathIN = "../Data Processed/Annotated/"
+            CV_PathOUT = "../Data Processed/Annotated/"
+            CV_Type=[".tif",".csv"]
         
-        if "CROP" in CV: #crop matrix     
+            PathIN = os.path.join(path_script, CV_PathIN, name + CV_Type[0])
+            PathOUT = os.path.join(path_script, CV_PathOUT, name + CV_Type[1])
+            CONVERT_TIFtoCSV(PathIN, PathOUT)
+            print("Converted",str(name+CV_Type[0]),"to",str(name+CV_Type[1]))
+        
+        if "CROP" in CV: #crop matrix   
+            CV_PathIN = "../Data Processed/Annotated/"
+            CV_PathOUT = "../Data Processed/Watershed/"
+            CV_Type=[".tif",".csv"]
+            
             FileName = name + CV_Type[1]
-            print(FileName)
             path = os.path.join(path_script, CV_PathOUT, FileName)
             Arr = np.genfromtxt(path, delimiter=",")
-                 
-            Arr_crop = CONVERT_CROP(Arr, 2, 5)
+            
+            #Arr_crop = CONVERT_CROP(Arr, 2, 5)
+            Arr_crop = CONVERT_CROP2(Arr)
+            #print(len(Arr_crop))
+            
             path = os.path.join(path_script, CV_PathOUT)
             os.chdir(path)
             print("Cropped : ", Arr.shape,"to", Arr_crop[0].shape)
@@ -187,8 +194,7 @@ if "CV" in Compute:
         
 if Tape == "Cropped":
     Tape = ""
-    M = [0,10]
-                
+
 # Comparator
 if "CP" in Compute:
     print("\n COMPARATOR : \n")
@@ -222,6 +228,7 @@ if "CP" in Compute:
 
         # file
         path = os.path.join(path_script, CP_PathIN, CP_GroundTruth, name + CP_Type[0])
+        print(path)
         CP_MatrixT = np.genfromtxt(path, delimiter=",")
     
         # compare each algo for each file

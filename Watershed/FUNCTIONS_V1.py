@@ -425,6 +425,9 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     Result = [[0, 0, 0, 0], [0, 0, 0, 0], 0, 0, 0]  # TP,TN,FP,FN (pixels, fibers), TrueFib, ResultFib, True Area
 
     # format matrices
+    MatrixT = np.array(MatrixT)
+    MatrixR = np.array(MatrixR)
+    
     SizeT = MatrixT.shape
     SizeR = MatrixR.shape
     if "print" in DETAIL[0]:
@@ -444,23 +447,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         print("     Matrix Size T,R Input:", SizeT, SizeR)
     
     while SizeR != SizeT:
-        print(SizeR[0],SizeT[0],SizeR[1],SizeT[1])
-        if SizeR[0] < SizeT[0]:
-            #pad
-            np.pad(MatrixR, [(0, 1), (0, 0)], mode='constant')
-            print("padding R0")
-        elif SizeR[0] > SizeT[0]:
-            #trim
-            MatrixR = np.delete(MatrixR, (0), axis=0)
-            print("trimming R0")
-        if SizeR[1] < SizeT[1]:
-            #pad
-            np.pad(MatrixR, [(0, 0), (0, 1)], mode='constant')
-            print("padding R1")
-        elif SizeR[1] > SizeT[1]:
-            #trim
-            MatrixR = np.delete(MatrixR, (0), axis=1)
-            print("trimming R1")
+        MatrixR = np.delete(MatrixR, (0), axis=0)
+        MatrixR = np.delete(MatrixR, (0), axis=1)
             
     if "print" in DETAIL[0]:
         print("     Matrix Size T,R Trimmed:", SizeT, SizeR)
@@ -724,16 +712,16 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         
     else:
         if N == [] and M==[]: # default
-            n, m = 2,1
+            n, m = 1,1
         else:
             n,m = N[0],M[0]
             
         if tape == "Large" or tape == "Cropped":
-            name + "_2_-" + str(n)
+            name = Name + "_2_-" + str(n)
         else:
             name = Name + "_" + str(n) + "_" + str(m)
         Names.append(name)
-        
+    
     return Names
 
 
@@ -773,4 +761,29 @@ def CONVERT_CROP(Arr, N, M):
     #print(Matrix.shape,"to", matrix.shape)
     return MATRIX
     
+def CONVERT_CROP2(ar):
+    ar_split = np.array_split(ar,5,axis=1)
+    top = 0
+    bot = 5
+    ar = [[],[],[],[],[],[],[],[],[],[]]
+    for j in range(0,5):
+        ar_topbot = ar_split[j]
+        ar_topbot = np.array_split(ar_topbot,2,axis=0)
+        ar_top = ar_topbot[0].astype("uint16")
+        ar_bot = ar_topbot[1].astype("uint16")
+        ar_top = ID_renamer(ar_top)
+        ar_bot = ID_renamer(ar_bot)
+        ar[top] = ar_top
+        ar[bot] = ar_bot
+        top +=1
+        bot +=1
+    #print(ar)
+    return ar
     
+def ID_renamer(ar):
+    ID = 0
+    for j in np.unique(ar):
+        if j !=0:
+            ID +=1
+            ar[ar==j] = ID
+    return ar

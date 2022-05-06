@@ -5,6 +5,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
 import random
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 def ID_renamer(ar):
     ID = 0
@@ -14,29 +16,30 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 #
-# for name in os.listdir("Data Processed/Watershed/Training"):
-#     print(f"{name}")
-#     if name != str("TIF"):
-#         ar = np.genfromtxt(f"Data Processed/Watershed/Training/{name}",delimiter=",")
-#         filename = name.replace(".csv","")
-#         ar = ar[1:,1:]
-#         ar = ar
-#         ar_split = np.array_split(ar,5,axis=1)
-#         top = 1
-#         bot = 6
-#         for j in range(0,5):
-#             ar_topbot = ar_split[j]
-#             ar_topbot = np.array_split(ar_topbot,2,axis=0)
-#             ar_top = ar_topbot[0].astype("uint16")
-#             ar_bot = ar_topbot[1].astype("uint16")
-#             ar_top = ID_renamer(ar_top)
-#             ar_bot = ID_renamer(ar_bot)
-#             ar_top_im = Image.fromarray(ar_top,)
-#             ar_bot_im = Image.fromarray(ar_bot)
-#             ar_top_im.save(f'Data Processed/Training/dataset4/masks/{filename}_{top}.tif')
-#             ar_bot_im.save(f'Data Processed/Training/dataset4/masks/{filename}_{bot}.tif')
-#             top +=1
-#             bot +=1
+for name in os.listdir("Data/Tape_B/Masks_tif"):
+    print(f"{name}")
+    if name != str("TIF"):
+        ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
+        ar_ar = np.array(ar_im)
+        #ar = np.genfromtxt(f"Data/Tape_B/Masks_tif/{name}",delimiter=",")
+        filename = name.replace(".tif","")
+        #ar = ar[1:,1:]
+        ar_split = np.array_split(ar_ar,5,axis=1)
+        top = 1
+        bot = 6
+        for j in range(0,5):
+            ar_topbot = ar_split[j]
+            ar_topbot = np.array_split(ar_topbot,2,axis=0)
+            ar_top = ar_topbot[0].astype("uint16")
+            ar_bot = ar_topbot[1].astype("uint16")
+            ar_top = ID_renamer(ar_top)
+            ar_bot = ID_renamer(ar_bot)
+            np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{top}.csv",ar_top, delimiter=",")
+            np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{bot}.csv", ar_bot, delimiter=",")
+            #ar_top_im = Image.fromarray(ar_top,)
+            #ar_bot_im = Image.fromarray(ar_bot)
+            top +=1
+            bot +=1
 
 def array_splitter(ar):
     ar_split = np.array_split(ar,5,axis=1)
@@ -56,7 +59,6 @@ def array_splitter(ar):
         ar[bot] = ar_bot
         print(ar)
         return ar
-
 
 
 # #
@@ -145,29 +147,15 @@ def color_image_maker(dataset):
         mask = Image.open(f"Data Processed/AI Results/{dataset}/masks/{filename}")
         mask_ar = np.array(mask)
         filename = filename.replace(".tif", "")
-        color_ar = np.zeros((np.shape(mask_ar)[1],np.shape(mask_ar)[0],3))
-        print(np.shape(color_ar))
-        color_store = []
-        mask_ar_unique = np.unique(mask_ar)[1:]
-        running = True
-        ID=0
-        while running:
-            R = random.randint(1,255)
-            G = random.randint(1,255)
-            B = random.randint(1,255)
-            RGB_ar = [R,G,B]
-            if RGB_ar not in color_store:
-                color_store.append(RGB_ar)
-                print(RGB_ar,color_store)
-                color_ar[np.where(mask_ar == mask_ar_unique[ID])] = RGB_ar
-                ID+=1
-            if ID >= len(mask_ar_unique):
-                running = False
-        print(color_ar)
-        color_im = Image.fromarray(color_ar,"RGB")
-        color_im.save(f"Data Processed/AI Results/{dataset}/pic_mask/{filename}.pdf")
+        tab20c = cm.get_cmap("tab20c",256)
+        cmap_cus = cmap(np.linspace(0,1,len(np.unique(mask_ar))))
+        white = [256,256,256,1]
+        cmap_cus[:1,:] = white
+        cmap = ListedColormap(cmap_cus)
+        plt.imshow(mask_ar,cmap=cmap)
+        plt.show()
         exit()
-color_image_maker(str("dataset2"))
+#color_image_maker(str("dataset2"))
 # im = Image.open(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)
 # im_ar = im_ar[:,2:]

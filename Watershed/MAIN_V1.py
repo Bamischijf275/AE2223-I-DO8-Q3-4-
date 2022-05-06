@@ -41,7 +41,7 @@ print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters
 Loop = "Random"  # Range, Random, List, All
-N,M,K = [],[],50 
+N,M,K = [],[],[50,1]
 Name = "Tape_B"
 Tape= "Large" #Large, Cropped, none=smalls
 
@@ -55,89 +55,33 @@ CV = ["CROP"]
 errorMin = 10**(-3)
 
 # file names
-def NAMES(loop, N=[], M=[],K=1):
-    Names = []
-    if Loop == "Range":
-        if N == [] or M==[]: # default
-            N = [1, 20]
-            M = [1, 10]
-    
-        n = N[0]
-        while n <= N[1]:
-            m = M[0]
-            while m <= M[1]:
-                if Tape == "Large" or Tape == "Cropped":
-                    name = Name + "_2_-" + str(n)
-                else:
-                    name = Name + "_" + str(n) + "_" + str(m)
-                Names.append(name)
-                m += 1
-            n += 1
-            
-    elif Loop == "List":
-        if N == [] or M==[]: # default
-            N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
-            M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
-        i = 0
-        while i < len(N):
-            if Tape == "Large" or Tape == "Cropped":
-                name = Name + "_2_-" + str(N[i])
-            else:
-                name = Name + "_" + str(N[i]) + "_" + str(M[i])
-            Names.append(name)
-            i += 1
-            
-    elif Loop == "Random":
-        if N == [] or M==[] or K==1: # default
-            if Tape == "Large" or Tape == "Cropped":
-                N,K = [0,2197],20
-            else:
-                N,M = [0,20],[0,10],20
-        i = 0
-        while i < K:
-            if Tape == "Large" or Tape == "Cropped":
-                name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
-            else:
-                name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
-            Names.append(name)
-            i += 1
-        
-    else:
-        if N == [] and M==[]: # default
-            n, m = 2,1
-        else:
-            n,m = N[0],M[0]
-            
-        if Tape == "Large" or Tape == "Cropped":
-            name + "_2_-" + str(n)
-        else:
-            name = Name + "_" + str(n) + "_" + str(m)
-        Names.append(name)
-        
-    return Names
-        
-Names = NAMES(Loop)
-Names = list(dict.fromkeys(Names))
-print("Filenames :")
-for name in Names:
-    print(name)
+
 
 # process
 path_script = os.path.dirname(__file__)
 
-for name in Names:
-    print("\n\n -- NEWFILE : ", name, " -- \n")
-    T0 = time.time()
-    # Waterhsed
-    if "WT" in Compute:
-        print("\n WATERSHED : \n")
+# Waterhsed
+if "WT" in Compute:
+    print("\n WATERSHED : \n")
+    
+    Names = NAMES(Loop,N,M,K,Tape,Name)
+    Names = list(dict.fromkeys(Names))
+    print("Filenames :")
+    for name in Names:
+        print(name)
+        
+    Progress = len(Names)
+    progress = 1
+    for name in Names:
+        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        T0 = time.time()
         
         # parameters
         WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
         #WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
 
         WT_PathIN = "../Data/Tape_B/"
-        WT_PathOUT = "../Data Processed/Training/"
+        WT_PathOUT = "../Data Processed/Watershed/Training/"
         WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
         if Tape == "Large" or Tape == "Cropped":
@@ -148,7 +92,7 @@ for name in Names:
         # file
         FileName = name + WT_Type[0]
         path = os.path.join(path_script, WT_PathIN, FileName)
-        print(path)
+        #print(path)
         WT_Image = cv.imread(path)
         #print(path)
     
@@ -184,10 +128,26 @@ for name in Names:
                 path = str(path + "Extras/" + FileName)
                 cv.imwrite(path, img)
                 i += 1
+            
+        progress += 1
+        T1 = time.time()
+        print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
      # Converter
-    if "CV" in Compute:
-        print("\n CONVERTER : \n")
+if "CV" in Compute:
+    print("\n CONVERTER : \n")
+    
+    Names = NAMES(Loop,N,M,K,Tape,Name)
+    Names = list(dict.fromkeys(Names))
+    print("Filenames :")
+    for name in Names:
+        print(name)
+        
+    Progress = len(Names)
+    progress = 1
+    for name in Names:
+        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        T0 = time.time()
         
         # parameters
         CV_PathIN = ""
@@ -219,9 +179,25 @@ for name in Names:
                 pd.DataFrame(Arr).to_csv((path), header="none", index="none")
                 m += 1
                 
-    # Comparator
-    if "CP" in Compute:
-        print("\n COMPARATOR : \n")
+        progress += 1
+        T1 = time.time()
+        print("> " + str(round((T1 - T0), 1)) + "[s] <")
+                
+# Comparator
+if "CP" in Compute:
+    print("\n COMPARATOR : \n")
+    
+    Names = NAMES(Loop,N,M,K,Tape,Name)
+    Names = list(dict.fromkeys(Names))
+    print("Filenames :")
+    for name in Names:
+        print(name)
+        
+    Progress = len(Names)
+    progress = 1
+    for name in Names:
+        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        T0 = time.time()
         
         # parameters
         CP_Parameters = [0.8]  # cutoff, DRAW, Dt
@@ -296,8 +272,9 @@ for name in Names:
                     cv.imwrite(path, img)
                     i += 1
             a += 1
-    
+             
     # end of name index[i][j]
+    progress += 1
     T1 = time.time()
     print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
@@ -337,9 +314,9 @@ if "CP" in Compute:
         a += 1
 
 # end
-T11 = time.time()
 print("\n")
 print("\n----- END PROGRAM ----- \n")
+T11 = time.time()
 print("> " + str(round((T11 - T00), 1)) + "[s] <")
 if "draw" in Detail[0]:
     cv.waitKey(1)

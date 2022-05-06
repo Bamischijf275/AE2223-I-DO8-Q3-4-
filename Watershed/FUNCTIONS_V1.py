@@ -655,6 +655,72 @@ def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill
     # Print New Line on Complete
     if iteration == total:
         print('')
+        
+def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
+    Names = []
+    if loop == "Range":
+        if N == [] or M==[]: # default
+            N = [1, 20]
+            M = [1, 10]
+    
+        n = N[0]
+        while n <= N[1]:
+            m = M[0]
+            while m <= M[1]:
+                if tape == "Large" or tape == "Cropped":
+                    name = Name + "_2_-" + str(n)
+                else:
+                    name = Name + "_" + str(n) + "_" + str(m)
+                Names.append(name)
+                m += 1
+            n += 1
+            
+    elif loop == "List":
+        if N == [] or M==[]: # default
+            N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
+            M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
+        i = 0
+        while i < len(N):
+            if tape == "Large" or tape == "Cropped":
+                name = Name + "_2_-" + str(N[i])
+            else:
+                name = Name + "_" + str(N[i]) + "_" + str(M[i])
+            Names.append(name)
+            i += 1
+            
+    elif loop == "Random":
+        if N == [] or M==[]: # default
+            if tape == "Large" or tape == "Cropped":
+                N= [0,2197]
+            else:
+                N,M = [0,20],[0,10]
+        elif K == 0:
+            K= [20,1]
+                
+        rnd.seed(K[1])
+        
+        i = 0
+        while i <= K[0]:
+            if tape == "Large" or tape == "Cropped":
+                name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
+            else:
+                name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
+            Names.append(name)
+            i += 1
+        
+    else:
+        if N == [] and M==[]: # default
+            n, m = 2,1
+        else:
+            n,m = N[0],M[0]
+            
+        if tape == "Large" or tape == "Cropped":
+            name + "_2_-" + str(n)
+        else:
+            name = Name + "_" + str(n) + "_" + str(m)
+        Names.append(name)
+        
+    return Names
 
 
 def CONVERT_TIFtoCSV(pathIN, pathOUT):

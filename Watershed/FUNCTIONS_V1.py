@@ -18,7 +18,7 @@ import time
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
-
+import os
 
 # FUNCTIONS
 
@@ -664,3 +664,29 @@ def CONVERT_TIFtoCSV(pathIN, pathOUT):
         pd.DataFrame(Arr).to_csv((pathOUT), header="none", index="none")
     # Arr_csv = np.genfromtxt(Arr, delimiter=",")
     return Arr
+
+def CONVERT_NAME(pathIN, nameOUT):
+    Img = PIL.Image.open(pathIN)
+    os.remove(pathIN)
+    cv.imwrite(nameOUT, Img)
+    
+def CONVERT_CROP(Arr, M, N):
+    print("     Crop in ", M,"x",N)
+    MATRIX = []
+    Matrix = np.array(Arr)
+    
+    H,W = Matrix.shape
+    w,h = math.floor(W/M),math.floor(H/N)
+    print("    ",W,"x",H,"to",w,"x",h)
+    
+    m = 0
+    while m < M:
+        n =0
+        while n < N:
+            matrix = MATRIX[m*h:(m+1)*h][n*w:(n+1)*w]
+            MATRIX.append(matrix)
+            n += 1
+        m += 1
+    return MATRIX
+    
+    

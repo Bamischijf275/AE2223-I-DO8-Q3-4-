@@ -45,17 +45,16 @@ N,M,K = [],[],[50,1]
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["print", "", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["print", "draw", "save"], 250]  # draw/print/save, substep Dt
 TypeOUT = [".jpg", ".csv"]
-Save = ["", "Matrix", ""]
+Save = ["", "Matrix", ""] #"Img", "Matrix", "Extra"
 
-Compute = ["WT","CV","CP"] #WT,CV,CP
-CV = ["CROP"]
+Compute = ["","","CP"] #WT,CV,CP
+CV = [""]
 
 errorMin = 10**(-3)
 
 # file names
-
 
 # process
 path_script = os.path.dirname(__file__)
@@ -85,7 +84,7 @@ if "WT" in Compute:
         WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
         if Tape == "Large" or Tape == "Cropped":
-            WT_PathIN += "Tape_B_2_JPG/"
+            WT_PathIN += "UncroppedImages/"
         else: 
             WT_PathIN += "Images/"
         
@@ -95,7 +94,7 @@ if "WT" in Compute:
         #print(path)
         WT_Image = cv.imread(path)
         #print(path)
-    
+
         WT = WATERSHED(WT_Image, WT_Parameters, Detail)
         WT_Image = WT[0]
         WT_Matrix = WT[1]
@@ -114,7 +113,8 @@ if "WT" in Compute:
             path = os.path.join(path_script, WT_PathOUT)
             os.chdir(path)
             path = str(path + FileName)
-            pd.DataFrame(WT_Matrix).to_csv((path), header="none", index="none")
+            #pd.DataFrame(WT_Matrix).to_csv((path), header="none", index="none")
+            np.savetxt(path, WT_Matrix, delimiter=",")
     
         if "Extra" in Save:
             IMG = WT[2]
@@ -151,8 +151,8 @@ if "CV" in Compute:
         
         # various converters
         if "TIFtoCSV" in CV:
-            CV_PathIN = "../Data Processed/Annotated/"
-            CV_PathOUT = "../Data Processed/Annotated/"
+            CV_PathIN = "..\Data Processed\AI results\dataset2\masks"
+            CV_PathOUT = "..\Data Processed\AI results\dataset2\masks"
             CV_Type=[".tif",".csv"]
         
             PathIN = os.path.join(path_script, CV_PathIN, name + CV_Type[0])
@@ -161,12 +161,12 @@ if "CV" in Compute:
             print("Converted",str(name+CV_Type[0]),"to",str(name+CV_Type[1]))
         
         if "CROP" in CV: #crop matrix   
-            CV_PathIN = "../Data Processed/Annotated/"
+            CV_PathIN = "../Data Processed/Watershed/"
             CV_PathOUT = "../Data Processed/Watershed/"
             CV_Type=[".tif",".csv"]
             
             FileName = name + CV_Type[1]
-            path = os.path.join(path_script, CV_PathOUT, FileName)
+            path = os.path.join(path_script, CV_PathIN, FileName)
             Arr = np.genfromtxt(path, delimiter=",")
             
             #Arr_crop = CONVERT_CROP(Arr, 2, 5)
@@ -185,7 +185,8 @@ if "CV" in Compute:
                 FileName = Name + "_" + str(n) + "_" + str(m)
                 print("saving :",FileName)
                 path = os.path.join(path_script, CV_PathOUT, FileName + CV_Type[1])
-                pd.DataFrame(Arr).to_csv((path), header="none", index="none")
+                #pd.DataFrame(Arr).to_csv((path), header="none", index="none")
+                np.savetxt(path, Arr, delimiter=",")
                 m += 1
                 
         progress += 1
@@ -216,8 +217,8 @@ if "CP" in Compute:
 
         CP_PathIN = "../Data Processed/"
         CP_PathOUT = "../Data Processed/Comparator/"
-        CP_Algorithms = ["Watershed"]
-        CP_GroundTruth = "Annotated"
+        CP_Algorithms = ["AI results/manual/mask_csv","AI results/dataset2/mask_csv","AI results/dataset3/mask_csv","AI results/dataset4/mask_csv", "Watershed"]
+        CP_GroundTruth = "Annotated/mask_csv"
         CP_Type = [".csv", ".png"]
         
         CP_Confusion = []

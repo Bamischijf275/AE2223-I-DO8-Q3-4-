@@ -15,31 +15,35 @@ def ID_renamer(ar):
             ID +=1
             ar[ar==j] = ID
     return ar
-#
 for name in os.listdir("Data/Tape_B/Masks_tif"):
-    print(f"{name}")
-    if name != str("TIF"):
-        ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
-        ar_ar = np.array(ar_im)
-        #ar = np.genfromtxt(f"Data/Tape_B/Masks_tif/{name}",delimiter=",")
-        filename = name.replace(".tif","")
-        #ar = ar[1:,1:]
-        ar_split = np.array_split(ar_ar,5,axis=1)
-        top = 1
-        bot = 6
-        for j in range(0,5):
-            ar_topbot = ar_split[j]
-            ar_topbot = np.array_split(ar_topbot,2,axis=0)
-            ar_top = ar_topbot[0].astype("uint16")
-            ar_bot = ar_topbot[1].astype("uint16")
-            ar_top = ID_renamer(ar_top)
-            ar_bot = ID_renamer(ar_bot)
-            np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{top}.csv",ar_top, delimiter=",")
-            np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{bot}.csv", ar_bot, delimiter=",")
-            #ar_top_im = Image.fromarray(ar_top,)
-            #ar_bot_im = Image.fromarray(ar_bot)
-            top +=1
-            bot +=1
+    ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
+    ar_ar = np.array(ar_im)
+    filename = name.replace(".tif", "")
+    np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}.csv",ar_ar, delimiter=",")
+# for name in os.listdir("Data/Tape_B/Masks_tif"):
+#     print(f"{name}")
+#     if name != str("TIF"):
+#         ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
+#         ar_ar = np.array(ar_im)
+#         #ar = np.genfromtxt(f"Data/Tape_B/Masks_tif/{name}",delimiter=",")
+#         filename = name.replace(".tif","")
+#         #ar = ar[1:,1:]
+#         ar_split = np.array_split(ar_ar,5,axis=1)
+#         top = 1
+#         bot = 6
+#         for j in range(0,5):
+#             ar_topbot = ar_split[j]
+#             ar_topbot = np.array_split(ar_topbot,2,axis=0)
+#             ar_top = ar_topbot[0].astype("uint16")
+#             ar_bot = ar_topbot[1].astype("uint16")
+#             ar_top = ID_renamer(ar_top)
+#             ar_bot = ID_renamer(ar_bot)
+#             np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{top}.csv",ar_top, delimiter=",")
+#             np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}_{bot}.csv", ar_bot, delimiter=",")
+#             #ar_top_im = Image.fromarray(ar_top,)
+#             #ar_bot_im = Image.fromarray(ar_bot)
+#             top +=1
+#             bot +=1
 
 def array_splitter(ar):
     ar_split = np.array_split(ar,5,axis=1)

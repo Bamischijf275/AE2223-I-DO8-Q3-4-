@@ -3,6 +3,7 @@ import os
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import cv2
 import random
 
 def ID_renamer(ar):
@@ -37,27 +38,45 @@ def ID_renamer(ar):
 #             top +=1
 #             bot +=1
 
-print(len(os.listdir("Data Processed/Training/dataset4/masks")))
+def array_splitter(ar):
+    ar_split = np.array_split(ar,5,axis=1)
+    top = 1
+    bot = 6
+    ar = [[],[],[],[],[],[],[],[],[],[]]
+    for j in range(0,5):
+        ar_topbot = ar_split[j]
+        ar_topbot = np.array_split(ar_topbot,2,axis=0)
+        ar_top = ar_topbot[0].astype("uint16")
+        ar_bot = ar_topbot[1].astype("uint16")
+        ar_top = ID_renamer(ar_top)
+        ar_bot = ID_renamer(ar_bot)
+        top +=1
+        bot +=1
+        ar[top] = ar_top
+        ar[bot] = ar_bot
+        print(ar)
+        return ar
 
 
-#
-ID=0
-for name in os.listdir("Data Processed/AI results/dataset4/images"):
-    a_m = Image.open(f'Data Processed/AI results/dataset4/masks/{name}')
-    a_im = Image.open(f'Data Processed/AI results/dataset4/images/{name}')
-    a_m_ar = np.array(a_m)
-    a_im_ar = np.array(a_im)
-    if np.shape(a_m_ar) != np.shape(a_im_ar):
-        print(np.shape(a_m_ar),np.shape(a_im_ar))
-        print(f"Placeholder {ID},{name}")
-    fig = plt.figure(figsize=(5,6))
-    fig.add_subplot(1,5,1)
-    plt.imshow(a_m_ar,cmap = "gray")
-    fig.add_subplot(2,1,2)
-    plt.imshow(a_im_ar,cmap = "gray")
-    plt.show()
-    input(f"{name}")
-    ID +=1
+
+# #
+# ID=0
+# for name in os.listdir("Data Processed/AI results/dataset4/images"):
+#     a_m = Image.open(f'Data Processed/AI results/dataset4/masks/{name}')
+#     a_im = Image.open(f'Data Processed/AI results/dataset4/images/{name}')
+#     a_m_ar = np.array(a_m)
+#     a_im_ar = np.array(a_im)
+#     if np.shape(a_m_ar) != np.shape(a_im_ar):
+#         print(np.shape(a_m_ar),np.shape(a_im_ar))
+#         print(f"Placeholder {ID},{name}")
+#     fig = plt.figure(figsize=(5,6))
+#     fig.add_subplot(1,5,1)
+#     plt.imshow(a_m_ar,cmap = "gray")
+#     fig.add_subplot(2,1,2)
+#     plt.imshow(a_im_ar,cmap = "gray")
+#     plt.show()
+#     input(f"{name}")
+#     ID +=1
 
 def add_im_mask():
     for name in os.listdir("Data Processed/Watershed/Training"):
@@ -121,7 +140,34 @@ def dim_checker():
     if ID == 0:
         print("all dimensions are correct")
 
-
+def color_image_maker(dataset):
+    for filename in os.listdir(f"Data Processed/AI Results/{dataset}/masks"):
+        mask = Image.open(f"Data Processed/AI Results/{dataset}/masks/{filename}")
+        mask_ar = np.array(mask)
+        filename = filename.replace(".tif", "")
+        color_ar = np.zeros((np.shape(mask_ar)[1],np.shape(mask_ar)[0],3))
+        print(np.shape(color_ar))
+        color_store = []
+        mask_ar_unique = np.unique(mask_ar)[1:]
+        running = True
+        ID=0
+        while running:
+            R = random.randint(1,255)
+            G = random.randint(1,255)
+            B = random.randint(1,255)
+            RGB_ar = [R,G,B]
+            if RGB_ar not in color_store:
+                color_store.append(RGB_ar)
+                print(RGB_ar,color_store)
+                color_ar[np.where(mask_ar == mask_ar_unique[ID])] = RGB_ar
+                ID+=1
+            if ID >= len(mask_ar_unique):
+                running = False
+        print(color_ar)
+        color_im = Image.fromarray(color_ar,"RGB")
+        color_im.save(f"Data Processed/AI Results/{dataset}/pic_mask/{filename}.pdf")
+        exit()
+color_image_maker(str("dataset2"))
 # im = Image.open(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)
 # im_ar = im_ar[:,2:]

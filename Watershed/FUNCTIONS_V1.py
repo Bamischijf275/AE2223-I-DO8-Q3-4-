@@ -439,15 +439,29 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     MatrixR = np.delete(MatrixR, (0), axis=0)
     MatrixR = np.delete(MatrixR, (0), axis=1)
     SizeR = MatrixR.shape
-
-    if SizeT != SizeR:
-        Matrix = np.zeros(SizeT)
-        Matrix[:MatrixR.shape[0], :MatrixR.shape[1]]
-        MatrixR = Matrix
-    if SizeT != SizeR:
-        Matrix = np.zeros(SizeR)
-        Matrix[:MatrixT.shape[0], :MatrixT.shape[1]]
-        MatrixT = Matrix
+    
+    if "print" in DETAIL[0]:
+        print("     Matrix Size T,R Input:", SizeT, SizeR)
+    
+    while SizeR != SizeT:
+        print(SizeR[0],SizeT[0],SizeR[1],SizeT[1])
+        if SizeR[0] < SizeT[0]:
+            #pad
+            np.pad(MatrixR, [(0, 1), (0, 0)], mode='constant')
+            print("padding R0")
+        elif SizeR[0] > SizeT[0]:
+            #trim
+            MatrixR = np.delete(MatrixR, (0), axis=0)
+            print("trimming R0")
+        if SizeR[1] < SizeT[1]:
+            #pad
+            np.pad(MatrixR, [(0, 0), (0, 1)], mode='constant')
+            print("padding R1")
+        elif SizeR[1] > SizeT[1]:
+            #trim
+            MatrixR = np.delete(MatrixR, (0), axis=1)
+            print("trimming R1")
+            
     if "print" in DETAIL[0]:
         print("     Matrix Size T,R Trimmed:", SizeT, SizeR)
 
@@ -736,23 +750,27 @@ def CONVERT_NAME(pathIN, nameOUT):
     os.remove(pathIN)
     cv.imwrite(nameOUT, Img)
     
-def CONVERT_CROP(Arr, M, N):
-    print("     Crop in ", M,"x",N)
+def CONVERT_CROP(Arr, N, M):
+    print("     Crop in ", N,"x",M)
     MATRIX = []
     Matrix = np.array(Arr)
     
-    H,W = Matrix.shape
-    w,h = math.floor(W/M),math.floor(H/N)
+    W,H = Matrix.shape
+    w,h = math.floor(W/N),math.floor(H/M)
     print("    ",W,"x",H,"to",w,"x",h)
-    
-    m = 0
-    while m < M:
-        n =0
-        while n < N:
-            matrix = MATRIX[m*h:(m+1)*h][n*w:(n+1)*w]
+    n = 0
+    while n < N:
+        m =0
+        while m < M:
+            size = [n*w,(n+1)*w, m*h,(m+1)*h]
+            #print(size)
+            matrix = Matrix[size[0]:size[1] , size[2]:size[3]]
+            #print(matrix.shape)
             MATRIX.append(matrix)
-            n += 1
-        m += 1
+            m += 1
+        n += 1
+        
+    #print(Matrix.shape,"to", matrix.shape)
     return MATRIX
     
     

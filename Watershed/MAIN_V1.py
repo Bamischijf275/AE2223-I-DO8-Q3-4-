@@ -40,16 +40,16 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters
-Loop = "Random"  # Range, Random, List, All
+Loop = "List"  # Range, Random, List, All
 N,M,K = [],[],[50,1]
 Name = "Tape_B"
-Tape= "Large" #Large, Cropped, none=smalls
+Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["", "print", "save"], 250]  # draw/print/save, substep Dt
 TypeOUT = [".jpg", ".csv"]
 Save = ["", "Matrix", ""]
 
-Compute = ["WT","",""] #WT,CP,CV
+Compute = ["","CV","CP"] #WT,CP,CV
 CV = ["CROP"]
 
 errorMin = 10**(-3)
@@ -81,7 +81,7 @@ if "WT" in Compute:
         #WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
 
         WT_PathIN = "../Data/Tape_B/"
-        WT_PathOUT = "../Data Processed/Watershed/Training/"
+        WT_PathOUT = "../Data Processed/Watershed/"
         WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
         if Tape == "Large" or Tape == "Cropped":
@@ -164,24 +164,30 @@ if "CV" in Compute:
             print(FileName)
             path = os.path.join(path_script, CV_PathOUT, FileName)
             Arr = np.genfromtxt(path, delimiter=",")
-            
-            Arr_crop = CONVERT_CROP(Arr, 5, 2)
+                 
+            Arr_crop = CONVERT_CROP(Arr, 2, 5)
             path = os.path.join(path_script, CV_PathOUT)
             os.chdir(path)
+            print("Cropped : ", Arr.shape,"to", Arr_crop[0].shape)
             
             sep = '-'
             n = name.split(sep, 1)[-1]
             m = 1
+            
             for Arr in Arr_crop:
                 FileName = Name + "_" + str(n) + "_" + str(m)
                 print("saving :",FileName)
-                path = os.path.join(path_script, CV_PathOUT, FileName+CV_Type[1])
+                path = os.path.join(path_script, CV_PathOUT, FileName + CV_Type[1])
                 pd.DataFrame(Arr).to_csv((path), header="none", index="none")
                 m += 1
                 
         progress += 1
         T1 = time.time()
         print("> " + str(round((T1 - T0), 1)) + "[s] <")
+        
+if Tape == "Cropped":
+    Tape = ""
+    M = [0,10]
                 
 # Comparator
 if "CP" in Compute:

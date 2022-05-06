@@ -15,11 +15,13 @@ def ID_renamer(ar):
             ID +=1
             ar[ar==j] = ID
     return ar
-for name in os.listdir("Data/Tape_B/Masks_tif"):
-    ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
-    ar_ar = np.array(ar_im)
-    filename = name.replace(".tif", "")
-    np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}.csv",ar_ar, delimiter=",")
+def Tabe_B_toCSV():
+    for name in os.listdir("Data/Tape_B/Masks_tif"):
+        ar_im = Image.open(f"Data/Tape_B/Masks_tif/{name}")
+        ar_ar = np.array(ar_im)
+        filename = name.replace(".tif", "")
+        np.savetxt(f"Data Processed/Annotated/mask_csv/{filename}.csv",ar_ar, delimiter=",")
+
 # for name in os.listdir("Data/Tape_B/Masks_tif"):
 #     print(f"{name}")
 #     if name != str("TIF"):
@@ -67,9 +69,9 @@ def array_splitter(ar):
 
 # #
 # ID=0
-# for name in os.listdir("Data Processed/AI results/dataset4/images"):
-#     a_m = Image.open(f'Data Processed/AI results/dataset4/masks/{name}')
-#     a_im = Image.open(f'Data Processed/AI results/dataset4/images/{name}')
+# for name in os.listdir("Data Processed/AI results/dataset4_ver1/images"):
+#     a_m = Image.open(f'Data Processed/AI results/dataset4_ver1/masks/{name}')
+#     a_im = Image.open(f'Data Processed/AI results/dataset4_ver1/images/{name}')
 #     a_m_ar = np.array(a_m)
 #     a_im_ar = np.array(a_im)
 #     if np.shape(a_m_ar) != np.shape(a_im_ar):
@@ -102,8 +104,8 @@ def add_im_mask():
                 ar_bot = ID_renamer(ar_bot)
                 ar_top_im = Image.fromarray(ar_top,)
                 ar_bot_im = Image.fromarray(ar_bot)
-                ar_top_im.save(f'Data Processed/Training/dataset4/images/{name}_{top}.tif')
-                ar_bot_im.save(f'Data Processed/Training/dataset4/images/{name}_{bot}.tif')
+                ar_top_im.save(f'Data Processed/Training/dataset4_ver1/images/{name}_{top}.tif')
+                ar_bot_im.save(f'Data Processed/Training/dataset4_ver1/images/{name}_{bot}.tif')
                 top +=1
                 bot +=1
 
@@ -126,8 +128,8 @@ def random_dataset2():
             ID +=1
             mask = Image.open(f"Data Processed/Training/watershed/masks/Tape_B_2_-{pic_num}_{sec_num}.tif")
             im = Image.open(f"Data Processed/Training/watershed/images/Tape_B_2_-{pic_num}_{sec_num}.tif")
-            mask.save(f"Data Processed/Training/dataset2/masks/Tape_B_2_{pic_num}_{sec_num}.tif")
-            im.save(f"Data Processed/Training/dataset2/images/Tape_B_2_{pic_num}_{sec_num}.tif")
+            mask.save(f"Data Processed/Training/dataset2`_ver1/masks/Tape_B_2_{pic_num}_{sec_num}.tif")
+            im.save(f"Data Processed/Training/dataset2`_ver1/images/Tape_B_2_{pic_num}_{sec_num}.tif")
         if ID >=30:
             print(manual_set)
             running = False
@@ -135,9 +137,9 @@ def random_dataset2():
 
 def dim_checker():
     ID=0
-    for filename in os.listdir("Data Processed/Training/dataset4/masks"):
-        mask_im = Image.open(f"Data Processed/Training/dataset4/masks/{filename}")
-        im_im = Image.open(f"Data Processed/Training/dataset4/images/{filename}")
+    for filename in os.listdir("Data Processed/Training/dataset4_ver1/masks"):
+        mask_im = Image.open(f"Data Processed/Training/dataset4_ver1/masks/{filename}")
+        im_im = Image.open(f"Data Processed/Training/dataset4_ver1/images/{filename}")
         mask_ar = np.array(mask_im)
         im_ar = np.array(im_im)
         if np.shape(im_ar) != np.shape(mask_ar):
@@ -153,13 +155,22 @@ def color_image_maker(dataset):
         filename = filename.replace(".tif", "")
         tab20c = cm.get_cmap("tab20c",256)
         cmap_cus = cmap(np.linspace(0,1,len(np.unique(mask_ar))))
-        white = [256,256,256,1]
+        white = np.array([256,256,256,1])
+        cmap_cus[:1,:] = white
+        newcmp = ListedColormap(cmap_cus)
         cmap_cus[:1,:] = white
         cmap = ListedColormap(cmap_cus)
         plt.imshow(mask_ar,cmap=cmap)
         plt.show()
         exit()
-#color_image_maker(str("dataset2"))
+
+def mask_to_csv(dataset):
+    for name in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
+        im = Image.open(f"Data Processed/AI results/{dataset}/masks/{name}")
+        filename = name.replace(".tif","")
+        im_ar = np.array(im)
+        np.savetxt(f"Data Processed/AI results/{dataset}/mask_csv/{filename}.csv",im_ar,delimiter = ",")
+mask_to_csv(str("dataset4"))
 # im = Image.open(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)
 # im_ar = im_ar[:,2:]
@@ -177,11 +188,11 @@ def color_image_maker(dataset):
 #     else:
 #         im = Image.open(f"Data Processed/Training/watershed/images/{list[number]}")
 #         mas = Image.open(f"Data Processed/Training/watershed/masks/{list[number]}")
-#         im.save(f'Data Processed/Training/dataset3/images/{list[number]}')
-#         mas.save(f'Data Processed/Training/dataset3/masks/{list[number]}')
+#         im.save(f'Data Processed/Training/dataset3_ver1/images/{list[number]}')
+#         mas.save(f'Data Processed/Training/dataset3_ver1/masks/{list[number]}')
 #         ar.append(number)
 #         ID +=1
 #     if ID >= 100:
 #         running = False
-# print(len(os.listdir("Data Processed/Training/dataset3/images")))
+# print(len(os.listdir("Data Processed/Training/dataset3_ver1/images")))
 #

@@ -40,18 +40,18 @@ def ID_renamer(ar):
 print(len(os.listdir("Data Processed/Training/dataset4/masks")))
 
 
-
+#
 ID=0
-for name in os.listdir("Data Processed/Training/dataset4/images"):
-    a_m = Image.open(f'Data Processed/Training/dataset4/masks/{name}')
-    a_im = Image.open(f'Data Processed/Training/dataset4/images/{name}')
+for name in os.listdir("Data Processed/AI results/dataset4/images"):
+    a_m = Image.open(f'Data Processed/AI results/dataset4/masks/{name}')
+    a_im = Image.open(f'Data Processed/AI results/dataset4/images/{name}')
     a_m_ar = np.array(a_m)
     a_im_ar = np.array(a_im)
     if np.shape(a_m_ar) != np.shape(a_im_ar):
         print(np.shape(a_m_ar),np.shape(a_im_ar))
         print(f"Placeholder {ID},{name}")
     fig = plt.figure(figsize=(5,6))
-    fig.add_subplot(2,1,1)
+    fig.add_subplot(1,5,1)
     plt.imshow(a_m_ar,cmap = "gray")
     fig.add_subplot(2,1,2)
     plt.imshow(a_im_ar,cmap = "gray")
@@ -115,7 +115,6 @@ def dim_checker():
         im_im = Image.open(f"Data Processed/Training/dataset4/images/{filename}")
         mask_ar = np.array(mask_im)
         im_ar = np.array(im_im)
-
         if np.shape(im_ar) != np.shape(mask_ar):
             print(f"{filename}, {np.shape(mask_ar),np.shape(im_ar)}")
             ID += 1

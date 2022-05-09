@@ -148,21 +148,75 @@ def dim_checker():
     if ID == 0:
         print("all dimensions are correct")
 
-def color_image_maker(dataset):
-    for filename in os.listdir(f"Data Processed/AI Results/{dataset}/masks"):
-        mask = Image.open(f"Data Processed/AI Results/{dataset}/masks/{filename}")
-        mask_ar = np.array(mask)
-        filename = filename.replace(".tif", "")
-        tab20c = cm.get_cmap("tab20c",256)
-        cmap_cus = cmap(np.linspace(0,1,len(np.unique(mask_ar))))
-        white = np.array([256,256,256,1])
-        cmap_cus[:1,:] = white
-        newcmp = ListedColormap(cmap_cus)
-        cmap_cus[:1,:] = white
-        cmap = ListedColormap(cmap_cus)
-        plt.imshow(mask_ar,cmap=cmap)
-        plt.show()
-        exit()
+def get_mask(dataset,filename):
+    mask = Image.open(f"Data Processed/AI results/{dataset}/masks/{filename}")
+    mask_ar = np.array(mask)
+    name = filename.replace(".tif","")
+    tab20c = cm.get_cmap("tab20c", 256)
+    cmap_cus = tab20c(np.linspace(0, 1, len(np.unique(mask_ar))))
+    white = np.array([0, 0, 0, 1])
+    cmap_cus[:1, :] = white
+    newcmp = ListedColormap(cmap_cus)
+    return mask_ar,dataset,newcmp
+
+def color_image_maker(filename):
+    mask_array = []
+    dataset_names = []
+    fig = plt.figure(constrained_layout = True)
+    ax = fig.add_gridspec(3,2)
+    ax1 = fig.add_subplot(ax[0,1])
+    ax_11 = fig.add_subplot(ax[0,0])
+    ax2 = fig.add_subplot(ax[1,0])
+    ax3 = fig.add_subplot(ax[1,1])
+    ax4 = fig.add_subplot(ax[2,0])
+    ax5 = fig.add_subplot(ax[2,1])
+    # set the spacing between subplots
+    plt.subplots_adjust(left=0.1,
+                        bottom=0.1,
+                        right=0.4,
+                        top=0.9,
+                        wspace=0.1,
+                        hspace=0.3)
+    #Ground thruth image
+    GT_im = Image.open(f"Data Processed/Annotated/{filename}")
+    GT_ar = np.array(GT_im)
+    tab20c = cm.get_cmap("tab20c", 256)
+    cmap_cus = tab20c(np.linspace(0, 1, len(np.unique(GT_ar))))
+    white = np.array([0, 0, 0, 1])
+    cmap_cus[:1, :] = white
+    newcmp = ListedColormap(cmap_cus)
+    ax1.set_title("GT")
+    ax1.imshow(GT_ar,cmap = newcmp,interpolation='nearest')
+    ax1.axis("off")
+    ax_11.set_title("Image")
+    ax_11.imshow(Image.open(f"Data Processed/AI results/dataset1/images/{filename}"),cmap="gray")
+    ax_11.axis("off")
+    ID = 0
+
+    for dataset in os.listdir("Data Processed/AI results"):
+        print(dataset,ID)
+        mask_ar,dataset,newcmp = get_mask(dataset,filename)
+
+        if ID == 0:
+            ax2.set_title(f"{dataset}")
+            ax2.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+            ax2.axis("off")
+        if ID == 1:
+            ax3.set_title(f"{dataset}")
+            ax3.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+            ax3.axis("off")
+        if ID == 2:
+            ax4.set_title(f"{dataset}")
+            ax4.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+            ax4.axis("off")
+        if ID == 3:
+            ax5.set_title(f"{dataset}")
+            ax5.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+            ax5.axis("off")
+        ID +=1
+    plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
+    plt.show()
+
 
 def mask_to_csv(dataset):
     for name in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
@@ -170,12 +224,14 @@ def mask_to_csv(dataset):
         filename = name.replace(".tif","")
         im_ar = np.array(im)
         np.savetxt(f"Data Processed/AI results/{dataset}/mask_csv/{filename}.csv",im_ar,delimiter = ",")
-mask_to_csv(str("dataset4"))
-# im = Image.open(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
+for filename in os.listdir("Data Processed/AI results/dataset1/images"):
+    color_image_maker(filename)
+
+# im = Image.open(f"Data Processed/Training/dataset1/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)
 # im_ar = im_ar[:,2:]
 # im = Image.fromarray(im_ar)
-# im.save(f"Data Processed/Training/manual/images/Tape_B_2_5.tif")
+# im.save(f"Data Processed/Training/dataset1/images/Tape_B_2_5.tif")
 # print(len(os.listdir("Data Processed/Watershed/Training")))
 # ar = []
 # running = True

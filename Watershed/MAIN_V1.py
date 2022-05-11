@@ -47,7 +47,7 @@ TypeOUT = [".jpg", ".csv"]
 Save = ["", "Matrix", ""] #"Img", "Matrix", "Extra"
 
 Compute = ["","","CP"] #WT,CV,CP
-CV=[""] #CROP, TIFtoCSV
+CV=["CROP"] #CROP, TIFtoCSV
 
 errorMin = 10**(-3)
 o = 2 # decimals
@@ -56,7 +56,9 @@ o = 2 # decimals
 WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
 #WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
 
-CP_Parameters = [0.85,0.5]  # cutoff, DRAW, Dt
+CP_Parameters = [0.8]  # cutoff
+
+M = [0,1,2] #choose plots (area,fiber,own metrics)
 
 # file names
 WT_PathIN = "../Data/Tape_B/"
@@ -67,9 +69,9 @@ CV_PathIN = "../Data Processed/Watershed/"
 CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
 
 CP_PathIN = "../Data Processed/"
-CP_GroundTruth = "Annotated"   #sub-folder
+CP_GroundTruth = "Annotated/mask_csv"   #sub-folder
 CP_Algorithms = [               #sub-folders
-        "Annotated",
+        #"Annotated",
         "AI results/dataset1/",
         "AI results/dataset2/",
         "AI results/dataset3/",
@@ -86,6 +88,13 @@ path_script = os.path.dirname(__file__)
 if "WT" in Compute:
     print("\n WATERSHED : \n")
     
+    if Tape == "Large" or Tape == "Cropped":
+        WT_PathIN += "UncroppedImages/"
+        WT_Type[1] = "L"+WT_Type[1]
+        WT_Type[2] = "L"+WT_Type[2] # consistent naming scheme (Large pictures)
+    else: 
+        WT_PathIN += "Images/"
+    
     Names = NAMES(Loop,N,M,K,Tape,Name)
     Names = list(dict.fromkeys(Names))
     print("Filenames :")
@@ -98,17 +107,12 @@ if "WT" in Compute:
         print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
         T0 = time.time()
         
-        if Tape == "Large" or Tape == "Cropped":
-            WT_PathIN += "UncroppedImages/"
-        else: 
-            WT_PathIN += "Images/"
-        
         # file
         FileName = name + WT_Type[0]
         path = os.path.join(path_script, WT_PathIN, FileName)
-        #print(path)
+        print(path)
         WT_Image = cv.imread(path)
-        #print(path)
+        print(path)
 
         WT = WATERSHED(WT_Image, WT_Parameters, Detail)
         WT_Image = WT[0]
@@ -151,6 +155,7 @@ if "WT" in Compute:
      # Converter
 if "CV" in Compute:
     print("\n CONVERTER : \n")
+    
     Names = NAMES(Loop,N,M,K,Tape,Name)
     # remove _2_ if "CROP"
     Names = list(dict.fromkeys(Names))
@@ -174,9 +179,9 @@ if "CV" in Compute:
             print("Converted",str(name+CV_Type[0]),"to",str(name+CV_Type[1]))
         
         if "CROP" in CV: #crop matrix   
-            #CV_Type=[".tif",".csv"]
+            CV_Type=[".tif",".csv"]
             
-            FileName = name + CV_Type[1]
+            FileName = name + "L" + CV_Type[1]
             path = os.path.join(path_script, CV_PathIN, FileName)
             Arr = np.genfromtxt(path, delimiter=",")
             
@@ -216,6 +221,19 @@ if "CP" in Compute:
     for name in Names:
         print(name)
         
+    CP_Confusion = []
+    CP_res = []
+    CP_stat = []
+    a = 0
+    while a < len(CP_Algorithms):
+        CP_Confusion.append([[0,0,0,0],[0,0,0,0]]) # Fibers
+        CP_res.append([
+                    [[],[],[],[]], # area confusion
+                    [[],[],[],[]], # fiber confusion
+                    [[],[],[],[]] # metrics
+                    ])
+        a += 1
+        
     Progress = len(Names)
     progress = 1
     for name in Names:
@@ -223,28 +241,14 @@ if "CP" in Compute:
         T0 = time.time()
 
         CP_Type = [".csv", ".png"]
-        
-        CP_Confusion = []
-        CP_res = []
-        CP_stat = []
-        a = 0
-        while a < len(CP_Algorithms):
-            CP_Confusion.append([[0,0,0,0],[0,0,0,0]]) # Fibers
-            CP_res.append([
-                    [[],[],[],[]], # area confusion
-                    [[],[],[],[]], # fiber confusion
-                    [[],[],[],[]] # metrics
-                    ])
-            CP_stat.append([[],[],[]]) # metrics
-            a += 1
 
         # file
         path = os.path.join(path_script, CP_PathIN, CP_GroundTruth, name + CP_Type[0])
-        print(path)
+        #print(path)
         CP_MatrixT = np.genfromtxt(path, delimiter=",")
     
         # compare each algo for each file
-        a = 0
+        a=0
         for Alg in CP_Algorithms:
             # File
             print(Alg, "against", CP_GroundTruth)
@@ -276,19 +280,19 @@ if "CP" in Compute:
             
             # Area
             CP_res[a][0][0].append(result[0][0]/result[0][3])
-            CP_res[a][0][1].append(result[0][1]/result[0][3])
-            CP_res[a][0][2].append(result[0][2]/result[0][3])
+            CP_res[a][0][1].append(1-result[0][1]/result[0][3])
+            CP_res[a][0][2].append(1-result[0][2]/result[0][3])
             CP_res[a][0][3].append(result[0][3])
             # Fibers
             CP_res[a][1][0].append(result[1][0]/result[1][3])
-            CP_res[a][1][1].append(result[1][1]/result[1][3])
-            CP_res[a][1][2].append(result[1][2]/result[1][3])
+            CP_res[a][1][1].append(1-result[1][1]/result[1][3])
+            CP_res[a][1][2].append(1-result[1][2]/result[1][3])
             CP_res[a][1][3].append(result[1][3])
             # Metrics
             CP_res[a][2][0].append(result[2][0])
-            CP_res[a][2][1].append(result[2][1])
-            CP_res[a][2][2].append(result[2][2])
-            CP_res[a][2][3].append(result[2][3])
+            CP_res[a][2][1].append(1-result[2][1])
+            CP_res[a][2][2].append(1-result[2][2])
+            CP_res[a][2][3].append(1-result[2][3])
 
             # Save images
             if "Extra" in Save:
@@ -304,11 +308,10 @@ if "CP" in Compute:
                     cv.imwrite(path, img)
                     i += 1
             a += 1
-             
-    # end of name index[i][j]
-    progress += 1
-    T1 = time.time()
-    print("> " + str(round((T1 - T0), 1)) + "[s] <")
+            
+        progress += 1
+        T1 = time.time()
+        print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
 if "CP" in Compute:
     a = 0
@@ -319,45 +322,48 @@ if "CP" in Compute:
     
     while a < len(CP_Algorithms):
         print("\n Comparing ",CP_Algorithms[a], "against", CP_GroundTruth, ": ")
-        print("Area")   
-        print("     Accuracy TP:", round(stat.mean(CP_res[a][0][0])*100,o), "%")
-        print("     Accuracy FP:", round(stat.mean(CP_res[a][0][1])*100,o), "%")
-        print("     Accuracy FN:", round(stat.mean(CP_res[a][0][2])*100,o), "%")
+        print("Area")
+        print("     TP:", round(stat.mean(CP_res[a][0][0])*100,o), "%")
+        print("     FP:", round(stat.mean(CP_res[a][0][1])*100,o), "%")
+        print("     FN:", round(stat.mean(CP_res[a][0][2])*100,o), "%")
         
         print("Fibers")
-        print("     Accuracy TP:", round(stat.mean(CP_res[a][1][0])*100,o), "%")
-        print("     Accuracy FP:", round(stat.mean(CP_res[a][1][1])*100,o), "%")
-        print("     Accuracy FN:", round(stat.mean(CP_res[a][1][2])*100,o), "%")
+        print("     TP:", round(stat.mean(CP_res[a][1][0])*100,o), "%")
+        print("     FP:", round(stat.mean(CP_res[a][1][1])*100,o), "%")
+        print("     FN:", round(stat.mean(CP_res[a][1][2])*100,o), "%")
         
         print("Metrics")
-        # Metrics
-        CP_stat[a][0] = [
-                stat.median_low(CP_res[a][2][0]),  
-                1-stat.median_low(CP_res[a][2][1]),  
-                1-stat.median_low(CP_res[a][2][2]), 
-                1-stat.median_low(CP_res[a][2][3])
-                ]
-        CP_stat[a][1] = [  
-                stat.mean(CP_res[a][2][0]),  
-                1-stat.mean(CP_res[a][2][1]),  
-                1-stat.mean(CP_res[a][2][2]), 
-                1-stat.mean(CP_res[a][2][3])
-                ]
-        CP_stat[a][2] = [  
-                stat.median_high(CP_res[a][2][0]),  
-                1-stat.median_high(CP_res[a][2][1]),  
-                1-stat.median_high(CP_res[a][2][2]), 
-                1-stat.median_high(CP_res[a][2][3])
-                ]
-        print("     a:", round(CP_stat[a][1][0]*100,o), "%")
-        print("     b:", round(CP_stat[a][1][1]*100,o), "%")
-        print("     c:", round(CP_stat[a][1][2]*100,o), "%")
-        print("     d:", round(CP_stat[a][1][3]*100,o), "%")
+        print("     a:", round(stat.mean(CP_res[a][2][0])*100,o), "%")
+        print("     b:", round(stat.mean(CP_res[a][2][1])*100,o), "%")
+        print("     c:", round(stat.mean(CP_res[a][2][2])*100,o), "%")
+        print("     d:", round(stat.mean(CP_res[a][2][3])*100,o), "%")
         
         a += 1
     
     print("\n")
-    PLOT(CP_stat, CP_Algorithms)
+    
+    # Plots
+    
+    Labels=[
+                [r'TP', r'FP', r'FN'],
+                [r'TP', r'FP', r'FN'],
+                [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
+                ]
+    Metric = ["Area","Fibers","Performance parameters"]
+    for m in M:
+        CP_stat = []
+        a=0
+        while a < len(CP_Algorithms):
+            CP_stat.append([[],[],[]]) #plot data form
+            n = 0
+            while n < len(Labels[m]):
+                CP_stat[a][0].append(stat.stdev(CP_res[a][2][n]))
+                CP_stat[a][1].append(stat.mean(CP_res[a][2][n]))
+                CP_stat[a][2].append(stat.stdev(CP_res[a][2][n]))
+                n+=1
+            a+=1
+        Title = str("Effectiveness based on "+Metric[m])
+        PLOT(CP_stat, CP_Algorithms,Title ,Labels[m])
 
 # end
 print("\n")

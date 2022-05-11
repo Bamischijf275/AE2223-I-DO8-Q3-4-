@@ -813,18 +813,15 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 
-def PLOT(Data, Algo):
+def PLOT(Data, Algo,Title,Labels):
     width = 0.15
-    gap = 0.1
-    index = -1
+    gap = 0
+    index = 0
     
-    labels = [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
 
-    x = np.arange(len(labels))  # the label locations
-    width = 0.15  # the width of the bars
-
+    x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
-    print("\n data : ", Data)
+    
     a = 0
     while a < len(Algo): #[a][metric][min,AVG,max]
         ax.bar(     x + ((a-index)*width+gap), Data[a][1], width=width, label=Algo[a])
@@ -832,12 +829,14 @@ def PLOT(Data, Algo):
         a += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel('Value [-]')
+    plt.title(Title)
+    
+    ax.set_ylabel('Index')
     ax.set_xticks(x)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels(Labels)
+    
     ax.legend()
-
     fig.tight_layout()
-
-    plt.ylim(0.3, 0.8)
-    plt.savefig("EffectivenessOfDifferentMethods")
+    plt.ylim(0.9, 1)
+    
+    plt.savefig(Title)

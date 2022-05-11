@@ -47,9 +47,9 @@ Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["print", "draw", "save"], 250]  # draw/print/save, substep Dt
 TypeOUT = [".jpg", ".csv"]
-Save = ["", "Matrix", ""] #"Img", "Matrix", "Extra"
+Save = ["Img", "Matrix", "Extra"] #"Img", "Matrix", "Extra"
 
-Compute = ["","","CP"] #WT,CV,CP
+Compute = ["WT","",""] #WT,CV,CP
 CV = [""]
 
 errorMin = 10**(-3)
@@ -213,11 +213,11 @@ if "CP" in Compute:
         T0 = time.time()
         
         # parameters
-        CP_Parameters = [0.8]  # cutoff, DRAW, Dt
+        CP_Parameters = [0.90]  # cutoff, DRAW, Dt
 
         CP_PathIN = "../Data Processed/"
         CP_PathOUT = "../Data Processed/Comparator/"
-        CP_Algorithms = ["AI results/manual/mask_csv","AI results/dataset2/mask_csv","AI results/dataset3/mask_csv","AI results/dataset4/mask_csv", "Watershed"]
+        CP_Algorithms = ["Annotated","AI results/manual/mask_csv","AI results/dataset2/mask_csv","AI results/dataset3/mask_csv","AI results/dataset4/mask_csv", "Watershed"]
         CP_GroundTruth = "Annotated/mask_csv"
         CP_Type = [".csv", ".png"]
         

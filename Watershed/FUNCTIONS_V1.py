@@ -472,6 +472,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         imgT = np.where(MatrixT != 0, 255, MatrixT)
         extra_IMGS.append([imgT, 'Truth'])
         cv.imshow("Truth", imgT)
+        
         imgR = np.where(MatrixR != 0, 255, MatrixR)
         extra_IMGS.append([imgR, 'Algo'])
         cv.imshow("Algo", imgR)
@@ -487,6 +488,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
     Result[2] += len(FibersT)
     Result[3] += len(FibersR)
+    
     if "print" in DETAIL[0]:
         print("     Fibers in T,R: ", Result[2:])
 
@@ -513,9 +515,11 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
         # find correspodance T to R (ID)
         SubMatrixR = MatrixR[RectT[0]:RectT[2], RectT[1]:RectT[3]]
+        
         Nmax = 0
         for ID in FibersR:
-            if MatrixCount(SubMatrixR, ID) >= Nmax:
+            n_id = MatrixCount(SubMatrixR, ID)
+            if n_id >= Nmax:
                 ID_R = ID
                 Nmax = MatrixCount(SubMatrixR, ID_R)
 

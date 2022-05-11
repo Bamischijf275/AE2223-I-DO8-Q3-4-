@@ -37,8 +37,8 @@ def generateResultsChart(SD1, SD2, SD3, WS):
     SD3bar = ax.bar(x + width/2, SD3, width, label='StarDist3')
     ax.errorbar(x + width/2, SD3, yerr=[SD3min, SD3max], fmt='ko', capsize=5)
 
-    WSbar = ax.bar(x + (3*width/2), WS, width, label='Watershed')
-    ax.errorbar(x + (3*width/2), WS, yerr=[WSmin, WSmax], fmt='ko', capsize=5)
+    WSbar = ax.bar( x + (3*width/2), WS, width, label='Watershed')
+    ax.errorbar(    x + (3*width/2), WS, yerr=[WSmin, WSmax], fmt='ko', capsize=5)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Value [-]')

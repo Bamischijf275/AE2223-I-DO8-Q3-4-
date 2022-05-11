@@ -12,25 +12,22 @@ T00 = time.time()
 
 # standard modules
 import cv2 as cv
-import imutils
-import math
+#import imutils
+#import math
 import numpy as np
-import numpy.random as rnd
-# from matplotlib import pyplot as plt
-# from matplotlib import image as mpimg
+#import numpy.random as rnd
 import os
-import pandas as pd
+#import pandas as pd
 import statistics as stat
-# from tqdm import tqdm
 import sys
 import warnings
-from scipy import ndimage
-from skimage.feature import peak_local_max
-from skimage.segmentation import watershed
-import PIL
+#from scipy import ndimage
+#from skimage.feature import peak_local_max
+#from skimage.segmentation import watershed
+#import PIL
 
 # own functions
-from FUNCTIONS_V1 import *
+from FUNCTIONS_V2 import *
 
 # init
 warnings.filterwarnings('ignore')
@@ -45,16 +42,42 @@ N,M,K = [],[],[50,1]
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["print", "draw", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 TypeOUT = [".jpg", ".csv"]
-Save = ["Img", "Matrix", "Extra"] #"Img", "Matrix", "Extra"
+Save = ["", "Matrix", ""] #"Img", "Matrix", "Extra"
 
-Compute = ["WT","",""] #WT,CV,CP
-CV = [""]
+Compute = ["","","CP"] #WT,CV,CP
+CV=[""] #CROP, TIFtoCSV
 
 errorMin = 10**(-3)
+o = 2 # decimals
+
+# Program parameters
+WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
+#WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
+
+CP_Parameters = [0.85,0.5]  # cutoff, DRAW, Dt
 
 # file names
+WT_PathIN = "../Data/Tape_B/"
+WT_PathOUT = "../Data Processed/Watershed/"
+WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
+        
+CV_PathIN = "../Data Processed/Watershed/"
+CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
+
+CP_PathIN = "../Data Processed/"
+CP_GroundTruth = "Annotated"   #sub-folder
+CP_Algorithms = [               #sub-folders
+        "Annotated",
+        "AI results/dataset1/",
+        "AI results/dataset2/",
+        "AI results/dataset3/",
+        "AI results/dataset4/",
+        "Watershed"
+        ]
+
+CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
 # process
 path_script = os.path.dirname(__file__)
@@ -74,14 +97,6 @@ if "WT" in Compute:
     for name in Names:
         print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
         T0 = time.time()
-        
-        # parameters
-        WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
-        #WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
-
-        WT_PathIN = "../Data/Tape_B/"
-        WT_PathOUT = "../Data Processed/Watershed/"
-        WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
         if Tape == "Large" or Tape == "Cropped":
             WT_PathIN += "UncroppedImages/"
@@ -136,13 +151,13 @@ if "WT" in Compute:
      # Converter
 if "CV" in Compute:
     print("\n CONVERTER : \n")
-    
     Names = NAMES(Loop,N,M,K,Tape,Name)
+    # remove _2_ if "CROP"
     Names = list(dict.fromkeys(Names))
     print("Filenames :")
     for name in Names:
         print(name)
-        
+    
     Progress = len(Names)
     progress = 1
     for name in Names:
@@ -151,8 +166,6 @@ if "CV" in Compute:
         
         # various converters
         if "TIFtoCSV" in CV:
-            CV_PathIN = "..\Data Processed\AI results\dataset2\masks"
-            CV_PathOUT = "..\Data Processed\AI results\dataset2\masks"
             CV_Type=[".tif",".csv"]
         
             PathIN = os.path.join(path_script, CV_PathIN, name + CV_Type[0])
@@ -161,9 +174,7 @@ if "CV" in Compute:
             print("Converted",str(name+CV_Type[0]),"to",str(name+CV_Type[1]))
         
         if "CROP" in CV: #crop matrix   
-            CV_PathIN = "../Data Processed/Watershed/"
-            CV_PathOUT = "../Data Processed/Watershed/"
-            CV_Type=[".tif",".csv"]
+            #CV_Type=[".tif",".csv"]
             
             FileName = name + CV_Type[1]
             path = os.path.join(path_script, CV_PathIN, FileName)
@@ -175,12 +186,11 @@ if "CV" in Compute:
             
             path = os.path.join(path_script, CV_PathOUT)
             os.chdir(path)
-            print("Cropped : ", Arr.shape,"to", Arr_crop[0].shape)
+            print("Cropped : ", Arr.shape, "to", Arr_crop[0].shape)
             
-            sep = '-'
-            n = name.split(sep, 1)[-1]
+            sep = '_'
+            n = name.split(sep)[-1]
             m = 1
-            
             for Arr in Arr_crop:
                 FileName = Name + "_" + str(n) + "_" + str(m)
                 print("saving :",FileName)
@@ -211,20 +221,21 @@ if "CP" in Compute:
     for name in Names:
         print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
         T0 = time.time()
-        
-        # parameters
-        CP_Parameters = [0.90]  # cutoff, DRAW, Dt
 
-        CP_PathIN = "../Data Processed/"
-        CP_PathOUT = "../Data Processed/Comparator/"
-        CP_Algorithms = ["Annotated","AI results/manual/mask_csv","AI results/dataset2/mask_csv","AI results/dataset3/mask_csv","AI results/dataset4/mask_csv", "Watershed"]
-        CP_GroundTruth = "Annotated/mask_csv"
         CP_Type = [".csv", ".png"]
         
         CP_Confusion = []
+        CP_res = []
+        CP_stat = []
         a = 0
         while a < len(CP_Algorithms):
-            CP_Confusion.append([[0,0,0,0,0],[0, 0, 0, 0, 0, 0]]) # Fibers
+            CP_Confusion.append([[0,0,0,0],[0,0,0,0]]) # Fibers
+            CP_res.append([
+                    [[],[],[],[]], # area confusion
+                    [[],[],[],[]], # fiber confusion
+                    [[],[],[],[]] # metrics
+                    ])
+            CP_stat.append([[],[],[]]) # metrics
             a += 1
 
         # file
@@ -236,7 +247,7 @@ if "CP" in Compute:
         a = 0
         for Alg in CP_Algorithms:
             # File
-            print(Alg, "against", CP_GroundTruth, ": ")
+            print(Alg, "against", CP_GroundTruth)
             
             #if Tape == "Cropped":
                  #associate tape
@@ -251,27 +262,34 @@ if "CP" in Compute:
             result = CP[0]
     
             # Results
-            if result[2] == 0:
-                result[2] += errorMin
-            print("Result : ", result)
             
             # Area
             CP_Confusion[a][0][0] += result[0][0]
             CP_Confusion[a][0][1] += result[0][1]
             CP_Confusion[a][0][2] += result[0][2]
             CP_Confusion[a][0][3] += result[0][3]
-            if result[4] == 0:
-                CP_Confusion[a][0][4] += errorMin
-            else:
-                CP_Confusion[a][0][4] += result[4]
             # Fibers
             CP_Confusion[a][1][0] += result[1][0]
             CP_Confusion[a][1][1] += result[1][1]
             CP_Confusion[a][1][2] += result[1][2]
             CP_Confusion[a][1][3] += result[1][3]
-            CP_Confusion[a][1][4] += result[2]
-            CP_Confusion[a][1][5] += result[3]
-    
+            
+            # Area
+            CP_res[a][0][0].append(result[0][0]/result[0][3])
+            CP_res[a][0][1].append(result[0][1]/result[0][3])
+            CP_res[a][0][2].append(result[0][2]/result[0][3])
+            CP_res[a][0][3].append(result[0][3])
+            # Fibers
+            CP_res[a][1][0].append(result[1][0]/result[1][3])
+            CP_res[a][1][1].append(result[1][1]/result[1][3])
+            CP_res[a][1][2].append(result[1][2]/result[1][3])
+            CP_res[a][1][3].append(result[1][3])
+            # Metrics
+            CP_res[a][2][0].append(result[2][0])
+            CP_res[a][2][1].append(result[2][1])
+            CP_res[a][2][2].append(result[2][2])
+            CP_res[a][2][3].append(result[2][3])
+
             # Save images
             if "Extra" in Save:
                 IMG = CP[1]
@@ -293,39 +311,53 @@ if "CP" in Compute:
     print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
 if "CP" in Compute:
+    a = 0
     # Algo Stats
     print("\n CONCLUSION : \n")
-    print("total number of True fibers : ", CP_Confusion[0][1][4])
-    print("total number of fibers found: ", CP_Confusion[0][1][5])
-    print("total True Area: ", CP_Confusion[0][0][4])
-    a = 0
-    Score = []
+    print("total True Area: ", sum(CP_res[a][0][3][:]))
+    print("total number of True fibers : ", sum(CP_res[a][1][3][:]))
+    
     while a < len(CP_Algorithms):
         print("\n Comparing ",CP_Algorithms[a], "against", CP_GroundTruth, ": ")
+        print("Area")   
+        print("     Accuracy TP:", round(stat.mean(CP_res[a][0][0])*100,o), "%")
+        print("     Accuracy FP:", round(stat.mean(CP_res[a][0][1])*100,o), "%")
+        print("     Accuracy FN:", round(stat.mean(CP_res[a][0][2])*100,o), "%")
+        
         print("Fibers")
-        print("     Accuracy TP = CI:", round(100 * CP_Confusion[a][1][0] / CP_Confusion[a][1][4], 2), "%")
-        #print("     Accuracy TN = / :", round(100 * CP_Confusion[a][1][1] / CP_Confusion[a][1][4], 2), "%")
-        print("     Accuracy FP = MI:", round(100 * CP_Confusion[a][1][2] / CP_Confusion[a][1][4], 2), "%")
-        print("     Accuracy FN = ND:", round(100 * CP_Confusion[a][1][3] / CP_Confusion[a][1][4], 2), "%")
+        print("     Accuracy TP:", round(stat.mean(CP_res[a][1][0])*100,o), "%")
+        print("     Accuracy FP:", round(stat.mean(CP_res[a][1][1])*100,o), "%")
+        print("     Accuracy FN:", round(stat.mean(CP_res[a][1][2])*100,o), "%")
         
-        print("Area")
-        print("     Accuracy TP = CI:", round(100 * CP_Confusion[a][0][0] / CP_Confusion[a][0][4], 2), "%")
-        #print("     Accuracy TN = / :", round(100 * CP_Confusion[a][0][1] / CP_Confusion[a][0][4], 2), "%")
-        print("     Accuracy FP = MI:", round(100 * CP_Confusion[a][0][2] / CP_Confusion[a][0][4], 2), "%")
-        print("     Accuracy FN = ND:", round(100 * CP_Confusion[a][0][3] / CP_Confusion[a][0][4], 2), "%")
-        
-        Score.append( 
-                (CP_Confusion[a][0][0] / (CP_Confusion[a][0][4])) * 
-                     (CP_Confusion[a][1][0] / CP_Confusion[a][1][4]) 
-                     )
+        print("Metrics")
+        # Metrics
+        CP_stat[a][0] = [
+                stat.median_low(CP_res[a][2][0]),  
+                1-stat.median_low(CP_res[a][2][1]),  
+                1-stat.median_low(CP_res[a][2][2]), 
+                1-stat.median_low(CP_res[a][2][3])
+                ]
+        CP_stat[a][1] = [  
+                stat.mean(CP_res[a][2][0]),  
+                1-stat.mean(CP_res[a][2][1]),  
+                1-stat.mean(CP_res[a][2][2]), 
+                1-stat.mean(CP_res[a][2][3])
+                ]
+        CP_stat[a][2] = [  
+                stat.median_high(CP_res[a][2][0]),  
+                1-stat.median_high(CP_res[a][2][1]),  
+                1-stat.median_high(CP_res[a][2][2]), 
+                1-stat.median_high(CP_res[a][2][3])
+                ]
+        print("     a:", round(CP_stat[a][1][0]*100,o), "%")
+        print("     b:", round(CP_stat[a][1][1]*100,o), "%")
+        print("     c:", round(CP_stat[a][1][2]*100,o), "%")
+        print("     d:", round(CP_stat[a][1][3]*100,o), "%")
         
         a += 1
-        
+    
     print("\n")
-    a = 0
-    while a < len(CP_Algorithms):
-        print("Score of ",CP_Algorithms[a], " :     ", round(100*Score[a],3) ,"[%]")
-        a += 1
+    PLOT(CP_stat, CP_Algorithms)
 
 # end
 print("\n")

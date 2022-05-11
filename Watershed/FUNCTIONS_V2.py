@@ -19,6 +19,7 @@ from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 import os
+import matplotlib.pyplot as plt
 
 # FUNCTIONS
 
@@ -415,15 +416,19 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         print("\n init :")
         T0 = time.time()
 
-    Col_CM = [(0, 255, 0), (150, 150, 150), (0, 0, 255), (255, 0, 0, 0),(255,255,255)]  # TP-G,TN-,FP-B,FN-R
+    Col_CM = [(0, 255, 0), (150, 150, 150), (0, 0, 255), (255, 0, 0, 0)]  # TP-G,TN-,FP-B,FN-R
     Col_Background = (100, 100, 100)
 
     Cutoff = PARAMETERS[0]
-    Cutoff2 = PARAMETERS[1]
     ShowTime = DETAIL[1] / 1000
     extra_IMGS = []
 
-    Result = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0]]  # TP=CI,FP=MI,FPu=MUI,FN=ND (pixels, fibers), True Area, True Fibers
+    Result = [
+            [0, 0, 0, 0], # area: TP,FP,FN , Tarea
+            [0, 0, 0, 0], # fibers: TP,FP,FN , Tfib
+            [0, 0, 0, 0]  # metrics: A,B,C,D
+            ]
+    MUI = 0
 
     # format matrices
     MatrixT = np.array(MatrixT)
@@ -446,7 +451,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     SizeR = MatrixR.shape
     
     if "print" in DETAIL[0]:
-        print("     Matrix Size T,R Trimmed:", SizeT, SizeR)
+        print("     Matrix Size T,R Input:", SizeT, SizeR)
     
     while MatrixT.shape != MatrixR.shape:
         SizeR = MatrixR.shape
@@ -466,7 +471,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         #print(SizeR,SizeT)
             
     if "print" in DETAIL[0]:
-        print("     Matrix Size T,R Adjusted:", MatrixT.shape, MatrixR.shape)
+        print("     Matrix Size T,R Trimmed:", SizeT, SizeR)
 
     # draw
     if "draw" in DETAIL[0]:
@@ -487,11 +492,10 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     FibersT = MatrixID(MatrixT)
     FibersR = MatrixID(MatrixR)
     
-    Tfib = len(FibersT)
-    Rfib = len(FibersT)
+    Result[1][3] = len(FibersT)
     
     if "print" in DETAIL[0]:
-        print("     Fibers in T,R: ", Tfib, Rfib)
+        print("     Fibers in T,R: ", Result[2:])
 
     # Loop through every TRUE fiber
     if "print" in DETAIL[0]:
@@ -502,17 +506,10 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         print("Fiber Comparison Progress :")
 
     Ti = time.time()
-    Progress = Tfib
+    Progress = len(FibersT)
     progress = 0
-    
-    ID_R = []
-    for ID_r in FibersR:
-        ID_R.append(ID_r)
-    if "print" in DETAIL[0]:
-        print(len(ID_R))
-    
     for ID_T in FibersT:
-        
+
         ID_p = -1
         if "print" in DETAIL[0]:
             progress += 1
@@ -523,17 +520,17 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
         # find correspodance T to R (ID)
         SubMatrixR = MatrixR[RectT[0]:RectT[2], RectT[1]:RectT[3]]
-
-        ID_r = [0]
+        
+        Nmax = 0
         for ID in FibersR:
             n_id = MatrixCount(SubMatrixR, ID)
-            if n_id >= 0:
-                ID_r.append(ID)
-        ID_r = np.sort(np.unique(ID_r))
+            if n_id >= Nmax:
+                ID_R = ID
+                Nmax = MatrixCount(SubMatrixR, ID_R)
 
         # rectangle fiber (corr. result)
-        if ID_r[0] != 0:
-            RectR = SubRect(MatrixR, ID_r[0])
+        if Nmax != 0:
+            RectR = SubRect(MatrixR, ID_R)
         else:  # no fiber found
             RectR = RectT
 
@@ -545,76 +542,46 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         RectTR[3] = max(RectT[3], RectR[3])
 
         # reformat to trimmed binary
-        SubMatrixR = MatrixBin((MatrixR[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), ID_r[0])
+        SubMatrixR = MatrixBin((MatrixR[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), ID_R)
         SubMatrixT = MatrixBin((MatrixT[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), ID_T)
 
-        # Compare single ID
+        # Compare
         DIF_Matrix = np.subtract(SubMatrixT, SubMatrixR)
         MUL_Matrix = np.multiply(SubMatrixT, SubMatrixR)
-        
-        # Results by Area
-        Tarea = MatrixCount(SubMatrixT, ID_T)
 
+        Tarea = MatrixCount(SubMatrixT, 1)
         TP = MatrixCount(MUL_Matrix, 1)
-        FP = MatrixCount(DIF_Matrix, -1)
         FN = MatrixCount(DIF_Matrix, 1)
-        
+        FP = MatrixCount(DIF_Matrix, -1)
+
+        # Results
         Result[0][0] += TP
         Result[0][1] += FP
         Result[0][2] += FN
         Result[0][3] += Tarea
-        
-        mui = False
-        
-        if Tarea == 0: # no true fiber here?
-            Result = Result #no change
-            
-        elif (TP + FP) == 0:  # no result fiber found - FN=MI
-            Result[1][3] += 1
-            
-        elif (TP/Tarea >= Cutoff) and (TP / (FP + TP) >= Cutoff): #CI
+
+        if (TP + FP) == 0:  # none found - FN
+            Result[1][2] += 1
+        elif TP / (FP + TP) >= Cutoff:  # TP
             Result[1][0] += 1
-            Rfib -= 1
-            if ID_r[0] in ID_R:
-                ID_R.remove(ID_r[0])
-        
-        # Compare all intersecting IDs
-        else:
-            mui = True
-            
-            submatrixr = SubMatrixR.copy()
-            for id_r in ID_r:
-                submatrixr = np.add(MatrixBin((MatrixR[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), id_r),submatrixr)
-            # same ops
-            dif_Matrix = np.subtract(SubMatrixT, submatrixr)
-            mul_Matrix = np.multiply(SubMatrixT, submatrixr)
-            
-            TP = MatrixCount(mul_Matrix, 1)
-            FP = MatrixCount(dif_Matrix, -1)
-            FN = MatrixCount(dif_Matrix, 1)
-            
-            if (TP/Tarea >= Cutoff) and (TP/(TP+FP) >= Cutoff): #MUI
-                Result[1][2] += 1
-                for id_r in ID_r: # count as part of MUI if >50% intersect
-                    submatrixr = MatrixBin((MatrixR[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), id_r)
-                    mul_Matrix = np.multiply(SubMatrixT, submatrixr)
-                    TP = MatrixCount(mul_Matrix, 1)
-                    Rarea = np.count_nonzero(submatrixr != 0)
-                    
-                    if TP/Rarea > Cutoff2:
-                        Rfib -= 1
-                        ID_R.remove(id_r)
-            else: #ND
-                 Result[1][3] += 1
-        
+
+        elif FP == 0 or FN == 0:  # no overlap - no change
+            Result = Result
+        elif FP >= FN:  # FP
+            Result[1][1] += 1
+        elif FN > FP:  # FN
+            Result[1][2] += 1
+
+        else: # debug ID_T == problem
+            Result[1][1] += 1
+            ID_p = ID_T
+
         # Image
         if "draw" in DETAIL[0]:
             for i in range(len(DIF_Matrix)):
                 for j in range(len(DIF_Matrix[0])):
-                    
                     m = MUL_Matrix[i][j]
                     n = DIF_Matrix[i][j]
-                    
                     if m == 1:
                         Col = Col_CM[0]
                     elif n == -1:
@@ -623,19 +590,13 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                         Col = Col_CM[3]
                     else:
                         Col = Col_CM[1]
-                        
-                    if mui:
-                        Col = Col_CM[4]
-                            
                     if ID_T == ID_p:
                         Col = (255, 255, 255)
-                        
                     cv.circle(imgConf, (int(RectTR[1] + j), int(RectTR[0] + i)), 0, Col, -1)
-        Tf = time.time()
-        if Tf - Ti >= ShowTime:
-            cv.imshow("Confusion", imgConf)
-            Ti = Tf
-                
+            Tf = time.time()
+            if Tf - Ti >= ShowTime:
+                cv.imshow("Confusion", imgConf)
+                Ti = Tf
         # debug
         if (ID_T == ID_p) and ("print" in DETAIL[0]):
             print("\n DEBUG")
@@ -648,29 +609,22 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             print(MUL_Matrix)
             print("result:")
             print(TP, FP, FN)
-            
+
     if "draw" in DETAIL[0]:
         cv.imshow("Accuracy", imgConf)
         extra_IMGS.append([imgConf, 'Confusion'])
-        cv.waitKey(1)   
+        cv.waitKey(1)
         
-    # every fiber in Result that's not assigned is mis-identified
-    Result[1][1] = Rfib
-    for ID_r in ID_R: #fibers not assigned a true fiber
-        Result[0][1] += MatrixCount(MatrixR, ID_r)
-    
-    # result formatting
-    Tarea = Result[0][3]
-    Stat = [[],[],[Tfib,Tarea]]
-    for area in Result[0]:
-        Stat[0].append(area/Tarea)
-    for fiber in Result[1]:
-        Stat[1].append(fiber/Tfib)
-    
+    # derive metrics
+    Result[2][0] = Result[1][0]/Result[1][3]
+    Result[2][1] = Result[1][1]/(Result[1][0]+Result[1][1])
+    Result[2][2] = Result[1][2]/Result[1][3]
+    Result[2][3] = MUI/Result[1][3]
+
     if "print" in DETAIL[0]:
         T1 = time.time()
         print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
-    return (Stat, extra_IMGS)
+    return (Result, extra_IMGS)
 
 
 # others
@@ -715,6 +669,9 @@ def MatrixBin(matrix, ID):
     matrixBIN = np.where(matrix == ID, 1, matrix)
     return (matrixBIN)
 
+    # QoL
+
+
 def PROGRESS(iteration, total, prefix='', suffix='', decimals=0, length=10, fill='█', printEnd="\r"):
     # Print Progress bar
     percent = ("{0:." + str(decimals) + "f}").format(100 * ((iteration) / float(total)))
@@ -731,7 +688,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         if N == [] or M==[]: # default
             N = [1, 20]
             M = [1, 10]
-    
+            
         n = N[0]
         while n <= N[1]:
             m = M[0]
@@ -855,3 +812,32 @@ def ID_renamer(ar):
             ID +=1
             ar[ar==j] = ID
     return ar
+
+def PLOT(Data, Algo):
+    width = 0.15
+    gap = 0.1
+    index = -1
+    
+    labels = [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.15  # the width of the bars
+
+    fig, ax = plt.subplots()
+    print("\n data : ", Data)
+    a = 0
+    while a < len(Algo): #[a][metric][min,AVG,max]
+        ax.bar(     x + ((a-index)*width+gap), Data[a][1], width=width, label=Algo[a])
+        ax.errorbar(x + ((a-index)*width+gap), Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
+        a += 1
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Value [-]')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    fig.tight_layout()
+
+    plt.ylim(0.3, 0.8)
+    plt.savefig("EffectivenessOfDifferentMethods")

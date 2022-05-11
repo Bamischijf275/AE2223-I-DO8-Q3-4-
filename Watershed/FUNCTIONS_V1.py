@@ -433,12 +433,13 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     if "print" in DETAIL[0]:
         print("     Matrix Size T,R Input:", SizeT, SizeR)
 
-    # MatrixT = MatrixT.astype(int)
+    #MatrixT = MatrixT.astype(int)
     MatrixT = np.delete(MatrixT, (0), axis=0)
     MatrixT = np.delete(MatrixT, (0), axis=1)
+
     SizeT = MatrixT.shape
 
-    # MatrixR = MatrixR.astype(int)
+    #MatrixR = MatrixR.astype(int)
     MatrixR = np.delete(MatrixR, (0), axis=0)
     MatrixR = np.delete(MatrixR, (0), axis=1)
     SizeR = MatrixR.shape
@@ -446,9 +447,22 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     if "print" in DETAIL[0]:
         print("     Matrix Size T,R Input:", SizeT, SizeR)
     
-    while SizeR != SizeT:
-        MatrixR = np.delete(MatrixR, (0), axis=0)
-        MatrixR = np.delete(MatrixR, (0), axis=1)
+    while MatrixT.shape != MatrixR.shape:
+        SizeR = MatrixR.shape
+        SizeT = MatrixT.shape
+        if SizeR[0] < SizeT[0]:
+            #trim T0
+            MatrixT = np.delete(MatrixT, (0), axis=0)
+        elif SizeR[0] > SizeT[0]:
+            #trim R0
+            MatrixR = np.delete(MatrixR, (0), axis=0)
+        if SizeR[1] < SizeT[1]:
+            #trim T1
+            MatrixT = np.delete(MatrixT, (0), axis=1)
+        elif SizeR[1] > SizeT[1]:
+            #trim R1
+            MatrixR = np.delete(MatrixR, (0), axis=1)
+        #print(SizeR,SizeT)
             
     if "print" in DETAIL[0]:
         print("     Matrix Size T,R Trimmed:", SizeT, SizeR)
@@ -458,6 +472,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         imgT = np.where(MatrixT != 0, 255, MatrixT)
         extra_IMGS.append([imgT, 'Truth'])
         cv.imshow("Truth", imgT)
+        
         imgR = np.where(MatrixR != 0, 255, MatrixR)
         extra_IMGS.append([imgR, 'Algo'])
         cv.imshow("Algo", imgR)
@@ -473,6 +488,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
     Result[2] += len(FibersT)
     Result[3] += len(FibersR)
+    
     if "print" in DETAIL[0]:
         print("     Fibers in T,R: ", Result[2:])
 
@@ -499,9 +515,11 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
         # find correspodance T to R (ID)
         SubMatrixR = MatrixR[RectT[0]:RectT[2], RectT[1]:RectT[3]]
+        
         Nmax = 0
         for ID in FibersR:
-            if MatrixCount(SubMatrixR, ID) >= Nmax:
+            n_id = MatrixCount(SubMatrixR, ID)
+            if n_id >= Nmax:
                 ID_R = ID
                 Nmax = MatrixCount(SubMatrixR, ID_R)
 
@@ -591,6 +609,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
     if "draw" in DETAIL[0]:
         cv.imshow("Accuracy", imgConf)
+        extra_IMGS.append([imgConf, 'Confusion'])
         cv.waitKey(1)
 
     # format results
@@ -670,7 +689,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
             m = M[0]
             while m <= M[1]:
                 if tape == "Large" or tape == "Cropped":
-                    name = Name + "_2_-" + str(n)
+                    name = Name + "_2_" + str(n)
                 else:
                     name = Name + "_" + str(n) + "_" + str(m)
                 Names.append(name)
@@ -684,7 +703,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         i = 0
         while i < len(N):
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_-" + str(N[i])
+                name = Name + "_2_" + str(N[i])
             else:
                 name = Name + "_" + str(N[i]) + "_" + str(M[i])
             Names.append(name)
@@ -704,7 +723,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         i = 0
         while i <= K[0]:
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
+                name = Name + "_2_" + str(rnd.randint(N[0], N[1]))
             else:
                 name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
             Names.append(name)
@@ -717,7 +736,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
             n,m = N[0],M[0]
             
         if tape == "Large" or tape == "Cropped":
-            name = Name + "_2_-" + str(n)
+            name = Name + "_2_" + str(n)
         else:
             name = Name + "_" + str(n) + "_" + str(m)
         Names.append(name)
@@ -729,8 +748,9 @@ def CONVERT_TIFtoCSV(pathIN, pathOUT):
     Img = PIL.Image.open(pathIN)
     Arr = np.array(Img)
     if pathOUT != "":
-        pd.DataFrame(Arr).to_csv((pathOUT), header="none", index="none")
-    # Arr_csv = np.genfromtxt(Arr, delimiter=",")
+        #pd.DataFrame(Arr).to_csv((pathOUT), header="none", index="none")
+        #np.genfromtxt(Arr, delimiter=",")
+        np.savetxt(pathOUT, Arr, delimiter=",")
     return Arr
 
 def CONVERT_NAME(pathIN, nameOUT):

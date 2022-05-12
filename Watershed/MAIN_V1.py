@@ -36,41 +36,27 @@ np.set_printoptions(threshold=sys.maxsize)
 # MAIN
 print("\n----- START PROGRAM ----- \n")
 
-# Macro parameters
+# Macro parameters : determine what to compute
 Loop = "List"  # Range, Random, List, All
-N,M,K = [],[],[50,1]
+N,M= [],[] #Tape_B_n_m
+K = [50,1] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
-TypeOUT = [".jpg", ".csv"]
-Save = ["", "Matrix", ""] #"Img", "Matrix", "Extra"
+Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
 Compute = ["","","CP"] #WT,CV,CP
-CV=["CROP"] #CROP, TIFtoCSV
 
-errorMin = 10**(-3)
-o = 2 # decimals
+Save = ["", "Matrix", "", "Plots"] #"Img", "Matrix", "Extra", "Plots"
+TypeOUT = [".png", ".csv"]
 
-# Program parameters
+# Program parameters : determine 
 WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
-#WT_Parameters = [4.5, [0.4, 5, 2], [6, 48, 2], 3, "exact",""]  # <- Combined Score, Fiber ID ^
+
+CV=[""] #CROP, TIFtoCSV
 
 CP_Parameters = [0.8]  # cutoff
-
-M = [0,1,2] #choose plots (area,fiber,own metrics)
-
-# file names
-WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/"
-WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
-        
-CV_PathIN = "../Data Processed/Watershed/"
-CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
-
-CP_PathIN = "../Data Processed/"
-CP_GroundTruth = "Annotated/mask_csv"   #sub-folder
-CP_Algorithms = [               #sub-folders
+CP_Algorithms = [               #chosen algos
         #"Annotated",
         "AI results/dataset1/",
         "AI results/dataset2/",
@@ -79,14 +65,71 @@ CP_Algorithms = [               #sub-folders
         "Watershed"
         ]
 
+PL_Metric = ["Area","Fibers","Performance parameters"] #choose plots (area,fiber,own metrics)
+    
+# file paths
+WT_PathIN = "../Data/Tape_B/"
+WT_PathOUT = "../Data Processed/Watershed/"
+WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
+        
+CV_PathIN = "../Data Processed/Watershed/"
+CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
+
+CP_PathIN = "../Data Processed/"
+CP_GroundTruth = "Annotated/GroundTruth"   #sub-folder
 CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
 # process
 path_script = os.path.dirname(__file__)
+errorMin = 10**(-3)
+o = 2 # decimals
+
+
+print('\n --- INITIAL PARAMETERS ---')
+print("\n IMAGES:  ")
+print("    ",Name,"n m",Tape)
+if Loop =="Range":
+    print("     Loop in Range ",N,M)
+if Loop =="List":   
+    print("     Loop in List")
+if Loop =="Random": 
+    print("     Loop in Random range ",N,M,"for",K[0],"images with seed",K[1])
+else:               
+    print("     Single image",N,M)
+if (N==[]) and (M==[]): print("     for default N,M indices")
+
+print("\n PROGRAM:")
+if "WT" in Compute:
+    print("     \n run Watershed")
+    print("     for:",WT_Parameters)
+if "CV" in Compute:
+    print("     \n run Converter")
+    if "Cropped" in Tape: print("     to crop Watershed image")
+    if "TIFtoCSV" in CV: print("     from .tif to .csv")
+if "CP" in Compute:
+    print("     \n run Comparator")
+    print("     with parameters:",CP_Parameters)
+    print("     and",(CP_GroundTruth.split("/",1))[0],"data as Ground Truth against")
+    for algo in CP_Algorithms:
+        print("         ",(algo.split("/",1))[-1])
+        
+print("  Detailing:")
+if "print" in Detail[0]:
+    print("     steps, progress and paths")
+if "draw" in Detail[0]:
+    print("     showing intermediate images - updates every",Detail[1],"[ms]")
+    
+print("  Saving:")
+if "Img" in Save:
+    print("     output images as",TypeOUT[0])
+if "Matrix" in Save:
+    print("     Output matrices as",TypeOUT[1],"required for CP")
+if "Plots" in Save:
+    print("     Statistics plots")
 
 # Waterhsed
 if "WT" in Compute:
-    print("\n WATERSHED : \n")
+    print("\n --- WATERSHED --- \n")
     
     if Tape == "Large" or Tape == "Cropped":
         WT_PathIN += "UncroppedImages/"
@@ -104,15 +147,14 @@ if "WT" in Compute:
     Progress = len(Names)
     progress = 1
     for name in Names:
-        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        print("\n - NEWFILE : ", name, " - ",progress,"/",Progress," -\n")
         T0 = time.time()
         
         # file
         FileName = name + WT_Type[0]
         path = os.path.join(path_script, WT_PathIN, FileName)
-        print(path)
         WT_Image = cv.imread(path)
-        print(path)
+        if "print" in Detail[0]:print(path)
 
         WT = WATERSHED(WT_Image, WT_Parameters, Detail)
         WT_Image = WT[0]
@@ -153,8 +195,8 @@ if "WT" in Compute:
         print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
      # Converter
-if "CV" in Compute:
-    print("\n CONVERTER : \n")
+if ("CV" in Compute) or (("WT" in Compute)and("Cropped" in Tape)):
+    print("\n --- CONVERTER --- \n")
     
     Names = NAMES(Loop,N,M,K,Tape,Name)
     # remove _2_ if "CROP"
@@ -166,7 +208,7 @@ if "CV" in Compute:
     Progress = len(Names)
     progress = 1
     for name in Names:
-        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        print("\n - NEWFILE : ", name, " - ",progress,"/",Progress,"- \n")
         T0 = time.time()
         
         # various converters
@@ -175,10 +217,13 @@ if "CV" in Compute:
         
             PathIN = os.path.join(path_script, CV_PathIN, name + CV_Type[0])
             PathOUT = os.path.join(path_script, CV_PathOUT, name + CV_Type[1])
+            if "print" in Detail[0]:
+                print(PathIN)
+                print(PathOUT)
             CONVERT_TIFtoCSV(PathIN, PathOUT)
             print("Converted",str(name+CV_Type[0]),"to",str(name+CV_Type[1]))
         
-        if "CROP" in CV: #crop matrix   
+        if ("CROP" in CV) or ("Cropped" in Tape): #crop matrix   
             CV_Type=[".tif",".csv"]
             
             FileName = name + "L" + CV_Type[1]
@@ -198,11 +243,12 @@ if "CV" in Compute:
             m = 1
             for Arr in Arr_crop:
                 FileName = Name + "_" + str(n) + "_" + str(m)
-                print("saving :",FileName)
+                if "print" in Detail[0]:print("saving :",FileName)
                 path = os.path.join(path_script, CV_PathOUT, FileName + CV_Type[1])
-                #pd.DataFrame(Arr).to_csv((path), header="none", index="none")
                 np.savetxt(path, Arr, delimiter=",")
                 m += 1
+                
+            print("Converted",str(FileName),"to",str(Name + "_" + str(n) + "_[" + str(0) + str(m) + "]"))
                 
         progress += 1
         T1 = time.time()
@@ -213,7 +259,7 @@ if Tape == "Cropped":
 
 # Comparator
 if "CP" in Compute:
-    print("\n COMPARATOR : \n")
+    print("\n  --- COMPARATOR --- \n")
     
     Names = NAMES(Loop,N,M,K,Tape,Name)
     Names = list(dict.fromkeys(Names))
@@ -237,26 +283,23 @@ if "CP" in Compute:
     Progress = len(Names)
     progress = 1
     for name in Names:
-        print("\n\n -- NEWFILE : ", name, " - ",progress,"/",Progress," -- \n")
+        print("\n - NEWFILE : ", name, " - ",progress,"/",Progress,"- \n")
         T0 = time.time()
 
         CP_Type = [".csv", ".png"]
 
         # file
         path = os.path.join(path_script, CP_PathIN, CP_GroundTruth, name + CP_Type[0])
-        #print(path)
         CP_MatrixT = np.genfromtxt(path, delimiter=",")
+        if "print" in Detail[0]:print(path)
     
         # compare each algo for each file
         a=0
         for Alg in CP_Algorithms:
             # File
-            print(Alg, "against", CP_GroundTruth)
             
-            #if Tape == "Cropped":
-                 #associate tape
-                 #path = os.path.join(path_script, CP_PathIN, Alg, name + CP_Type[0])
-            #else:
+            print(Alg, "against", CP_GroundTruth)
+
             path = os.path.join(path_script, CP_PathIN, Alg, name + CP_Type[0])
             CP_MatrixR = np.genfromtxt(path, delimiter=",")
             #print(path)
@@ -316,7 +359,8 @@ if "CP" in Compute:
 if "CP" in Compute:
     a = 0
     # Algo Stats
-    print("\n CONCLUSION : \n")
+    print("\n - STATISTICS -\n")
+    T0 = time.time()
     print("total True Area: ", sum(CP_res[a][0][3][:]))
     print("total number of True fibers : ", sum(CP_res[a][1][3][:]))
     
@@ -340,30 +384,35 @@ if "CP" in Compute:
         
         a += 1
     
-    print("\n")
-    
     # Plots
+    print("\n - PLOTS - \n")
     
     Labels=[
-                [r'TP', r'FP', r'FN'],
-                [r'TP', r'FP', r'FN'],
-                [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
-                ]
-    Metric = ["Area","Fibers","Performance parameters"]
-    for m in M:
+            [r'TP', r'FP', r'FN'],
+            [r'TP', r'FP', r'FN'],
+            [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
+            ]
+    
+    m = 0
+    while m < len(PL_Metric): # for each plot type
         CP_stat = []
         a=0
-        while a < len(CP_Algorithms):
+        while a < len(CP_Algorithms): # for each algo compared
             CP_stat.append([[],[],[]]) #plot data form
             n = 0
-            while n < len(Labels[m]):
+            while n < len(Labels[m]): # for each metric
                 CP_stat[a][0].append(stat.stdev(CP_res[a][2][n]))
                 CP_stat[a][1].append(stat.mean(CP_res[a][2][n]))
                 CP_stat[a][2].append(stat.stdev(CP_res[a][2][n]))
                 n+=1
             a+=1
-        Title = str("Effectiveness based on "+Metric[m])
-        PLOT(CP_stat, CP_Algorithms,Title ,Labels[m])
+        print(np.array(CP_stat).shape)
+        Title = str("Effectiveness based on "+PL_Metric[m])
+        PLOT(CP_stat, CP_Algorithms,Title ,[0.9,1],Labels[m],Save)
+        m += 1
+        
+    T1 = time.time()
+    print("> " + str(round((T1 - T0), 1)) + "[s] <")
 
 # end
 print("\n")

@@ -813,12 +813,11 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 
-def PLOT(Data, Algo,Title,Labels):
+def PLOT(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
     gap = 0
     index = 0
     
-
     x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
     
@@ -837,6 +836,7 @@ def PLOT(Data, Algo,Title,Labels):
     
     ax.legend()
     fig.tight_layout()
-    plt.ylim(0.9, 1)
+    plt.ylim(Range[0], Range[1])
     
-    plt.savefig(Title)
+    if "Plot" in Save:
+        plt.savefig(Title)

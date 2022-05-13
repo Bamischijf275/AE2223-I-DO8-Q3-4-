@@ -37,17 +37,17 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Loop = "Range"  # Range, Random, List, All
-N,M= [0.200],[] #Tape_B_n_m
+Loop = "List"  # Range, Random, List, All
+N,M= [],[] #Tape_B_n_m
 K = [50,1] #if random: number of picks in folder, seed
 Name = "Tape_B"
-Tape= "Large" #Large, Cropped, none=smalls
+Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["draw", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","","",""] #WT,CV,CP,"PL"
+Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plots"
+Save = ["", "Matrix", "", "Plots"] #"Img", "Matrix", "Extra", "Plots"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -80,7 +80,7 @@ PL_Range = [0.5,1]
     
 # file paths (GitHub structure dependent)
 WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/3D"
+WT_PathOUT = "../Data Processed/Watershed/3D/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
 CV_PathIN = "../Data Processed/Watershed/"
@@ -134,7 +134,7 @@ print("  Saving:")
 if "Img" in Save:
     print("     output images as",TypeOUT[0])
 if "Matrix" in Save:
-    print("     Output matrices as",TypeOUT[1],"required for CP")
+    print("     Output matrices as",TypeOUT[1])
 if "Plots" in Save:
     print("     Statistics plots")
 
@@ -143,7 +143,9 @@ if "WT" in Compute:
     print("\n --- WATERSHED --- \n")
     
     if Tape == "Large" or Tape == "Cropped":
-        WT_PathIN += "UncroppedImages/"
+        if Tape == "Cropped": WT_PathIN += "UncroppedImages/"
+        if Tape == "Large":WT_PathIN += "Tape_B_2_JPG/"
+        
         WT_Type[1] = "L"+WT_Type[1]
         WT_Type[2] = "L"+WT_Type[2] # consistent naming scheme (Large pictures)
     else: 

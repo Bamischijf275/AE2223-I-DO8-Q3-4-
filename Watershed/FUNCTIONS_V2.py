@@ -719,7 +719,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
             m = M[0]
             while m <= M[1]:
                 if tape == "Large" or tape == "Cropped":
-                    name = Name + "_2_" + str(n)
+                    name = Name + "_2_-" + str(n)
                 else:
                     name = Name + "_" + str(n) + "_" + str(m)
                 Names.append(name)

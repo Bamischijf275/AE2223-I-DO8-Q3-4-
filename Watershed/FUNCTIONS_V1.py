@@ -683,7 +683,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         if N == [] or M==[]: # default
             N = [1, 20]
             M = [1, 10]
-    
+            
         n = N[0]
         while n <= N[1]:
             m = M[0]

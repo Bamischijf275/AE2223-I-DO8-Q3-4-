@@ -5,6 +5,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
 import random
+import matplotlib.image as mpimg
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
@@ -126,8 +127,8 @@ def random_dataset2():
             manual_set.append(num_ar)
             print(f"{num_ar}")
             ID +=1
-            mask = Image.open(f"Data Processed/Training/watershed/masks/Tape_B_2_-{pic_num}_{sec_num}.tif")
-            im = Image.open(f"Data Processed/Training/watershed/images/Tape_B_2_-{pic_num}_{sec_num}.tif")
+            mask = Image.open(f"Data Processed/Training/control algorithm/masks/Tape_B_2_-{pic_num}_{sec_num}.tif")
+            im = Image.open(f"Data Processed/Training/control algorithm/images/Tape_B_2_-{pic_num}_{sec_num}.tif")
             mask.save(f"Data Processed/Training/dataset2`_ver1/masks/Tape_B_2_{pic_num}_{sec_num}.tif")
             im.save(f"Data Processed/Training/dataset2`_ver1/images/Tape_B_2_{pic_num}_{sec_num}.tif")
         if ID >=30:
@@ -170,7 +171,7 @@ def color_image_maker(filename):
     ax3 = fig.add_subplot(ax[1,1])
     ax4 = fig.add_subplot(ax[2,0])
     ax5 = fig.add_subplot(ax[2,1])
-    # set the spacing between subplots
+    #set the spacing between subplots
     plt.subplots_adjust(left=0.1,
                         bottom=0.1,
                         right=0.4,
@@ -198,25 +199,35 @@ def color_image_maker(filename):
         mask_ar,dataset,newcmp = get_mask(dataset,filename)
 
         if ID == 0:
-            ax2.set_title(f"{dataset}")
+            ax2.set_title(f"Stardist1")
             ax2.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax2.axis("off")
         if ID == 1:
-            ax3.set_title(f"{dataset}")
+            ax3.set_title(f"Stardist2")
             ax3.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax3.axis("off")
         if ID == 2:
-            ax4.set_title(f"{dataset}")
+            ax4.set_title(f"Stardist3")
             ax4.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax4.axis("off")
-        if ID == 3:
-            ax5.set_title(f"{dataset}")
-            ax5.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+        if ID == 4:
+            ax5.set_title(f"CA")
+            filename = filename.replace(".tif","")
+            print(f"Data Processed/Annotated/Watershed/Extras/{filename}_step_7_Out.png")
+            ax5.imshow(mpimg.imread(f"Data Processed/Watershed/Extras/{filename}_step_7_Out.png"),interpolation="nearest")
             ax5.axis("off")
         ID +=1
     plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
     plt.show()
-
+def csv_to_mask():
+    for name in os.listdir(f"Data Processed/Annotated"):
+        if name == str("Tape_B_1_4.csv") or name == str("Tape_B_1_7.csv") or name == str("Tape_B_2_3.csv") or name == str("Tape_B_3_8.csv") or name == str("Tape_B_5_7.csv") or name == str("Tape_B_6_6.csv") or name == str("Tape_B_7_3.csv") or name == str("Tape_B_8_5.csv") or name == str("Tape_B_8_9.csv") or name == str("Tape_B_11_6.csv"):
+            ar = np.genfromtxt(f"Data Processed/Annotated/{name}", delimiter=",")
+            ar = ar[1:,1:]
+            name = name.replace(".csv","")
+            image = Image.fromarray(ar)
+            print(name)
+            image.save(f"Data Processed/AI results/watershed/{name}.tif")
 
 def mask_to_csv(dataset):
     for name in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
@@ -224,8 +235,8 @@ def mask_to_csv(dataset):
         filename = name.replace(".tif","")
         im_ar = np.array(im)
         np.savetxt(f"Data Processed/AI results/{dataset}/mask_csv/{filename}.csv",im_ar,delimiter = ",")
-for filename in os.listdir("Data Processed/AI results/dataset1/images"):
-    color_image_maker(filename)
+# for filename in os.listdir("Data Processed/AI results/dataset1/images"):
+#     color_image_maker(filename)
 
 # im = Image.open(f"Data Processed/Training/dataset1/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)

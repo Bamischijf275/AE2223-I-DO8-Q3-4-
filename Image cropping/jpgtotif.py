@@ -26,7 +26,7 @@ for name in os.listdir("Data Processed/Watershed/Training"):
             ar_bot = ar_topbot[1]
             ar_top_im = Image.fromarray(ar_top)
             ar_bot_im = Image.fromarray(ar_bot)
-            ar_top_im.save(f"Data Processed/Training/watershed/images/{name}_{top}.tif")
-            ar_bot_im.save(f"Data Processed/Training/watershed/images/{name}_{bot}.tif")
+            ar_top_im.save(f"Data Processed/Training/control algorithm/images/{name}_{top}.tif")
+            ar_bot_im.save(f"Data Processed/Training/control algorithm/images/{name}_{bot}.tif")
             top+=1
             bot+=1

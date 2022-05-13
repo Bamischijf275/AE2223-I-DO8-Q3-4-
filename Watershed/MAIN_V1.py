@@ -37,15 +37,15 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Loop = "List"  # Range, Random, List, All
-N,M= [],[] #Tape_B_n_m
+Loop = "Range"  # Range, Random, List, All
+N,M= [0.200],[] #Tape_B_n_m
 K = [50,1] #if random: number of picks in folder, seed
 Name = "Tape_B"
-Tape= "Cropped" #Large, Cropped, none=smalls
+Tape= "Large" #Large, Cropped, none=smalls
 
-Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["draw", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP",""] #WT,CV,CP,"PL"
+Compute = ["WT","","",""] #WT,CV,CP,"PL"
 
 Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plots"
 TypeOUT = [".png", ".csv"]
@@ -56,14 +56,14 @@ WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.8]  # cutoff
+CP_Parameters = [0.85,0.5]  # cutoff
 CP_Algorithms = [               #chosen algos
-        #"Annotated",
+        "Watershed",
         "AI results/dataset1/",
         "AI results/dataset2/",
         "AI results/dataset3/",
         "AI results/dataset4/",
-        "Watershed"
+        "Annotated/"
         ]
 
 PL_Metric = [
@@ -76,11 +76,11 @@ PL_Labels=[
             [r'TP', r'FP', r'FN'],
             [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
             ]
-PL_Range = [0.9,1]
+PL_Range = [0.5,1]
     
 # file paths (GitHub structure dependent)
 WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/"
+WT_PathOUT = "../Data Processed/Watershed/3D"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
 CV_PathIN = "../Data Processed/Watershed/"
@@ -401,7 +401,7 @@ if "CP" in Compute:
         Score.append(1)
         for m in CP_res[a][2]:
             Score[a]*=stat.mean(m)
-        print("Overall Score: ",round(Score[a]*100),o,"%")
+        print("Overall Score: ",round(Score[a]*100,o),"%")
         
         a += 1
         

@@ -411,6 +411,7 @@ def WATERSHED(IMAGE, PARAMETERS, DETAIL):
 # Comparator !
 def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     # SETUP
+    CheckForMUI = True
     # parameters
     if "print" in DETAIL[0]:
         print("\n init :")
@@ -429,6 +430,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             [0, 0, 0, 0]  # metrics: A,B,C,D
             ]
     MUI = 0
+    CutoffMUI = PARAMETERS[1]
 
     # format matrices
     MatrixT = np.array(MatrixT)
@@ -489,8 +491,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         cv.waitKey(1)
 
     # identify fibers list
-    FibersT = MatrixID(MatrixT)
-    FibersR = MatrixID(MatrixR)
+    FibersT = MatrixID(MatrixT).tolist()
+    FibersR = MatrixID(MatrixR).tolist()
     
     Result[1][3] = len(FibersT)
     
@@ -562,19 +564,37 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
         if (TP + FP) == 0:  # none found - FN
             Result[1][2] += 1
+            
         elif TP / (FP + TP) >= Cutoff:  # TP
             Result[1][0] += 1
+            FibersR.remove(ID_R)
 
-        elif FP == 0 or FN == 0:  # no overlap - no change
+        elif FP != 0 or FN != 0:
+            
+            if CheckForMUI: # check MUI TO DO
+                # find every fiber in SubMatrix
+                ID_Rarr = []
+                for ID in FibersR:
+                    n_id = MatrixCount(SubMatrixR, ID)
+                    if n_id != 0:
+                        ID_Rarr.append(ID)
+                # if the combination of every fiber is CI, then MUI
+
+                if TP / Tarea >= CutoffMUI:  # CI+ == MUI
+                    MUI += 1
+                
+                    for ID in ID_Rarr:
+                        Result[1][1] += 1
+                        FibersR.remove(ID)
+        
+            elif FP >= FN:  # FP
+                Result[1][1] += 1
+                FibersR.remove(ID_R)
+            elif FN > FP:  # FN
+                Result[1][2] += 1
+                
+        else: # nothing detected
             Result = Result
-        elif FP >= FN:  # FP
-            Result[1][1] += 1
-        elif FN > FP:  # FN
-            Result[1][2] += 1
-
-        else: # debug ID_T == problem
-            Result[1][1] += 1
-            ID_p = ID_T
 
         # Image
         if "draw" in DETAIL[0]:
@@ -614,7 +634,14 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         cv.imshow("Accuracy", imgConf)
         extra_IMGS.append([imgConf, 'Confusion'])
         cv.waitKey(1)
-        
+    
+    # FP
+    FP_fib = 0
+    for ID_R in FibersR:
+        FP_fib += MatrixCount(MatrixR, ID_R)
+    Result[0][1] = FP_fib
+    Result[1][1] = len(FibersR)
+    
     # derive metrics
     Result[2][0] = Result[1][0]/Result[1][3]
     Result[2][1] = Result[1][1]/(Result[1][0]+Result[1][1])
@@ -628,8 +655,6 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
 
 # others
-
-# WT
 
 def COL(x, y, z, ID, width, height):
     # X = int((x / width) * 255)
@@ -815,16 +840,20 @@ def ID_renamer(ar):
 
 def PLOT(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
-    gap = 0.1
-    index = 0
+    gap = 0.2
+    index = -width*len(Algo)/2
     
     x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
     
     a = 0
+    X = x + index
     while a < len(Algo): #[a][metric][min,AVG,max]
-        ax.bar(     x + ((a+index)*width+gap), Data[a][1], width=width, label=Algo[a])
-        ax.errorbar(x + ((a+index)*width+gap), Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
+        if a == 0: X += gap
+        else: X += width
+        
+        ax.bar(     X, Data[a][1], width=width, label=Algo[a])
+        ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
         a += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.

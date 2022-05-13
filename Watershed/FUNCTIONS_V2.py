@@ -567,7 +567,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             
         elif TP / (FP + TP) >= Cutoff:  # TP
             Result[1][0] += 1
-            FibersR.remove(ID_R)
+            if ID_R in FibersR:
+                FibersR.remove(ID_R)
 
         elif FP != 0 or FN != 0:
             
@@ -585,11 +586,13 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                 
                     for ID in ID_Rarr:
                         Result[1][1] += 1
-                        FibersR.remove(ID)
+                        if ID_R in FibersR:
+                            FibersR.remove(ID)
         
             elif FP >= FN:  # FP
                 Result[1][1] += 1
-                FibersR.remove(ID_R)
+                if ID_R in FibersR:
+                    FibersR.remove(ID_R)
             elif FN > FP:  # FN
                 Result[1][2] += 1
                 
@@ -729,7 +732,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
     elif loop == "List":
         if N == [] or M==[]: # default
             N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
-            M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
+            M = [4, 7, 3, 4, 7, 6, 3, 5, 9, 6]
         i = 0
         while i < len(N):
             if tape == "Large" or tape == "Cropped":
@@ -751,9 +754,9 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         rnd.seed(K[1])
         
         i = 0
-        while i <= K[0]:
+        while i < K[0]:
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_" + str(rnd.randint(N[0], N[1]))
+                name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
             else:
                 name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
             Names.append(name)

@@ -37,33 +37,35 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
+Jurgen = False
+
 Loop = "List"  # Range, Random, List, All
-N,M= [],[] #Tape_B_n_m
-K = [50,1] #if random: number of picks in folder, seed
+N,M= [],[]
+K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
-Tape= "" #Large, Cropped, none=smalls
+Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
-WT_Parameters = [3, [0.5, 3, 1], [5, 20, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
 #WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.85,0.85,"M"]  # cutoff, Miko/Theo version
+CP_Parameters = [0.85,0.85,""]  # cutoff, Miko/Theo version
 CP_Algorithms = [               #chosen algos
         "Watershed",
-        "AI results/dataset1/",
-        "AI results/dataset2/",
-        "AI results/dataset3/",
-        "AI results/dataset4/",
-        #"Annotated/"
+        #"AI results/dataset1/",
+        #"AI results/dataset2/",
+        #"AI results/dataset3/",
+        #"AI results/dataset4/",
+        #"Annotated/GroundTruth/"
         ]
 
 PL_Metric = [
@@ -79,15 +81,17 @@ PL_Labels=[
 PL_Range = [0.5,1]
     
 # file paths (GitHub structure dependent)
+
 WT_PathIN = "../Data/Tape_B/"
 WT_PathOUT = "../Data Processed/Watershed/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
 CV_PathIN = "../Data Processed/Watershed/"
 CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
+if Jurgen != False: CV_PathOUT += str("Training/"+str(Jurgen)+"/Mask/")
 
 CP_PathIN = "../Data Processed/"
-CP_GroundTruth = "Annotated/GroundTruth"   #sub-folder
+CP_GroundTruth = "Annotated/Validation"   #sub-folder
 CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
 # process (others)
@@ -143,7 +147,7 @@ if "WT" in Compute:
     print("\n --- WATERSHED --- \n")
     
     if Tape == "Large" or Tape == "Cropped":
-        if Tape == "Cropped": WT_PathIN += "UncroppedImages/"
+        if Tape == "Cropped": WT_PathIN += "Tape_B_2_JPG/"     #"UncroppedImages/"
         if Tape == "Large":WT_PathIN += "Tape_B_2_JPG/"
         
         WT_Type[1] = "L"+WT_Type[1]
@@ -168,6 +172,13 @@ if "WT" in Compute:
         path = os.path.join(path_script, WT_PathIN, FileName)
         WT_Image = cv.imread(path)
         if "print" in Detail[0]:print(path)
+        
+        if Jurgen != False:
+            print("saving input WT Image : ", FileName)
+            path = os.path.join(path_script, WT_PathOUT)
+            os.chdir(path)
+            path = str(path + "/Training/"+str(Jurgen)+"/Images/" + FileName)
+            cv.imwrite(path, WT_Image)
 
         WT = WATERSHED(WT_Image, WT_Parameters, Detail)
         WT_Image = WT[0]
@@ -189,10 +200,13 @@ if "WT" in Compute:
             path = str(path + FileName)
             #pd.DataFrame(WT_Matrix).to_csv((path), header="none", index="none")
             np.savetxt(path, WT_Matrix, delimiter=",")
+            if WT_Type[2]==".tif":
+                image = Image.fromarray(WT_Matrix)
+                image.save(path)
     
         if "Extra" in Save:
             IMG = WT[2]
-            i = 0
+            i=0
             for Img in IMG:
                 img, step = Img
                 FileName = name + "_step_" + str(i) + "_" + step + WT_Type[1]
@@ -201,7 +215,7 @@ if "WT" in Compute:
                 os.chdir(path)
                 path = str(path + "Extras/" + FileName)
                 cv.imwrite(path, img)
-                i += 1
+                i+=1
             
         progress += 1
         T1 = time.time()

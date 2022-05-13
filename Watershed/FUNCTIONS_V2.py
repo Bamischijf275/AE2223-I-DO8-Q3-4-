@@ -5,7 +5,6 @@ Created on Wed May  4 14:32:55 2022
 @author: huege
 """
 
-import PIL
 # STANDARD MODULES
 import cv2 as cv
 import imutils
@@ -20,6 +19,7 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 import os
 import matplotlib.pyplot as plt
+import PIL
 
 # FUNCTIONS
 

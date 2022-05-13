@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed May  4 14:32:55 2022
-
 @author: huege
 """
+
 # INIT
 # startup
 import time
@@ -27,7 +27,7 @@ import warnings
 #import PIL
 
 # own functions
-from FUNCTIONS_V2 import *
+from FUNCTIONS_V3 import *
 
 # init
 warnings.filterwarnings('ignore')
@@ -41,13 +41,13 @@ Loop = "List"  # Range, Random, List, All
 N,M= [],[] #Tape_B_n_m
 K = [50,1] #if random: number of picks in folder, seed
 Name = "Tape_B"
-Tape= "Cropped" #Large, Cropped, none=smalls
+Tape= "" #Large, Cropped, none=smalls
 
-Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["draw", "", "save"], 250]  # draw/print/save, substep Dt
 
 Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
+Save = ["Img", "Matrix", "Extra", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -56,7 +56,7 @@ WT_Parameters = [3, [0.5, 3, 1], [5, 20, 2], 3, "exact",""]  # Radius, Relative 
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.85,0.5]  # cutoff
+CP_Parameters = [0.85,0.85]  # cutoff
 CP_Algorithms = [               #chosen algos
         "Watershed",
         "AI results/dataset1/",
@@ -80,7 +80,7 @@ PL_Range = [0.5,1]
     
 # file paths (GitHub structure dependent)
 WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/3D/"
+WT_PathOUT = "../Data Processed/Watershed/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
         
 CV_PathIN = "../Data Processed/Watershed/"
@@ -323,8 +323,13 @@ if "CP" in Compute:
             # Comp
             CP = COMPARATOR(CP_MatrixT, CP_MatrixR, CP_Parameters, Detail)
             result = CP[0]
+            
+            # MUI - delta:
+            matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\mask_csv\Tape_B_1_7.csv', delimiter=",")
+            matrix2 = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_7.csv', delimiter=',')
+            delta = DELTA(matrix,matrix2)
     
-            # Results
+            # Results bt :
             
             # Area
             CP_Confusion[a][0][0] += result[0][0]
@@ -351,7 +356,7 @@ if "CP" in Compute:
             CP_res[a][2][0].append(result[2][0])
             CP_res[a][2][1].append(1-result[2][1])
             CP_res[a][2][2].append(1-result[2][2])
-            CP_res[a][2][3].append(1-DELTA(CP_MatrixT,CP_MatrixR))
+            CP_res[a][2][3].append(1-delta)
 
             # Save images
             if "Extra" in Save:

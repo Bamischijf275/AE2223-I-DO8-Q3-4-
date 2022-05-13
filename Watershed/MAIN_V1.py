@@ -43,11 +43,11 @@ K = [50,1] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "" #Large, Cropped, none=smalls
 
-Detail = [["draw", "", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
 Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["Img", "Matrix", "Extra", "Plot"] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -56,14 +56,14 @@ WT_Parameters = [3, [0.5, 3, 1], [5, 20, 2], 3, "exact",""]  # Radius, Relative 
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.85,0.85]  # cutoff
+CP_Parameters = [0.85,0.85,""]  # cutoff, Miko/Theo version
 CP_Algorithms = [               #chosen algos
         "Watershed",
         "AI results/dataset1/",
         "AI results/dataset2/",
         "AI results/dataset3/",
         "AI results/dataset4/",
-        "Annotated/"
+        #"Annotated/"
         ]
 
 PL_Metric = [
@@ -307,6 +307,8 @@ if "CP" in Compute:
         # file
         path = os.path.join(path_script, CP_PathIN, CP_GroundTruth, name + CP_Type[0])
         CP_MatrixT = np.genfromtxt(path, delimiter=",")
+        matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\GroundTruth\Tape_B_1_7.csv', delimiter=",")
+            
         if "print" in Detail[0]:print(path)
     
         # compare each algo for each file
@@ -318,6 +320,7 @@ if "CP" in Compute:
 
             path = os.path.join(path_script, CP_PathIN, Alg, name + CP_Type[0])
             CP_MatrixR = np.genfromtxt(path, delimiter=",")
+            matrix2 = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_7.csv', delimiter=',')
             #print(path)
     
             # Comp
@@ -325,9 +328,9 @@ if "CP" in Compute:
             result = CP[0]
             
             # MUI - delta:
-            matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\mask_csv\Tape_B_1_7.csv', delimiter=",")
-            matrix2 = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_7.csv', delimiter=',')
-            delta = DELTA(matrix,matrix2)
+            if "M" in CP_Parameters:
+                delta = DELTA(matrix,matrix2)
+            else: delta = result[2][3]
     
             # Results bt :
             

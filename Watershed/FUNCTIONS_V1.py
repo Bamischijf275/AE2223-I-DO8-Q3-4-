@@ -620,8 +620,6 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         T1 = time.time()
         print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
     return (Result, extra_IMGS)
-
-
 # others
 
 # WT

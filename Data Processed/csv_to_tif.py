@@ -179,7 +179,7 @@ def color_image_maker(filename):
                         wspace=0.1,
                         hspace=0.3)
     #Ground thruth image
-    GT_im = Image.open(f"Data Processed/Annotated/{filename}")
+    GT_im = Image.open(f"Data Processed/Annotated/tif/{filename}")
     GT_ar = np.array(GT_im)
     tab20c = cm.get_cmap("tab20c", 256)
     cmap_cus = tab20c(np.linspace(0, 1, len(np.unique(GT_ar))))
@@ -199,19 +199,19 @@ def color_image_maker(filename):
         mask_ar,dataset,newcmp = get_mask(dataset,filename)
 
         if ID == 0:
-            ax2.set_title(f"Stardist1")
+            ax2.set_title(f"StarDist1")
             ax2.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax2.axis("off")
         if ID == 1:
-            ax3.set_title(f"Stardist2")
+            ax3.set_title(f"StarDist2")
             ax3.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax3.axis("off")
         if ID == 2:
-            ax4.set_title(f"Stardist3")
+            ax4.set_title(f"StarDist3")
             ax4.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax4.axis("off")
         if ID == 4:
-            ax5.set_title(f"CA")
+            ax5.set_title(f"Control")
             filename = filename.replace(".tif","")
             print(f"Data Processed/Annotated/Watershed/Extras/{filename}_step_7_Out.png")
             ax5.imshow(mpimg.imread(f"Data Processed/Watershed/Extras/{filename}_step_7_Out.png"),interpolation="nearest")
@@ -219,6 +219,7 @@ def color_image_maker(filename):
         ID +=1
     plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
     plt.show()
+color_image_maker(str('Tape_B_7_3.tif'))
 def csv_to_mask():
     for name in os.listdir(f"Data Processed/Annotated"):
         if name == str("Tape_B_1_4.csv") or name == str("Tape_B_1_7.csv") or name == str("Tape_B_2_3.csv") or name == str("Tape_B_3_8.csv") or name == str("Tape_B_5_7.csv") or name == str("Tape_B_6_6.csv") or name == str("Tape_B_7_3.csv") or name == str("Tape_B_8_5.csv") or name == str("Tape_B_8_9.csv") or name == str("Tape_B_11_6.csv"):

@@ -9,11 +9,6 @@ from skimage import io
 from time import sleep
 from tqdm import tqdm
 
-img1 = Image.open(f"Data Processed/AI 3D/Tape_B_2_-{0}.jpg.tif")
-ar1 = np.array(img1)
-img2 = Image.open(f"Data Processed/AI 3D/Tape_B_2_-{1}.jpg.tif")
-ar2 = np.array(img2)
-ar2 = ar2
 def ar_compar(ar1,ar2):
     ar1_un = np.unique(ar1)
     ar2 = ar2*1000
@@ -30,7 +25,7 @@ def ar_compar(ar1,ar2):
             if ar2[indice[0],indice[1]] !=0:
                 score +=1
                 number_store = np.append(number_store,int(ar2[indice[0],indice[1]]))
-        if score/amount >=0.7:
+        if score/amount >=0.5:
             values, counts = np.unique(number_store,return_counts=True)
             ind = np.argmax(counts)
             a2 = np.argwhere(ar2 == values[ind])
@@ -42,14 +37,16 @@ def ar_compar(ar1,ar2):
 
 def tif_generator():
     im_start = Image.open(f"Data Processed/AI 3D/Tape_B_2_-{0}.jpg.tif")
+    #ar = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-1L.csv',delimiter=",")
     ar = np.array(im_start)
-    ar = ar
+    ar = ar[100:200,300:400]
     ar_last = ar
-    for i in range(1,500):
-        print(f"Tape_B_2_-{i}.jpg.tif")
+    for i in range(1,201):
+        print(f"Tape_B_2_-{i}L.csv")
         img = Image.open(f"Data Processed/AI 3D/Tape_B_2_-{i}.jpg.tif")
+        #img = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-{i}L.csv',delimiter=",")
         ar1 = np.array(img)
-        ar1 = ar1
+        ar1 = ar1[100:200,300:400]
         ar_add = ar_compar(ar_last,ar1)
         ar = np.dstack([ar,ar_add])
         ar_last = ar_add
@@ -63,17 +60,15 @@ def tif_generator():
         print(np.argwhere(ar_new==un),un)
         ar_new[ar_new!=un]=0
         ar_new[ar_new!=0] =1
-        tifffile.imwrite(f'Data processed/3D tiff/test_{un}.tif', ar_new.astype('uint16'), photometric="minisblack", imagej=True)
+        tifffile.imwrite(f'Data processed/3D tiff (0.5)/dataset1_200/dataset1_{un}.tif', ar_new.astype('uint16'), photometric="minisblack", imagej=True)
     print(np.shape(ar))
-    tifffile.imwrite(f'Data processed/3D tiff/test.tif', ar.astype('uint16'),photometric= "minisblack",imagej=True)
+    tifffile.imwrite(f'Data processed/3D tiff (0.5)/dataset1_200/dataset1_whole.tif', ar.astype('uint16'),photometric= "minisblack",imagej=True)
 
-
+tif_generator()
 def extract_pos(filename): #test_27.0.tif
-    im = io.imread(f'Data processed/3D tiff/{filename}')
+    im = io.imread(f'Data processed/3D tiff (0.5)/{filename}')
     ar = np.array(im)
     pos_ar = np.argwhere(ar !=0)
     pos_ar = np.array(pos_ar)
     if np.std(pos_ar[:,1]) >= 5 or np.std(pos_ar[:,2]) >=5:
         print(f"test_{i}.0.tif deviate")
-for i in tqdm(range(1,946)):
-    extract_pos(str(f"test_{i}.0.tif"))

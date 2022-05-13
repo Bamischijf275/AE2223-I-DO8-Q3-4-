@@ -36,7 +36,7 @@ np.set_printoptions(threshold=sys.maxsize)
 # MAIN
 print("\n----- START PROGRAM ----- \n")
 
-# Macro parameters : determine what to compute
+# Macro parameters (determine what to compute)
 Loop = "List"  # Range, Random, List, All
 N,M= [],[] #Tape_B_n_m
 K = [50,1] #if random: number of picks in folder, seed
@@ -45,13 +45,14 @@ Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["","","CP"] #WT,CV,CP
+Compute = ["WT","CV","CP",""] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plots"] #"Img", "Matrix", "Extra", "Plots"
+Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plots"
 TypeOUT = [".png", ".csv"]
 
-# Program parameters : determine 
-WT_Parameters = [2.5, [0.5, 5, 2], [5, 20, 2], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
+# Program parameters :
+WT_Parameters = [3, [0.5, 5, 2], [5, 20, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 
@@ -65,9 +66,19 @@ CP_Algorithms = [               #chosen algos
         "Watershed"
         ]
 
-PL_Metric = ["Area","Fibers","Performance parameters"] #choose plots (area,fiber,own metrics)
+PL_Metric = [
+        "Area",
+        "Fibers",
+        "Performance parameters"
+        ] #choose plots (area,fiber,own metrics)
+PL_Labels=[
+            [r'TP', r'FP', r'FN'],
+            [r'TP', r'FP', r'FN'],
+            [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
+            ]
+PL_Range = [0.9,1]
     
-# file paths
+# file paths (GitHub structure dependent)
 WT_PathIN = "../Data/Tape_B/"
 WT_PathOUT = "../Data Processed/Watershed/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
@@ -79,7 +90,7 @@ CP_PathIN = "../Data Processed/"
 CP_GroundTruth = "Annotated/GroundTruth"   #sub-folder
 CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
-# process
+# process (others)
 path_script = os.path.dirname(__file__)
 errorMin = 10**(-3)
 o = 2 # decimals
@@ -248,7 +259,10 @@ if ("CV" in Compute) or (("WT" in Compute)and("Cropped" in Tape)):
                 np.savetxt(path, Arr, delimiter=",")
                 m += 1
                 
-            print("Converted",str(FileName),"to",str(Name + "_" + str(n) + "_[" + str(0) + str(m) + "]"))
+            print("Converted",
+                  str(FileName),"to",
+                  str(Name + "_" + str(n) + "_[" + str(0) + "-" + str(m) + "]")
+                  )
                 
         progress += 1
         T1 = time.time()
@@ -364,7 +378,9 @@ if "CP" in Compute:
     print("total True Area: ", sum(CP_res[a][0][3][:]))
     print("total number of True fibers : ", sum(CP_res[a][1][3][:]))
     
+    Score = []
     while a < len(CP_Algorithms):
+        
         print("\n Comparing ",CP_Algorithms[a], "against", CP_GroundTruth, ": ")
         print("Area")
         print("     TP:", round(stat.mean(CP_res[a][0][0])*100,o), "%")
@@ -382,34 +398,39 @@ if "CP" in Compute:
         print("     c:", round(stat.mean(CP_res[a][2][2])*100,o), "%")
         print("     d:", round(stat.mean(CP_res[a][2][3])*100,o), "%")
         
+        Score.append(1)
+        for m in CP_res[a][2]:
+            Score[a]*=stat.mean(m)
+        print("Overall Score: ",round(Score[a]*100),o,"%")
+        
         a += 1
-    
+        
     # Plots
-    print("\n - PLOTS - \n")
+    if "PL" in Compute:
+        print("\n - PLOTS - \n")
+        
+        m = 0
+        while m < len(PL_Metric): # for each plot type
+            CP_stat = []
+            a=0
+            while a < len(CP_Algorithms): # for each algo compared
+                CP_stat.append([[],[],[]]) #plot data form
+                n = 0
+                while n < len(PL_Labels[m]): # for each metric
+                    MEAN = stat.mean( CP_res[a][2][n])
+                    MIN = MEAN-min(CP_res[a][2][n])
+                    MAX = max(CP_res[a][2][n])-MEAN
     
-    Labels=[
-            [r'TP', r'FP', r'FN'],
-            [r'TP', r'FP', r'FN'],
-            [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
-            ]
-    
-    m = 0
-    while m < len(PL_Metric): # for each plot type
-        CP_stat = []
-        a=0
-        while a < len(CP_Algorithms): # for each algo compared
-            CP_stat.append([[],[],[]]) #plot data form
-            n = 0
-            while n < len(Labels[m]): # for each metric
-                CP_stat[a][0].append(stat.stdev(CP_res[a][2][n]))
-                CP_stat[a][1].append(stat.mean(CP_res[a][2][n]))
-                CP_stat[a][2].append(stat.stdev(CP_res[a][2][n]))
-                n+=1
-            a+=1
-        print(np.array(CP_stat).shape)
-        Title = str("Effectiveness based on "+PL_Metric[m])
-        PLOT(CP_stat, CP_Algorithms,Title ,[0.9,1],Labels[m],Save)
-        m += 1
+                    CP_stat[a][0].append(MIN)
+                    CP_stat[a][1].append(MEAN)
+                    CP_stat[a][2].append(MAX)
+                    
+                    n+=1
+                a+=1
+            PL_Range[1]+=errorMin
+            Title = str("Effectiveness based on "+PL_Metric[m])
+            PLOT(CP_stat, CP_Algorithms,Title ,PL_Labels[m],PL_Range,Save)
+            m += 1
         
     T1 = time.time()
     print("> " + str(round((T1 - T0), 1)) + "[s] <")

@@ -815,7 +815,7 @@ def ID_renamer(ar):
 
 def PLOT(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
-    gap = 0
+    gap = 0.1
     index = 0
     
     x = np.arange(len(Labels))  # the label locations
@@ -823,8 +823,8 @@ def PLOT(Data, Algo,Title,Labels,Range,Save):
     
     a = 0
     while a < len(Algo): #[a][metric][min,AVG,max]
-        ax.bar(     x + ((a-index)*width+gap), Data[a][1], width=width, label=Algo[a])
-        ax.errorbar(x + ((a-index)*width+gap), Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
+        ax.bar(     x + ((a+index)*width+gap), Data[a][1], width=width, label=Algo[a])
+        ax.errorbar(x + ((a+index)*width+gap), Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
         a += 1
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
@@ -836,7 +836,7 @@ def PLOT(Data, Algo,Title,Labels,Range,Save):
     
     ax.legend()
     fig.tight_layout()
-    plt.ylim(Range[0], Range[1])
+    plt.ylim(Range[0],Range[1])
     
     if "Plot" in Save:
         plt.savefig(Title)

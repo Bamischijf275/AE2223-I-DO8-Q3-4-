@@ -210,7 +210,7 @@ def color_image_maker(filename):
             ax4.set_title(f"StarDist3")
             ax4.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax4.axis("off")
-        if ID == 4:
+        if ID == 3:
             ax5.set_title(f"Control")
             filename = filename.replace(".tif","")
             print(f"Data Processed/Annotated/Watershed/Extras/{filename}_step_7_Out.png")
@@ -219,7 +219,7 @@ def color_image_maker(filename):
         ID +=1
     plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
     plt.show()
-color_image_maker(str('Tape_B_7_3.tif'))
+
 def csv_to_mask():
     for name in os.listdir(f"Data Processed/Annotated"):
         if name == str("Tape_B_1_4.csv") or name == str("Tape_B_1_7.csv") or name == str("Tape_B_2_3.csv") or name == str("Tape_B_3_8.csv") or name == str("Tape_B_5_7.csv") or name == str("Tape_B_6_6.csv") or name == str("Tape_B_7_3.csv") or name == str("Tape_B_8_5.csv") or name == str("Tape_B_8_9.csv") or name == str("Tape_B_11_6.csv"):
@@ -230,12 +230,13 @@ def csv_to_mask():
             print(name)
             image.save(f"Data Processed/AI results/watershed/{name}.tif")
 
-def mask_to_csv(dataset):
-    for name in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
-        im = Image.open(f"Data Processed/AI results/{dataset}/masks/{name}")
-        filename = name.replace(".tif","")
+def mask_to_csv():
+    for name in os.listdir(f"Data Processed/Validation"):
+        im = Image.open(f"Data Processed/Validation/{name}")
+        name = name.replace(".jpg.tif","")
         im_ar = np.array(im)
-        np.savetxt(f"Data Processed/AI results/{dataset}/mask_csv/{filename}.csv",im_ar,delimiter = ",")
+        np.savetxt(f"Data Processed/Annotated/Validation/{name}.csv",im_ar,delimiter = ",")
+mask_to_csv()
 # for filename in os.listdir("Data Processed/AI results/dataset1/images"):
 #     color_image_maker(filename)
 

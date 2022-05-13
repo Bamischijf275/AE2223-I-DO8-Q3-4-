@@ -45,14 +45,14 @@ Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plots"] #"Img", "Matrix", "Extra", "Plots"
+Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
-WT_Parameters = [3, [0.5, 5, 2], [5, 20, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
-WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.5, 3, 1], [5, 20, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
+#WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 
@@ -351,7 +351,7 @@ if "CP" in Compute:
             CP_res[a][2][0].append(result[2][0])
             CP_res[a][2][1].append(1-result[2][1])
             CP_res[a][2][2].append(1-result[2][2])
-            CP_res[a][2][3].append(1-result[2][3])
+            CP_res[a][2][3].append(1-DELTA(CP_MatrixT,CP_MatrixR))
 
             # Save images
             if "Extra" in Save:

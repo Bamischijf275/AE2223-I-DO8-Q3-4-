@@ -45,7 +45,7 @@ Tape= "" #Large, Cropped, none=smalls
 
 Detail = [["draw", "", "save"], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
 Save = ["Img", "Matrix", "Extra", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
@@ -323,8 +323,13 @@ if "CP" in Compute:
             # Comp
             CP = COMPARATOR(CP_MatrixT, CP_MatrixR, CP_Parameters, Detail)
             result = CP[0]
+            
+            # MUI - delta:
+            matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\mask_csv\Tape_B_1_7.csv', delimiter=",")
+            matrix2 = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_7.csv', delimiter=',')
+            delta = DELTA(matrix,matrix2)
     
-            # Results
+            # Results bt :
             
             # Area
             CP_Confusion[a][0][0] += result[0][0]
@@ -351,7 +356,7 @@ if "CP" in Compute:
             CP_res[a][2][0].append(result[2][0])
             CP_res[a][2][1].append(1-result[2][1])
             CP_res[a][2][2].append(1-result[2][2])
-            CP_res[a][2][3].append(1-result[2][3])
+            CP_res[a][2][3].append(1-delta)
 
             # Save images
             if "Extra" in Save:

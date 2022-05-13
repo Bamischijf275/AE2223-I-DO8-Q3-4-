@@ -192,6 +192,11 @@ def ComparatorM(matrix,matrix2):
 #comparatorS=ComparatorOf2(matrix,matrix3)
 #print(" For Stardist: identified", comparatorS[0],"misidentified",comparatorS[1])
 def DELTA(matrix,matrix2):
+    print(matrix.shape)
+    matrix2 = np.pad(matrix2, ((0, 2), (0, 2)))
+    # matrix = np.pad(matrix, ((0, 2), (0, 2)))
+    matrix = matrix.astype(int)
+    matrix2 = matrix2.astype(int)
     numero=findhighestIDnumber(matrix)
     print(numero)
     numero2=findhighestIDnumber(matrix2)
@@ -225,8 +230,8 @@ def DELTA(matrix,matrix2):
     delta = mui / numberoffibers2
     return delta
 
-#matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\mask_csv\Tape_B_1_7.csv', delimiter=",")
-#matrix2 = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_7.csv', delimiter=',')
+matrix = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\GroundTruth\Tape_B_1_4.csv', delimiter=",")
+matrix2 = np.genfromtxt(r'C:\Users\mikol\PycharmProjects\AE2223-I-DO8-Q3-4-\Data Processed\Watershed\Tape_B_1_4.csv', delimiter=',')
 start=time.time()
 print(DELTA(matrix,matrix2))
 end = time.time()

@@ -891,40 +891,46 @@ def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
     
     if "Plot" in Save:
         plt.savefig(Title)
-    
-def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
-    width = 0.15
-    gap = 0.2
-    index = -width*len(Algo)/2-gap
-    
-    x = np.arange(len(Labels))  # the label locations
-    fig, ax = plt.subplots()
-    
-    a = 0
-    X = x + index
-    while a < len(Algo): #[a][metric][min,AVG,max]
-        if a == 0: X += gap
-        else: X += width
-        
-        ax.bar(     X, Data[a][1], width=width, label=Algo[a].split("/",1)[-1] )
-        ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
-        a += 1
-        if a == len(Algo): X += width
 
-    # Add some text for labels, title and custom x-axis tick labels, etc.
-    plt.title(Title)
-    
-    ax.set_ylabel('Index')
-    ax.set_xticks(x)
-    ax.set_xticklabels(Labels)
-    
-    ax.legend()
-    fig.tight_layout()
-    plt.ylim(Range[0],Range[1])
-    
-    if "Plot" in Save:
-        plt.savefig(Title)
-        
+
+def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
+
+    alphaData = {
+        "SD1": Data[1][2][0],
+        "SD2": Data[2][2][0],
+        "SD3": Data[3][2][0],
+        "SD4": Data[4][2][0],
+        "WS": Data[0][2][0],
+        "MA": Data[5][2][0]}
+
+    betaData = {"SD1": Data[1][2][1], "SD2": Data[2][2][1], "SD3": Data[3][2][1], "SD4": Data[4][2][1],
+                 "WS": Data[0][2][1], "MA": Data[5][2][1]}
+    gammaData = {"SD1": Data[1][2][2], "SD2": Data[2][2][2], "SD3": Data[3][2][2], "SD4": Data[4][2][2],
+                "WS": Data[0][2][2], "MA": Data[5][2][2]}
+    deltaData = {"SD1": Data[1][2][3], "SD2": Data[2][2][3], "SD3": Data[3][2][3], "SD4": Data[4][2][3],
+                "WS": Data[0][2][3], "MA": Data[5][2][3]}
+
+    fig, axs = plt.subplots(2, 2)
+
+    axs[0, 0].boxplot(alphaData.values(), patch_artist=True)
+    axs[0, 0].xaxis.set_tick_params(labelbottom=False)
+    axs[0, 0].set_title(r"$\alpha$")
+
+    axs[0, 1].boxplot(betaData.values(), patch_artist=True)
+    axs[0, 1].xaxis.set_tick_params(labelbottom=False)
+    axs[0, 1].set_title(r"$\beta$")
+
+    axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
+    axs[1, 0].set_xticklabels(alphaData.keys())
+    axs[1, 0].set_title(r"$\gamma$")
+
+    axs[1, 1].boxplot(deltaData.values(), patch_artist=True)
+    axs[1, 1].set_xticklabels(alphaData.keys())
+    axs[1, 1].set_title(r"$\delta$")
+
+    plt.savefig("Effectiveness Boxplots")
+
+
 def DELTA(matrix,matrix2):
     numero=findhighestIDnumber(matrix)
     print(numero)

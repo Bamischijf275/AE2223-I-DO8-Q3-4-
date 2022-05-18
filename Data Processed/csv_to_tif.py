@@ -70,9 +70,9 @@ def array_splitter(ar):
 
 def check_im_masks():
     ID=0
-    for name in os.listdir("Data Processed/Training/dataset3/dataset3_ver2/images"):
-        a_m = Image.open(f'Data Processed/Training/dataset3/dataset3_ver2/masks/{name}')
-        a_im = Image.open(f'Data Processed/Training/dataset3/dataset3_ver2/images/{name}')
+    for name in os.listdir("Data Processed/Training/dataset2/dataset2_V3/images"):
+        a_m = Image.open(f'Data Processed/Training/dataset2/dataset2_V3/masks/{name}')
+        a_im = Image.open(f'Data Processed/Training/dataset2/dataset2_V3/images/{name}')
         a_m_ar = np.array(a_m)
         a_im_ar = np.array(a_im)
         if np.shape(a_m_ar) != np.shape(a_im_ar):
@@ -86,6 +86,8 @@ def check_im_masks():
         plt.show()
         input(f"{name}")
         ID +=1
+
+check_im_masks()
 def add_im_mask():
     for name in os.listdir("Data Processed/Watershed/Training/500/Images"):
         if name != str("TIF"):
@@ -136,18 +138,19 @@ def random_dataset2():
             running = False
 
 
-def dim_checker(dataset):
+def dim_checker(dataset,ver):
     ID=0
-    for filename in os.listdir(f"Data Processed/Training/{dataset}/masks"):
-        mask_im = Image.open(f"Data Processed/Training/{dataset}/masks/{filename}")
-        im_im = Image.open(f"Data Processed/Training/{dataset}/images/{filename}")
+    for filename in os.listdir(f"Data Processed/Training/{dataset}/{dataset}_V{ver}/masks"):
+        mask_im = Image.open(f"Data Processed/Training/{dataset}/{dataset}_V{ver}/masks/{filename}")
+        im_im = Image.open(f"Data Processed/Training/{dataset}/{dataset}_V{ver}/images/{filename}")
         mask_ar = np.array(mask_im)
         im_ar = np.array(im_im)
         if np.shape(im_ar) != np.shape(mask_ar):
-            print(f"{filename}, {np.shape(mask_ar),np.shape(im_ar)}")
+            print(f"{filename}, {np.shape(mask_ar), np.shape(im_ar)}")
+
             ID += 1
     if ID == 0:
-        print("all dimensions are correct")
+        print(f"all dimensions are correct of {dataset}_V{ver}")
 
 # dim_checker(str("dataset4/dataset4_ver2"))
 # print(len(os.listdir("Data Processed/Training/dataset4/dataset4_ver2/images")))
@@ -228,15 +231,13 @@ def add_mask_to_im():
             im.save(f"Data Processed/Training/dataset2/dataset2_ver2/masks/{name}")
 
 def csv_to_mask():
-    for dataset in os.listdir(f"Data Processed/AI results"):
-        for filename in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
-            ar = np.genfromtxt("Data Processed/Watershed/Training/500/Mask/{name}", delimiter=",")
-            ar = ar.astype("uint16")
-            name = name.replace(".csv","")
-            image = Image.fromarray(ar)
-            print(name)
-            image.save(f"Data Processed/Watershed/Training/500 (tif)/masks/{name}.tif")
-
+    for filename in os.listdir(f"Data Processed/Watershed/Training/500/Mask"):
+        ar = np.genfromtxt(f"Data Processed/Watershed/Training/500/Mask/{filename}", delimiter=",")
+        ar = ar.astype("uint16")
+        name = filename.replace(".csv","")
+        image = Image.fromarray(ar)
+        print(name)
+        image.save(f"Data Processed/Watershed/Training/500 (tif)/masks/{name}.tif")
 def mask_to_csv():
     for dataset in os.listdir(f"Data Processed/AI results"):
 
@@ -246,7 +247,6 @@ def mask_to_csv():
             filename = filename.replace(".tif","")
             im_ar = np.array(im)
             np.savetxt(f"Data Processed/AI results/{dataset}/{filename}.csv",im_ar,delimiter = ",")
-mask_to_csv()
 # for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
 #     color_image_maker(filename)
 

@@ -228,24 +228,27 @@ def add_mask_to_im():
             im.save(f"Data Processed/Training/dataset2/dataset2_ver2/masks/{name}")
 
 def csv_to_mask():
-    for name in os.listdir(f"Data Processed/Watershed/Training/500/Mask"):
-        #if name == str("Tape_B_1_4.csv") or name == str("Tape_B_1_7.csv") or name == str("Tape_B_2_3.csv") or name == str("Tape_B_3_8.csv") or name == str("Tape_B_5_7.csv") or name == str("Tape_B_6_6.csv") or name == str("Tape_B_7_3.csv") or name == str("Tape_B_8_5.csv") or name == str("Tape_B_8_9.csv") or name == str("Tape_B_11_6.csv"):
-        ar = np.genfromtxt(f"Data Processed/Watershed/Training/500/Mask/{name}", delimiter=",")
-        ar = ar.astype("uint16")
-        name = name.replace(".csv","")
-        image = Image.fromarray(ar)
-        print(name)
-        image.save(f"Data Processed/Watershed/Training/500 (tif)/masks/{name}.tif")
+    for dataset in os.listdir(f"Data Processed/AI results"):
+        for filename in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
+            ar = np.genfromtxt("Data Processed/Watershed/Training/500/Mask/{name}", delimiter=",")
+            ar = ar.astype("uint16")
+            name = name.replace(".csv","")
+            image = Image.fromarray(ar)
+            print(name)
+            image.save(f"Data Processed/Watershed/Training/500 (tif)/masks/{name}.tif")
 
 def mask_to_csv():
-    for name in os.listdir(f"Data Processed/Validation"):
-        im = Image.open(f"Data Processed/Validation/{name}")
-        name = name.replace(".jpg.tif","")
-        im_ar = np.array(im)
-        np.savetxt(f"Data Processed/Annotated/Validation/{name}.csv",im_ar,delimiter = ",")
+    for dataset in os.listdir(f"Data Processed/AI results"):
 
-for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
-    color_image_maker(filename)
+        for filename in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
+            print(dataset,filename)
+            im = Image.open(f"Data Processed/AI results/{dataset}/masks/{filename}")
+            filename = filename.replace(".tif","")
+            im_ar = np.array(im)
+            np.savetxt(f"Data Processed/AI results/{dataset}/{filename}.csv",im_ar,delimiter = ",")
+mask_to_csv()
+# for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
+#     color_image_maker(filename)
 
 # im = Image.open(f"Data Processed/Training/dataset1/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)

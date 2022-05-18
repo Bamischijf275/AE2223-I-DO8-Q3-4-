@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 SD1 = [0.4, 0.5, 0.45, 0.55]
 SD2 = [0.42, 0.52, 0.47, 0.57]
@@ -28,7 +29,7 @@ def generateResultsChart(SD1, SD2, SD3, WS):
 
     fig, ax = plt.subplots()
 
-    SD1bar = ax.bar(x - (3*width/2), SD1, width, label='StarDist1')
+    SD1bar = ax.boxplot(x - (3*width/2), SD1, width, label='StarDist1')
     ax.errorbar(x - (3*width/2), SD1, yerr=[SD1min, SD1max], fmt='ko', capsize=5)
 
     SD2bar = ax.bar(x - width/2, SD2, width, label='StarDist2')
@@ -51,5 +52,34 @@ def generateResultsChart(SD1, SD2, SD3, WS):
     plt.ylim(0.3, 0.8)
     plt.savefig("EffectivenessOfDifferentMethods")
 
+def boxplots(data):
+    alphaData = {"SD1": [1,1,1], "SD2": [1,1,1], "SD3": [1,1,1], "SD4": [1,1,1], "WS": [1,1,1], "MA": [1,1,1]}
+    betaData = {"SD1": [1, 1, 1], "SD2": [1, 1, 1], "SD3": [1, 1, 1], "SD4": [1, 1, 1], "WS": [1, 1, 1],
+                 "MA": [1, 1, 1]}
+    gammaData = {"SD1": [1, 1, 1], "SD2": [1, 1, 1], "SD3": [1, 1, 1], "SD4": [1, 1, 1], "WS": [1, 1, 1],
+                 "MA": [1, 1, 1]}
+    deltaData = {"SD1": [1, 1, 1], "SD2": [1, 1, 1], "SD3": [1, 1, 1], "SD4": [1, 1, 1], "WS": [1, 1, 1],
+                 "MA": [1, 1, 1]}
 
-generateResultsChart(SD1, SD2, SD3, WS)
+    fig, axs = plt.subplots(2, 2)
+
+    axs[0,0].boxplot(alphaData.values())
+    axs[0,0].xaxis.set_tick_params(labelbottom=False)
+    axs[0,0].set_title(r"$\alpha$")
+
+    axs[0,1].boxplot(betaData.values())
+    axs[0,1].xaxis.set_tick_params(labelbottom=False)
+    axs[0,1].set_title(r"$\beta$")
+
+    axs[1,0].boxplot(gammaData.values())
+    axs[1, 0].set_xticklabels(alphaData.keys())
+    axs[1,0].set_title(r"$\gamma$")
+
+    axs[1,1].boxplot(deltaData.values())
+    axs[1,1].set_xticklabels(alphaData.keys())
+    axs[1,1].set_title(r"$\delta$")
+
+    plt.show()
+
+
+boxplots(1)

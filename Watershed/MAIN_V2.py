@@ -40,12 +40,13 @@ print("\n----- START PROGRAM ----- \n")
 Jurgen = False # for AI training sets
 
 Loop = "List"  # Range, Random, List, All
-N,M= [],[]
+N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
+M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
 K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["print", "draw", ""], 250]  # draw/print/save, substep Dt
+Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
 Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
@@ -57,16 +58,16 @@ WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.85,0.85,""]  # cutoff
-CP_GroundTruth = "Annotated/Validation/"   #sub-folder
+CP_Parameters = [0.8,0.8,"M"]  # cutoff
+CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
-        #"Watershed",
-        #"AI results/dataset1/",
-        #"AI results/dataset2/",
-        #"AI results/dataset3/",
-        #"AI results/dataset4/",
-        #"Annotated/GroundTruth/",
-        "Annotated/Validation/"
+        "Watershed",
+        "AI results/Dataset1_V2",
+        "AI results/Dataset2_V2",
+        "AI results/Dataset3_V2",
+        "AI results/Dataset4_V2",
+        "Annotated/Manually Annotated",
+        #"Annotated/Ground Truth/"
         ]
 
 PL_Metric = [
@@ -79,8 +80,8 @@ PL_Labels=[
             [r'TP', r'FP', r'FN'],
             [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
             ]
-PL_Range = [0.5,1]
-    
+PL_Range = [0.8,1]
+
 # file paths (GitHub structure dependent)
 
 WT_PathIN = "../Data/Tape_B/"
@@ -344,7 +345,7 @@ if "CP" in Compute:
             
             # MUI - delta:
             if "M" in CP_Parameters:
-                delta = DELTA(CP_MatrixT,CP_MatrixR)
+                delta = DELTA(CP_MatrixT,CP_MatrixR,Detail)
             else: delta = result[2][3]
     
             # Results bt :
@@ -433,7 +434,7 @@ if "CP" in Compute:
     # Plots
     if "PL" in Compute:
         print("\n - PLOTS - \n")
-        
+        os.chdir(path_script)
         m = 0
         while m < len(PL_Metric): # for each plot type
             CP_stat = []
@@ -454,7 +455,7 @@ if "CP" in Compute:
                 a+=1
             PL_Range[1]+=errorMin
             Title = str("Effectiveness based on "+PL_Metric[m])
-            PLOT(CP_stat, CP_Algorithms,Title ,PL_Labels[m],PL_Range,Save)
+            PLOT_BAR(CP_stat, CP_Algorithms, Title ,PL_Labels[m],PL_Range,Save)
             m += 1
         
     T1 = time.time()

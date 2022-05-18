@@ -48,7 +48,7 @@ Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
 
 Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
@@ -58,15 +58,15 @@ WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.8,0.8,"M"]  # cutoff
+CP_Parameters = [0.7,0.7,"M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",
-        "AI results/Dataset1_V2",
-        "AI results/Dataset2_V2",
-        "AI results/Dataset3_V2",
-        "AI results/Dataset4_V2",
-        "Annotated/Manually Annotated",
+        #"AI results/Dataset1_V2",
+        #"AI results/Dataset2_V2",
+        #"AI results/Dataset3_V2",
+        #"AI results/Dataset4_V2",
+        #"Annotated/Manually Annotated",
         #"Annotated/Ground Truth/"
         ]
 
@@ -80,7 +80,7 @@ PL_Labels=[
             [r'TP', r'FP', r'FN'],
             [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
             ]
-PL_Range = [0.8,1]
+PL_Range = [0.5,1]
 
 # file paths (GitHub structure dependent)
 
@@ -419,10 +419,10 @@ if "CP" in Compute:
         print("     FN:", round(stat.mean(CP_res[a][1][2])*100,o), "%")
         
         print("Metrics")
-        print("     a:", round(stat.mean(CP_res[a][2][0])*100,o), "%")
-        print("     b:", round(stat.mean(CP_res[a][2][1])*100,o), "%")
-        print("     c:", round(stat.mean(CP_res[a][2][2])*100,o), "%")
-        print("     d:", round(stat.mean(CP_res[a][2][3])*100,o), "%")
+        print("     alpha:", round(stat.mean(CP_res[a][2][0])*100,o), "%")
+        print("     beta:", round(stat.mean(CP_res[a][2][1])*100,o), "%")
+        print("     gamma:", round(stat.mean(CP_res[a][2][2])*100,o), "%")
+        print("     delta:", round(stat.mean(CP_res[a][2][3])*100,o), "%")
         
         Score.append(1)
         for m in CP_res[a][2]:

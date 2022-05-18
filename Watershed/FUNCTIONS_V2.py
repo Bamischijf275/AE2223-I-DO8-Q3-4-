@@ -565,7 +565,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         if (TP + FP) == 0:  # no result area found
             Result = Result
             
-        elif TP / (FP + TP) >= Cutoff:  # TP
+        elif (TP/Tarea >= Cutoff) and (TP / (FP + TP) >= Cutoff) :  # TP
             Result[1][0] += 1
             FibersR.remove(ID_R)
 
@@ -856,7 +856,40 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 
-def PLOT(Data, Algo,Title,Labels,Range,Save):
+def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
+    width = 0.15
+    gap = 0.2
+    index = -width*len(Algo)/2-gap
+    
+    x = np.arange(len(Labels))  # the label locations
+    fig, ax = plt.subplots()
+    
+    a = 0
+    X = x + index
+    while a < len(Algo): #[a][metric][min,AVG,max]
+        if a == 0: X += gap
+        else: X += width
+        
+        ax.bar(     X, Data[a][1], width=width, label=Algo[a].split("/",1)[-1] )
+        ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
+        a += 1
+        if a == len(Algo): X += width
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    plt.title(Title)
+    
+    ax.set_ylabel('Index')
+    ax.set_xticks(x)
+    ax.set_xticklabels(Labels)
+    
+    ax.legend()
+    fig.tight_layout()
+    plt.ylim(Range[0],Range[1])
+    
+    if "Plot" in Save:
+        plt.savefig(Title)
+    
+def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
     gap = 0.2
     index = -width*len(Algo)/2-gap

@@ -480,7 +480,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         imgT = np.where(MatrixT != 0, 255, MatrixT)
         extra_IMGS.append([imgT, 'Truth'])
         cv.imshow("Truth", imgT)
-        
+
         imgR = np.where(MatrixR != 0, 255, MatrixR)
         extra_IMGS.append([imgR, 'Algo'])
         cv.imshow("Algo", imgR)
@@ -493,7 +493,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     # identify fibers list
     FibersT = MatrixID(MatrixT).tolist()
     FibersR = MatrixID(MatrixR).tolist()
-    
+
     Result[1][3] = len(FibersT)
     
     if "print" in DETAIL[0]:
@@ -535,6 +535,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             RectR = SubRect(MatrixR, ID_R)
         else:  # no fiber found
             RectR = RectT
+            ID_R = 1
 
         # rectangle fiber (combined)
         RectTR = [0, 0, 0, 0]
@@ -562,36 +563,53 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         Result[0][2] += FN
         Result[0][3] += Tarea
 
-        if (TP + FP) == 0:  # none found - FN
-            Result[1][2] += 1
+        if (TP + FP) == 0:  # no result area found
+            Result = Result
             
-        elif TP / (FP + TP) >= Cutoff:  # TP
+        elif (TP/Tarea >= Cutoff) and (TP / (FP + TP) >= Cutoff) :  # TP
             Result[1][0] += 1
-            FibersR.remove(ID_R)
+            if ID_R in FibersR:
+                FibersR.remove(ID_R)
 
         elif FP != 0 or FN != 0:
             
+            if FP/Tarea >= CutoffMUI:  # FP
+                Result = Result
+                
             if CheckForMUI: # check MUI TO DO
+                # set 2nd pass with every fiber
+                mul_matrix = MUL_Matrix
+                dif_Matrix = DIF_Matrix
+                submatrixR = MatrixR[RectT[0]:RectT[2], RectT[1]:RectT[3]]
                 # find every fiber in SubMatrix
                 ID_Rarr = []
                 for ID in FibersR:
-                    n_id = MatrixCount(SubMatrixR, ID)
+                    n_id = MatrixCount(submatrixR, ID)
                     if n_id != 0:
                         ID_Rarr.append(ID)
-                # if the combination of every fiber is CI, then MUI
-
-                if TP / Tarea >= CutoffMUI:  # CI+ == MUI
-                    MUI += 1
                 
+                # matrix counting, again
+                tp,fp = 0,0
+                for ID in ID_Rarr:
+                    submatrixR = MatrixBin((MatrixR[RectTR[0]:RectTR[2], RectTR[1]:RectTR[3]]), ID)
+                    mul_matrix += np.multiply(SubMatrixT, submatrixR)
+                    dif_Matrix = np.subtract(SubMatrixT, submatrixR)
+                    tp += MatrixCount(mul_matrix, 1)
+                    fp += MatrixCount(dif_Matrix, -1)
+                    
+                # if the combination of every fiber is CI, then MUI
+                
+                if tp / Tarea >= CutoffMUI:  # CI+ == MUI
+                    MUI += 1
+                else: # FN
+                    Result[1][2] += 1
                     for ID in ID_Rarr:
-                        Result[1][1] += 1
                         FibersR.remove(ID)
-        
-            elif FP >= FN:  # FP
-                Result[1][1] += 1
-                FibersR.remove(ID_R)
-            elif FN > FP:  # FN
+                        
+            else: # FN
                 Result[1][2] += 1
+                if ID_R in FibersR:
+                    FibersR.remove(ID_R)
                 
         else: # nothing detected
             Result = Result
@@ -618,29 +636,30 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                 cv.imshow("Confusion", imgConf)
                 Ti = Tf
         # debug
-        if (ID_T == ID_p) and ("print" in DETAIL[0]):
+        if ((ID_T == ID_p) or False) and ("print" in DETAIL[0]):
             print("\n DEBUG")
             print("Fiber ID : ", ID_T)
             print("Sub-Matrices:")
             print(SubMatrixT)
             print(SubMatrixR)
             print("Ops-Matrices:")
-            print(DIF_Matrix)
-            print(MUL_Matrix)
+            #print(DIF_Matrix)
+            #print(MUL_Matrix)
             print("result:")
             print(TP, FP, FN)
+    
 
     if "draw" in DETAIL[0]:
         cv.imshow("Accuracy", imgConf)
-        extra_IMGS.append([imgConf, 'Confusion'])
+        extra_IMGS.append([imgConf, 'Accuracy'])
         cv.waitKey(1)
     
     # FP
     FP_fib = 0
     for ID_R in FibersR:
         FP_fib += MatrixCount(MatrixR, ID_R)
-    Result[0][1] = FP_fib
-    Result[1][1] = len(FibersR)
+    Result[0][1] = round(FP_fib,0)
+    Result[1][1] = round(len(list(dict.fromkeys(FibersR))),0)
     
     # derive metrics
     Result[2][0] = Result[1][0]/Result[1][3]
@@ -649,6 +668,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     Result[2][3] = MUI/Result[1][3]
 
     if "print" in DETAIL[0]:
+        print(Result[0],Result[1])
+        
         T1 = time.time()
         print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
     return (Result, extra_IMGS)
@@ -729,11 +750,11 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
     elif loop == "List":
         if N == [] or M==[]: # default
             N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
-            M = [4, 7, 3, 4, 7, 6, 3, 5, 9, 6]
+            M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
         i = 0
         while i < len(N):
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_" + str(N[i])
+                name = Name + "_2_-" + str(N[i])
             else:
                 name = Name + "_" + str(N[i]) + "_" + str(M[i])
             Names.append(name)
@@ -751,9 +772,9 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         rnd.seed(K[1])
         
         i = 0
-        while i <= K[0]:
+        while i < K[0]:
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_" + str(rnd.randint(N[0], N[1]))
+                name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
             else:
                 name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
             Names.append(name)
@@ -838,10 +859,10 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 
-def PLOT(Data, Algo,Title,Labels,Range,Save):
+def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
     gap = 0.2
-    index = -width*len(Algo)/2
+    index = -width*len(Algo)/2-gap
     
     x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
@@ -852,9 +873,43 @@ def PLOT(Data, Algo,Title,Labels,Range,Save):
         if a == 0: X += gap
         else: X += width
         
-        ax.bar(     X, Data[a][1], width=width, label=Algo[a])
+        ax.bar(     X, Data[a][1], width=width, label=Algo[a].split("/",1)[-1] )
         ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
         a += 1
+        if a == len(Algo): X += width
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    plt.title(Title)
+    
+    ax.set_ylabel('Index')
+    ax.set_xticks(x)
+    ax.set_xticklabels(Labels)
+    
+    ax.legend()
+    fig.tight_layout()
+    plt.ylim(Range[0],Range[1])
+    
+    if "Plot" in Save:
+        plt.savefig(Title)
+    
+def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
+    width = 0.15
+    gap = 0.2
+    index = -width*len(Algo)/2-gap
+    
+    x = np.arange(len(Labels))  # the label locations
+    fig, ax = plt.subplots()
+    
+    a = 0
+    X = x + index
+    while a < len(Algo): #[a][metric][min,AVG,max]
+        if a == 0: X += gap
+        else: X += width
+        
+        ax.bar(     X, Data[a][1], width=width, label=Algo[a].split("/",1)[-1] )
+        ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
+        a += 1
+        if a == len(Algo): X += width
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     plt.title(Title)
@@ -870,12 +925,123 @@ def PLOT(Data, Algo,Title,Labels,Range,Save):
     if "Plot" in Save:
         plt.savefig(Title)
         
-        
-        
- # COMPARATOR M
- 
- 
-        
+def DELTA(matrix,matrix2):
+    numero=findhighestIDnumber(matrix)
+    print(numero)
+    numero2=findhighestIDnumber(matrix2)
+    identified=0
+    misidentified=0
+    number=findlowestIDnumber(matrix)
+    print(numero,numero2)
+    numero=numero+1
+    exist=existingFiberIds(matrix,numero)
+    exist2 = existingFiberIds(matrix2, numero2)
+    numberoffibers2=len(exist)
+    numberoffibers22 = len(exist2)
+    notdetected = 0
+    mp = {k: 0 for k in range(int(numero2) + 5)}
+    for number in exist:#exist
+
+        gtpixel=GTpixels(matrix,matrix2,number)
+        a=majorityInMatrix(gtpixel, numero2)
+        if a!=0:
+            mp[a] += 1
+    mui = 0
+    mp2 = {k: 0 for k in range(int(numero2) + 5)}
+    for i in range(int(numero2)+5):
+        if mp[i]>1:
+            mui=mui+1
+            mp2[mp[i]]=mp2[mp[i]]+1
+    array=[]
+    for i in range(int(numero2)+5):
+        if mp2[i]>0:
+            array.append((mp2[i],"groups of", i))
+    delta = mui / numberoffibers2
+    return delta
+
+def findhighestIDnumber(matrix): ###largest id number in the matrix
+    numero=0
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j]>numero: numero=matrix[i][j]
+    return numero
+
+def findlowestIDnumber(matrix): ### lowest id number in the matrix
+    numero= findhighestIDnumber(matrix)
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j]!=0:
+                if matrix[i][j]<numero: numero=matrix[i][j]
+    return numero
+
+def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are actually existing, returns array of the ids
+    mp = {k: 0 for k in range(int(greaterthanany)+5)}
+    #print(greaterthanany)
+    existingfibers=[]
+    #print(len(arr), len(arr[0]),"pog")
+    #print(greaterthanany,"bruh")
+    for i in range(len(arr)):
+        for j in range(len(arr[0])):
+            #print(i,j,"ij")
+            if arr[i][j]!=0:
+                #print(arr[i][j], i,j)
+                mp[arr[i][j]] += 1
+
+    for i in range(int(greaterthanany)+1):
+        if mp[i]!=0:
+            existingfibers=np.append(existingfibers, i, axis=None)
+
+    return existingfibers
+
+def GTpixels(matrix,matrix2,number): #Finds the corresponding id number in the other matrix (the ids do not directly correspond)
+
+    imax = 0
+    jmax = 0
+    z=0
+    imin = len(matrix)
+    jmin = len(matrix[0])
+
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == number:
+                if i > imax: imax = i
+                if i < imin: imin = i
+                if j> jmax: jmax = j
+                if j < jmin: jmin = j
+    jmax=jmax+1
+    imax=imax+1
+    #print(zi,zj,imax, imin, jmax, jmin,number)
+    #print("pixel boundary:",imin,imax,jmin,jmax)
+    newmatrix=np.zeros((imax-imin,jmax-jmin),dtype="int")
+    newmatrix2 = np.zeros((imax - imin, jmax - jmin), dtype="int")
+    #print(newmatrix)
+    for i in range(imin,imax):
+        for j in range(jmin,jmax):
+            if matrix[i][j]==number:
+                newmatrix[i-imin][j-jmin]=matrix[i][j]
+            #if matrix[i][j] ==number:
+                newmatrix2[i-imin][j-jmin]=matrix2[i][j]
+    #print(newmatrix,"\n", newmatrix2)
+    return newmatrix2#, newmatrix3
+
+def majorityInMatrix(arr,greaterthanany):  ###### Returns the number that happens the most times in a matrix
+    mp = {k: 0 for k in range(int(greaterthanany)+1)}
+    maxi=0
+    maxi2=0
+    #print(greaterthanany,"bruh")
+    #print(arr.shape, greaterthanany)
+    for i in range(len(arr)):
+        for j in range(len(arr[0])):
+            if arr[i][j]!=0:
+                #print(arr[i][j],"arr[i][j]")
+                #print(mp[arr[i][j]])
+                mp[int(arr[i][j])] += 1
+
+                if mp[int(arr[i][j])]>maxi:
+                    maxi=mp[int(arr[i][j])]
+                    maxi2=arr[i][j]
+
+    return maxi2
 def existingFiberIds(arr, greaterthanany):  #####Checking what Fiber IDs are actually existing, returns array of the ids
     mp = {k: 0 for k in range(int(greaterthanany)+5)}
     #print(greaterthanany)
@@ -1058,14 +1224,22 @@ def ComparatorM(matrix,matrix2):
 
 #comparatorS=ComparatorOf2(matrix,matrix3)
 #print(" For Stardist: identified", comparatorS[0],"misidentified",comparatorS[1])
-def DELTA(matrix,matrix2):
+def DELTA(matrix,matrix2,DETAIL):
+    if "print" in DETAIL[0]:
+        print(matrix.shape)
+    matrix2 = np.pad(matrix2, ((0, 2), (0, 2)), mode='constant')
+    #matrix = np.pad(matrix, ((0, 2), (0, 2)))
+    #matrix = matrix.astype(int)
+    #matrix2 = matrix2.astype(int)
     numero=findhighestIDnumber(matrix)
-    print(numero)
+    if "print" in DETAIL[0]:
+        print(numero)
     numero2=findhighestIDnumber(matrix2)
     identified=0
     misidentified=0
     number=findlowestIDnumber(matrix)
-    print(numero,numero2)
+    if "print" in DETAIL[0]:
+        print(numero,numero2)
     numero=numero+1
     exist=existingFiberIds(matrix,numero)
     exist2 = existingFiberIds(matrix2, numero2)
@@ -1090,4 +1264,6 @@ def DELTA(matrix,matrix2):
         if mp2[i]>0:
             array.append((mp2[i],"groups of", i))
     delta = mui / numberoffibers2
+    if "print" in DETAIL[0]:
+        print("delta",delta)
     return delta

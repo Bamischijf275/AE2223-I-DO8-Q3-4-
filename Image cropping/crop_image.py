@@ -13,16 +13,15 @@ print(cwd,files)
 column_crop = 5
 width_crop = 2
 
-def image_cropper(img,direc,tapename):
-    im = Image.open(img,mode='r')
-    try:
-        os.makedirs(f'Image cropping/Cropped data/{tapename}/{direc}')
-    except OSError:
-        print("ERROR")
-    else:
-        print("Made new folder")
+def image_cropper(img,filename,num):
+    im = Image.open(img,mode='r').convert("L")
+    # try:
+    #     os.makedirs(f'Image cropping/Cropped data/{tapename}/{direc}')
+    # except OSError:
+    #     print("ERROR")
+    # else:
+    #     print("Made new folder")
     im_array = numpy.asarray(im)
-    print(np.shape(im_array))
     height = round(np.shape(im_array)[1]/column_crop)
     width = round(np.shape(im_array)[0]/width_crop)
     print(height,width)
@@ -47,17 +46,20 @@ def image_cropper(img,direc,tapename):
     im8 = Image.fromarray(im8_ar)
     im9 = Image.fromarray(im9_ar)
     im10 = Image.fromarray(im10_ar)
+    filename = filename.replace(".jpg","")
+    filename = filename.replace("2_","")
+    print(filename)
 
-    im1.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_1.jpg')
-    im2.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_2.jpg')
-    im3.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_3.jpg')
-    im4.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_4.jpg')
-    im5.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_5.jpg')
-    im6.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_6.jpg')
-    im7.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_7.jpg')
-    im8.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_8.jpg')
-    im9.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_9.jpg')
-    im10.save(f'Image cropping/Cropped data/{tapename}/{direc}/{direc}_10.jpg')
+    im1.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_1.tif')
+    im2.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_2.tif')
+    im3.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_3.tif')
+    im4.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_4.tif')
+    im5.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_5.tif')
+    im6.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_6.tif')
+    im7.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_7.tif')
+    im8.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_8.tif')
+    im9.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_9.tif')
+    im10.save(f'Data Processed/Watershed/Training/{num} (tif)/images/{filename}_10.tif')
 
 
 
@@ -75,5 +77,5 @@ def image_opener(direc_path):
 
 #image_opener(r'C:\Users\degro\OneDrive - Delft University of Technology\Aerospace engineering\Year 2\Q3-4 project\Data\Data\Training data\Tape_B_2_JPG')
 
-for i in range(1,21):
-     image_cropper(f'Image cropping/Uncropped pictures/Tape_B_2_{i}.jpg',f'Tape_B_{i}','Tape_B')
+for name in os.listdir(f'Data Processed/Watershed/Training/100/Images'):
+     image_cropper(f'Data Processed/Watershed/Training/100/images/{name}',name,100)

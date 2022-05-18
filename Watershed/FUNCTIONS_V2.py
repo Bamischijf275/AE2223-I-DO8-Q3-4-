@@ -480,7 +480,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         imgT = np.where(MatrixT != 0, 255, MatrixT)
         extra_IMGS.append([imgT, 'Truth'])
         cv.imshow("Truth", imgT)
-        
+
         imgR = np.where(MatrixR != 0, 255, MatrixR)
         extra_IMGS.append([imgR, 'Algo'])
         cv.imshow("Algo", imgR)
@@ -493,7 +493,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     # identify fibers list
     FibersT = MatrixID(MatrixT).tolist()
     FibersR = MatrixID(MatrixR).tolist()
-    
+
     Result[1][3] = len(FibersT)
     
     if "print" in DETAIL[0]:
@@ -562,16 +562,14 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
         Result[0][2] += FN
         Result[0][3] += Tarea
 
-        if (TP + FP) == 0:  # none found - FN
-            Result[1][2] += 1
+        if (TP + FP) == 0:  # none found
+            Result = Result
             
         elif TP / (FP + TP) >= Cutoff:  # TP
             Result[1][0] += 1
-            if ID_R in FibersR:
-                FibersR.remove(ID_R)
+            FibersR.remove(ID_R)
 
         elif FP != 0 or FN != 0:
-            
             if CheckForMUI: # check MUI TO DO
                 # find every fiber in SubMatrix
                 ID_Rarr = []
@@ -581,19 +579,14 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                         ID_Rarr.append(ID)
                 # if the combination of every fiber is CI, then MUI
 
-                if TP / Tarea >= CutoffMUI:  # CI+ == MUI
+                if TP / Tarea >= Cutoff:  # CI+ == MUI
                     MUI += 1
-                
-                    for ID in ID_Rarr:
-                        Result[1][1] += 1
-                        if ID_R in FibersR:
-                            FibersR.remove(ID)
         
-            elif FP >= FN:  # FP
-                Result[1][1] += 1
-                if ID_R in FibersR:
-                    FibersR.remove(ID_R)
-            elif FN > FP:  # FN
+            elif FP/Tarea >= CutoffMUI:  # FP
+                Result = Result
+                
+            else: # FN
+                #FibersR.remove(ID_R)
                 Result[1][2] += 1
                 
         else: # nothing detected
@@ -621,21 +614,22 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                 cv.imshow("Confusion", imgConf)
                 Ti = Tf
         # debug
-        if (ID_T == ID_p) and ("print" in DETAIL[0]):
+        if ((ID_T == ID_p) or False) and ("print" in DETAIL[0]):
             print("\n DEBUG")
             print("Fiber ID : ", ID_T)
             print("Sub-Matrices:")
             print(SubMatrixT)
             print(SubMatrixR)
             print("Ops-Matrices:")
-            print(DIF_Matrix)
-            print(MUL_Matrix)
+            #print(DIF_Matrix)
+            #print(MUL_Matrix)
             print("result:")
             print(TP, FP, FN)
+    
 
     if "draw" in DETAIL[0]:
         cv.imshow("Accuracy", imgConf)
-        extra_IMGS.append([imgConf, 'Confusion'])
+        extra_IMGS.append([imgConf, 'Accuracy'])
         cv.waitKey(1)
     
     # FP
@@ -652,6 +646,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
     Result[2][3] = MUI/Result[1][3]
 
     if "print" in DETAIL[0]:
+        print(Result[0],Result[1])
+        
         T1 = time.time()
         print("> " + str(round((T1 - T0) * 1000)) + "[ms] <")
     return (Result, extra_IMGS)

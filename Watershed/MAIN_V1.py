@@ -27,7 +27,7 @@ import warnings
 #import PIL
 
 # own functions
-from FUNCTIONS_V3 import *
+from FUNCTIONS_V2T import *
 
 # init
 warnings.filterwarnings('ignore')
@@ -57,13 +57,15 @@ WT_Parameters = [3, [0.5, 3, 1], [5, 20, 2], 3, "exact",""]  # Radius, Relative 
 CV=[""] #CROP, TIFtoCSV
 
 CP_Parameters = [0.85,0.85,""]  # cutoff, Miko/Theo version
+CP_GroundTruth = "Annotated/GroundTruth"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",
-        "AI results/dataset1/",
-        "AI results/dataset2/",
-        "AI results/dataset3/",
-        "AI results/dataset4/",
-        #"Annotated/"
+        #"AI results/dataset1/",
+        #"AI results/dataset2/",
+        #"AI results/dataset3/",
+        #"AI results/dataset4/",
+        "Annotated/GroundTruth",
+        "Annotated/Validation",
         ]
 
 PL_Metric = [
@@ -87,7 +89,6 @@ CV_PathIN = "../Data Processed/Watershed/"
 CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
 
 CP_PathIN = "../Data Processed/"
-CP_GroundTruth = "Annotated/GroundTruth"   #sub-folder
 CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
 # process (others)

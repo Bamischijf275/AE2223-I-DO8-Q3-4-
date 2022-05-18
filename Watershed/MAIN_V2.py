@@ -27,7 +27,7 @@ import warnings
 #import PIL
 
 # own functions
-from FUNCTIONS_V2 import *
+from FUNCTIONS_V3 import *
 
 # init
 warnings.filterwarnings('ignore')
@@ -61,12 +61,12 @@ CP_Parameters = [0.7,0.7,"M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",
-        #"AI results/Dataset1_V2",
-        #"AI results/Dataset2_V2",
-        #"AI results/Dataset3_V2",
-        #"AI results/Dataset4_V2",
-        #"Annotated/Manually Annotated",
-        #"Annotated/Ground Truth/"
+        "AI results/Dataset1_V2",
+        "AI results/Dataset2_V2",
+        "AI results/Dataset3_V2",
+        "AI results/Dataset4_V2",
+        "Annotated/Manually Annotated",
+        "Annotated/Ground Truth/"
         ]
 
 PL_Metric = [

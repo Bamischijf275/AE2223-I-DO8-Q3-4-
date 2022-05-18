@@ -37,19 +37,19 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Jurgen = 500 # for AI training sets # 100-1, 500-2
+Jurgen = False # for AI training sets # 100-1, 500-2
 
-Loop = "Random"  # Range, Random, List, All
+Loop = "List"  # Range, Random, List, All
 N,M = [],[]
 K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["print", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["print", "", "save"], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","",""] #WT,CV,CP,"PL"
+Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -66,7 +66,7 @@ CP_Algorithms = [               #chosen algos
         "AI results/Dataset3_V2",
         "AI results/Dataset4_V2",
         "Annotated/Manually Annotated",
-        "Annotated/Ground Truth/"
+        #"Annotated/Ground Truth/"
         ]
 
 PL_Metric = [
@@ -455,6 +455,9 @@ if "CP" in Compute:
             PL_Range[1]+=errorMin
             Title = str("Effectiveness based on "+PL_Metric[m])
             PLOT_BAR(CP_stat, CP_Algorithms, Title ,PL_Labels[m],PL_Range,Save)
+            
+            
+            PLOT_BOX(CP_res, CP_Algorithms, Title ,PL_Labels[m],PL_Range,Save)
             m += 1
         
     T1 = time.time()

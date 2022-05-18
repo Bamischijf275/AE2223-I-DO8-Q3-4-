@@ -860,8 +860,8 @@ def ID_renamer(ar):
     return ar
 
 def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
-    width = 0.15
-    gap = 0.2
+    width = 0.1
+    gap = 0.15
     index = -width*len(Algo)/2-gap
     
     x = np.arange(len(Labels))  # the label locations
@@ -890,40 +890,45 @@ def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
     plt.ylim(Range[0],Range[1])
     
     if "Plot" in Save:
-        plt.savefig(Title)
+        plt.savefig((Title+"_BAR"))
     
 def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
-    width = 0.15
-    gap = 0.2
-    index = -width*len(Algo)/2-gap
-    
-    x = np.arange(len(Labels))  # the label locations
-    fig, ax = plt.subplots()
-    
-    a = 0
-    X = x + index
-    while a < len(Algo): #[a][metric][min,AVG,max]
-        if a == 0: X += gap
-        else: X += width
-        
-        ax.bar(     X, Data[a][1], width=width, label=Algo[a].split("/",1)[-1] )
-        ax.errorbar(X, Data[a][1], yerr=[Data[a][0], Data[a][2]], fmt='ko', capsize=5)
-        a += 1
-        if a == len(Algo): X += width
 
-    # Add some text for labels, title and custom x-axis tick labels, etc.
-    plt.title(Title)
-    
-    ax.set_ylabel('Index')
-    ax.set_xticks(x)
-    ax.set_xticklabels(Labels)
-    
-    ax.legend()
-    fig.tight_layout()
-    plt.ylim(Range[0],Range[1])
-    
+    alphaData = {
+        "SD1": Data[1][2][0],
+        "SD2": Data[2][2][0],
+        "SD3": Data[3][2][0],
+        "SD4": Data[4][2][0],
+        "WS": Data[0][2][0],
+        "MA": Data[5][2][0]}
+
+    betaData = {"SD1": Data[1][2][1], "SD2": Data[2][2][1], "SD3": Data[3][2][1], "SD4": Data[4][2][1],
+                 "WS": Data[0][2][1], "MA": Data[5][2][1]}
+    gammaData = {"SD1": Data[1][2][2], "SD2": Data[2][2][2], "SD3": Data[3][2][2], "SD4": Data[4][2][2],
+                "WS": Data[0][2][2], "MA": Data[5][2][2]}
+    deltaData = {"SD1": Data[1][2][3], "SD2": Data[2][2][3], "SD3": Data[3][2][3], "SD4": Data[4][2][3],
+                "WS": Data[0][2][3], "MA": Data[5][2][3]}
+
+    fig, axs = plt.subplots(2, 2)
+
+    axs[0, 0].boxplot(alphaData.values(), patch_artist=True)
+    axs[0, 0].xaxis.set_tick_params(labelbottom=False)
+    axs[0, 0].set_title(r"$\alpha$")
+
+    axs[0, 1].boxplot(betaData.values(), patch_artist=True)
+    axs[0, 1].xaxis.set_tick_params(labelbottom=False)
+    axs[0, 1].set_title(r"$\beta$")
+
+    axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
+    axs[1, 0].set_xticklabels(alphaData.keys())
+    axs[1, 0].set_title(r"$\gamma$")
+
+    axs[1, 1].boxplot(deltaData.values(), patch_artist=True)
+    axs[1, 1].set_xticklabels(alphaData.keys())
+    axs[1, 1].set_title(r"$\delta$")
+
     if "Plot" in Save:
-        plt.savefig(Title)
+        plt.savefig((Title+"_BOX"))
         
 def DELTA(matrix,matrix2):
     numero=findhighestIDnumber(matrix)
@@ -1226,20 +1231,20 @@ def ComparatorM(matrix,matrix2):
 #print(" For Stardist: identified", comparatorS[0],"misidentified",comparatorS[1])
 def DELTA(matrix,matrix2,DETAIL):
     if "print" in DETAIL[0]:
-        print(matrix.shape)
+        print("Truth matrix shape:",matrix.shape)
     matrix2 = np.pad(matrix2, ((0, 2), (0, 2)), mode='constant')
     #matrix = np.pad(matrix, ((0, 2), (0, 2)))
     #matrix = matrix.astype(int)
     #matrix2 = matrix2.astype(int)
     numero=findhighestIDnumber(matrix)
     if "print" in DETAIL[0]:
-        print(numero)
+        print("highest T_ID:",numero)
     numero2=findhighestIDnumber(matrix2)
     identified=0
     misidentified=0
     number=findlowestIDnumber(matrix)
     if "print" in DETAIL[0]:
-        print(numero,numero2)
+        print("highest F_ID:",numero2)
     numero=numero+1
     exist=existingFiberIds(matrix,numero)
     exist2 = existingFiberIds(matrix2, numero2)
@@ -1265,5 +1270,5 @@ def DELTA(matrix,matrix2,DETAIL):
             array.append((mp2[i],"groups of", i))
     delta = mui / numberoffibers2
     if "print" in DETAIL[0]:
-        print("delta",delta)
+        print("delta:",delta)
     return delta

@@ -87,7 +87,7 @@ def check_im_masks():
         input(f"{name}")
         ID +=1
 
-check_im_masks()
+
 def add_im_mask():
     for name in os.listdir("Data Processed/Watershed/Training/500/Images"):
         if name != str("TIF"):
@@ -221,6 +221,7 @@ def color_image_maker(filename):
     ax5.axis("off")
     plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
     plt.show()
+
 def add_mask_to_im():
     for name in os.listdir("Data Processed/Training/dataset2/dataset2_ver2/images"):
         if name in os.listdir("Data Processed/Training/dataset2/dataset2_ver1/masks"):
@@ -240,13 +241,13 @@ def csv_to_mask():
         image.save(f"Data Processed/Watershed/Training/500 (tif)/masks/{name}.tif")
 def mask_to_csv():
     for dataset in os.listdir(f"Data Processed/AI results"):
-
         for filename in os.listdir(f"Data Processed/AI results/{dataset}/masks"):
             print(dataset,filename)
             im = Image.open(f"Data Processed/AI results/{dataset}/masks/{filename}")
             filename = filename.replace(".tif","")
             im_ar = np.array(im)
             np.savetxt(f"Data Processed/AI results/{dataset}/{filename}.csv",im_ar,delimiter = ",")
+mask_to_csv()
 # for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
 #     color_image_maker(filename)
 

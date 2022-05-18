@@ -535,6 +535,7 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             RectR = SubRect(MatrixR, ID_R)
         else:  # no fiber found
             RectR = RectT
+            ID_R = 1
 
         # rectangle fiber (combined)
         RectTR = [0, 0, 0, 0]
@@ -567,7 +568,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
             
         elif (TP/Tarea >= Cutoff) and (TP / (FP + TP) >= Cutoff) :  # TP
             Result[1][0] += 1
-            FibersR.remove(ID_R)
+            if ID_R in FibersR:
+                FibersR.remove(ID_R)
 
         elif FP != 0 or FN != 0:
             
@@ -606,7 +608,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
                         
             else: # FN
                 Result[1][2] += 1
-                FibersR.remove(ID_R)
+                if ID_R in FibersR:
+                    FibersR.remove(ID_R)
                 
         else: # nothing detected
             Result = Result
@@ -751,7 +754,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
         i = 0
         while i < len(N):
             if tape == "Large" or tape == "Cropped":
-                name = Name + "_2_" + str(N[i])
+                name = Name + "_2_-" + str(N[i])
             else:
                 name = Name + "_" + str(N[i]) + "_" + str(M[i])
             Names.append(name)

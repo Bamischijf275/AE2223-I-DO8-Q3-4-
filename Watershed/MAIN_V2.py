@@ -37,24 +37,23 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Jurgen = False # for AI training sets
+Jurgen = 500 # for AI training sets # 100-1, 500-2
 
-Loop = "List"  # Range, Random, List, All
-N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
-M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
+Loop = "Random"  # Range, Random, List, All
+N,M = [],[]
 K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["print", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["WT","CV","",""] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
-WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 

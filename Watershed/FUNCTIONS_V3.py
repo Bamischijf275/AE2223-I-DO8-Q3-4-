@@ -907,9 +907,10 @@ def PLOT_BAR(Data, Algo, Title, Labels, Range, Save):
     ax.legend()
     fig.tight_layout()
     plt.ylim(Range[0], Range[1])
-
+    
     if "Plot" in Save:
-        plt.savefig((Title + "_BAR"))
+        plt.savefig((Title + "_BAR"),bbox_inches='tight')
+    plt.show()
 
 
 def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
@@ -963,7 +964,8 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
         title = Title + Met[m]
         plt.title(title)
         if "Plot" in Save:
-            plt.savefig(title + "_BOX")
+            plt.savefig(title + "_BOX",bbox_inches='tight')
+        plt.show()
 
         m += 1
 

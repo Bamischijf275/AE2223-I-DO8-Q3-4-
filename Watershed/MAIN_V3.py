@@ -45,7 +45,7 @@ K = [Jurgen / 10, 2]  # if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape = "Cropped"  # Large, Cropped, none=smalls
 
-Detail = [["draw", "print", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 
 Compute = ["", "", "CP", "PL"]  # WT,CV,CP,"PL"
 
@@ -57,7 +57,7 @@ WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]  # Radius, Rel
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.7, 0.7, "M"]  # cutoff
+CP_Parameters = [0.7, 0.7, ""]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
     "Watershed",

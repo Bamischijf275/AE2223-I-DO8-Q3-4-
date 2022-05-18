@@ -58,7 +58,7 @@ WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.7,0.7]  # cutoff
+CP_Parameters = [0.7,0.7, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",

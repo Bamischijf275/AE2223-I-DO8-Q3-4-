@@ -48,9 +48,9 @@ Tape= "Cropped" #Large, Cropped, none=smalls
 
 Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -58,15 +58,15 @@ WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.7,0.7,"M"]  # cutoff
+CP_Parameters = [0.7,0.7, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",
-        #"AI results/Dataset1_V2",
-        #"AI results/Dataset2_V2",
-        #"AI results/Dataset3_V2",
-        #"AI results/Dataset4_V2",
-        #"Annotated/Manually Annotated",
+        "AI results/Dataset1_V2",
+        "AI results/Dataset2_V2",
+        "AI results/Dataset3_V2",
+        "AI results/Dataset4_V2",
+        "Annotated/Manually Annotated",
         #"Annotated/Ground Truth/"
         ]
 
@@ -456,6 +456,7 @@ if "CP" in Compute:
             PL_Range[1]+=errorMin
             Title = str("Effectiveness based on "+PL_Metric[m])
             PLOT_BAR(CP_stat, CP_Algorithms, Title ,PL_Labels[m],PL_Range,Save)
+            PLOT_BOX(CP_res, CP_Algorithms, Title, PL_Labels[m], PL_Range, Save)
             m += 1
         
     T1 = time.time()

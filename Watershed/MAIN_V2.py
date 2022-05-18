@@ -27,7 +27,7 @@ import warnings
 #import PIL
 
 # own functions
-from FUNCTIONS_V3 import *
+from FUNCTIONS_V2 import *
 
 # init
 warnings.filterwarnings('ignore')
@@ -37,27 +37,28 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Jurgen = 500 # for AI training sets # 100-1, 500-2
+Jurgen = False # for AI training sets
 
-Loop = "Random"  # Range, Random, List, All
-N,M = [],[]
+Loop = "List"  # Range, Random, List, All
+N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
+M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
 K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["print", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","",""] #WT,CV,CP,"PL"
+Compute = ["CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
-WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.7,0.7,"M"]  # cutoff
+CP_Parameters = [0.7,0.7, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"   #sub-folder
 CP_Algorithms = [               #chosen algos
         "Watershed",
@@ -66,7 +67,7 @@ CP_Algorithms = [               #chosen algos
         "AI results/Dataset3_V2",
         "AI results/Dataset4_V2",
         "Annotated/Manually Annotated",
-        "Annotated/Ground Truth/"
+        #"Annotated/Ground Truth/"
         ]
 
 PL_Metric = [
@@ -455,6 +456,7 @@ if "CP" in Compute:
             PL_Range[1]+=errorMin
             Title = str("Effectiveness based on "+PL_Metric[m])
             PLOT_BAR(CP_stat, CP_Algorithms, Title ,PL_Labels[m],PL_Range,Save)
+            PLOT_BOX(CP_res, CP_Algorithms, Title, PL_Labels[m], PL_Range, Save)
             m += 1
         
     T1 = time.time()

@@ -912,22 +912,28 @@ def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
 
     fig, axs = plt.subplots(2, 2)
 
-    axs[0, 0].boxplot(alphaData.values(), patch_artist=True)
+    bp1 =axs[0, 0].boxplot(alphaData.values(), patch_artist=True)
     axs[0, 0].xaxis.set_tick_params(labelbottom=False)
     axs[0, 0].set_title(r"$\alpha$")
 
-    axs[0, 1].boxplot(betaData.values(), patch_artist=True)
+    bp2 = axs[0, 1].boxplot(betaData.values(), patch_artist=True)
     axs[0, 1].xaxis.set_tick_params(labelbottom=False)
     axs[0, 1].set_title(r"$\beta$")
 
-    axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
+    bp3 =axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
     axs[1, 0].set_xticklabels(alphaData.keys())
     axs[1, 0].set_title(r"$\gamma$")
 
-    axs[1, 1].boxplot(deltaData.values(), patch_artist=True)
+    bp4 = axs[1, 1].boxplot(deltaData.values(), patch_artist=True)
     axs[1, 1].set_xticklabels(alphaData.keys())
     axs[1, 1].set_title(r"$\delta$")
 
+    bps = [bp1, bp2, bp3, bp4]
+    colors = ['blue', 'green', 'purple', 'tan', 'pink', 'red']
+
+    for bplot in bps:
+        for patch, color in zip(bplot['boxes'], colors):
+            patch.set_facecolor(color)
     plt.savefig("Effectiveness Boxplots")
 
 

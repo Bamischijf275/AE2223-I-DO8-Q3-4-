@@ -45,11 +45,11 @@ K = [Jurgen / 10, 2]  # if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape = "Cropped"  # Large, Cropped, none=smalls
 
-Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
+Detail = [["draw", "print", "save"], 250]  # draw/print/save, substep Dt
 
 Compute = ["", "", "CP", "PL"]  # WT,CV,CP,"PL"
 
-Save = ["", "", "Extra", "Plot"]  # "Img", "Matrix", "Extra", "Plot"
+Save = ["Img", "Matrix", "Extra", "Plot"]  # "Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -57,14 +57,14 @@ WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]  # Radius, Rel
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.7, 0.7, ""]  # cutoff
+CP_Parameters = [0.7, 0.7, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
     "Watershed",
-    "AI results/Dataset1_V2",
-    "AI results/Dataset2_V2",
-    "AI results/Dataset3_V2",
-    "AI results/Dataset4_V2",
+    "AI results/Dataset1_V3",
+    "AI results/Dataset2_V3",
+    "AI results/Dataset3_V3",
+    "AI results/Dataset4_V3",
     "Annotated/Manually Annotated",
     #"Annotated/Ground Truth/"
 ]
@@ -79,7 +79,7 @@ PL_Labels = [
     [r'TP', r'FP', r'FN'],
     [r'$\alpha$', r'$\beta$', r'$\gamma$', r'$\delta$']
 ]
-PL_Range = [0.5, 1]
+PL_Range = [0.4, 1]
 
 # file paths (GitHub structure dependent)
 
@@ -327,6 +327,7 @@ if "CP" in Compute:
         # matrix = np.genfromtxt(r'C:\Users\huege\Documents\GitHub\AE2223-I-DO8-Q3-4-\Data Processed\Annotated\GroundTruth\Tape_B_1_7.csv', delimiter=",")
 
         if "print" in Detail[0]: print(path)
+        AlgNames = PLOT_NAME(CP_Algorithms) # abb. name
 
         # compare each algo for each file
         a = 0
@@ -381,11 +382,12 @@ if "CP" in Compute:
 
             # Save images
             if "Extra" in Save:
+                
                 IMG = CP[1]
                 i = 0
                 for Img in IMG:
                     img, step = Img
-                    FileName = name + "_step_" + str(i) + "_" + step + CP_Type[1]
+                    FileName = AlgNames[a] + "-" + name + "_step_" + str(i) + "_" + step + CP_Type[1]
                     print("saving extra CP Image : ", FileName)
                     path = os.path.join(path_script, CP_PathOUT)
                     os.chdir(path)

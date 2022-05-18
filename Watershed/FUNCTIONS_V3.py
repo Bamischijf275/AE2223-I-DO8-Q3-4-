@@ -740,8 +740,10 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
         while n <= N[1]:
             m = M[0]
             while m <= M[1]:
-                if tape == "Large" or tape == "Cropped":
+                if tape == "Large": 
                     name = Name + "_2_-" + str(n)
+                if tape == "Cropped":
+                    name = Name + "_2_" + str(n)
                 else:
                     name = Name + "_" + str(n) + "_" + str(m)
                 Names.append(name)
@@ -754,8 +756,10 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
             M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
         i = 0
         while i < len(N):
-            if tape == "Large" or tape == "Cropped":
+            if tape == "Large": 
                 name = Name + "_2_-" + str(N[i])
+            if tape == "Cropped":
+                name = Name + "_2_" + str(N[i])
             else:
                 name = Name + "_" + str(N[i]) + "_" + str(M[i])
             Names.append(name)
@@ -774,8 +778,11 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
 
         i = 0
         while i < K[0]:
-            if tape == "Large" or tape == "Cropped":
+            if tape == "Large": 
                 name = Name + "_2_-" + str(rnd.randint(N[0], N[1]))
+            if tape == "Cropped":
+                name = Name + "_2_" + str(rnd.randint(N[0], N[1]))
+                
             else:
                 name = Name + "_" + str(rnd.randint(N[0], N[1])) + "_" + str(rnd.randint(M[0], M[1]))
             Names.append(name)
@@ -787,7 +794,9 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
         else:
             n, m = N[0], M[0]
 
-        if tape == "Large" or tape == "Cropped":
+        if tape == "Large": 
+            name = Name + "_2_-" + str(n)
+        if tape == "Cropped":
             name = Name + "_2_" + str(n)
         else:
             name = Name + "_" + str(n) + "_" + str(m)

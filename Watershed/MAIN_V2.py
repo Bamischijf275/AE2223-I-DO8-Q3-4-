@@ -37,7 +37,7 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Jurgen = False
+Jurgen = False # for AI training sets
 
 Loop = "List"  # Range, Random, List, All
 N,M= [],[]
@@ -45,27 +45,28 @@ K = [Jurgen/10,2] #if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape= "Cropped" #Large, Cropped, none=smalls
 
-Detail = [["", "", ""], 250]  # draw/print/save, substep Dt
+Detail = [["print", "draw", ""], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT","CV","CP","PL"] #WT,CV,CP,"PL"
+Compute = ["","","CP","PL"] #WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", ""] #"Img", "Matrix", "Extra", "Plot"
+Save = ["", "Matrix", "", "Plot"] #"Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
 WT_Parameters = [3, [0.3, 2, 2], [10, 10, 1], 3, "exact",""]  # Radius, Relative errors, Filter, kernel
-#WT_Parameters = [3, [0.5, 3, 1], [2, 1, 1], 3, "exact","UF"]  # Radius, Relative errors, Filter, kernel
 
 CV=[""] #CROP, TIFtoCSV
 
-CP_Parameters = [0.85,0.85,""]  # cutoff, Miko/Theo version
+CP_Parameters = [0.85,0.85,""]  # cutoff
+CP_GroundTruth = "Annotated/Validation/"   #sub-folder
 CP_Algorithms = [               #chosen algos
-        "Watershed",
+        #"Watershed",
         #"AI results/dataset1/",
         #"AI results/dataset2/",
         #"AI results/dataset3/",
         #"AI results/dataset4/",
-        #"Annotated/GroundTruth/"
+        #"Annotated/GroundTruth/",
+        "Annotated/Validation/"
         ]
 
 PL_Metric = [
@@ -91,7 +92,6 @@ CV_PathOUT = "../Data Processed/Watershed/" #.csv and Out-images
 if Jurgen != False: CV_PathOUT += str("Training/"+str(Jurgen)+"/Mask/")
 
 CP_PathIN = "../Data Processed/"
-CP_GroundTruth = "Annotated/Validation"   #sub-folder
 CP_PathOUT = "../Data Processed/Comparator/" # for extras, ?excel?
 
 # process (others)
@@ -147,8 +147,9 @@ if "WT" in Compute:
     print("\n --- WATERSHED --- \n")
     
     if Tape == "Large" or Tape == "Cropped":
-        if Tape == "Cropped": WT_PathIN += "Tape_B_2_JPG/"     #"UncroppedImages/"
-        if Tape == "Large":WT_PathIN += "Tape_B_2_JPG/"
+        if Jurgen != False: WT_PathIN += "Tape_B_2_JPG/"
+        elif Tape == "Cropped": WT_PathIN += "UncroppedImages/"
+        elif Tape == "Large":WT_PathIN += "Tape_B_2_JPG/"
         
         WT_Type[1] = "L"+WT_Type[1]
         WT_Type[2] = "L"+WT_Type[2] # consistent naming scheme (Large pictures)

@@ -697,7 +697,7 @@ def NAMES(loop, N=[], M=[],K=[], tape="", Name="Tape_B"):
     elif loop == "List":
         if N == [] or M==[]: # default
             N = [1, 1, 2, 3, 5, 6, 7, 8, 8, 11]
-            M = [4, 7, 3, 8, 7, 6, 3, 5, 9, 6]
+            M = [4, 7, 3, 4, 7, 6, 3, 5, 9, 6]
         i = 0
         while i < len(N):
             if tape == "Large" or tape == "Cropped":

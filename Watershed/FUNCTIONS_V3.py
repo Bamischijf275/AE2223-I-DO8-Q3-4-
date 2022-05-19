@@ -935,7 +935,7 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
                 bottom=0.2,
                 top=0.8*len(Lab[m]), 
                 
-                hspace=0.15, 
+                hspace=0.15,
                 wspace=0.5
                 )
 

@@ -859,6 +859,8 @@ def ID_renamer(ar):
             ar[ar==j] = ID
     return ar
 
+# ! plots !
+
 def PLOT_BAR(Data, Algo,Title,Labels,Range,Save):
     width = 0.15
     gap = 0.2
@@ -910,23 +912,23 @@ def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
     deltaData = {"SD1": Data[1][2][3], "SD2": Data[2][2][3], "SD3": Data[3][2][3], "SD4": Data[4][2][3],
                 "WS": Data[0][2][3], "MA": Data[5][2][3]}
 
-    fig, axs = plt.subplots(2, 2)
+    fig, axs = plt.subplots(1, 4)
 
-    bp1 =axs[0, 0].boxplot(alphaData.values(), patch_artist=True)
-    axs[0, 0].xaxis.set_tick_params(labelbottom=False)
-    axs[0, 0].set_title(r"$\alpha$")
+    bp1 =axs[0].boxplot(alphaData.values(), patch_artist=True)
+    axs[0].xaxis.set_tick_params(labelbottom=False)
+    axs[0].set_title(r"$\alpha$")
 
-    bp2 = axs[0, 1].boxplot(betaData.values(), patch_artist=True)
-    axs[0, 1].xaxis.set_tick_params(labelbottom=False)
-    axs[0, 1].set_title(r"$\beta$")
+    bp2 = axs[1].boxplot(betaData.values(), patch_artist=True)
+    axs[1].xaxis.set_tick_params(labelbottom=False)
+    axs[1].set_title(r"$\beta$")
 
-    bp3 = axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
-    axs[1, 0].set_xticklabels(alphaData.keys())
-    axs[1, 0].set_title(r"$\gamma$")
+    bp3 =axs[2].boxplot(gammaData.values(), patch_artist=True)
+    axs[2].set_xticklabels(alphaData.keys())
+    axs[2].set_title(r"$\gamma$")
 
-    bp4 = axs[1, 1].boxplot(deltaData.values(), patch_artist=True)
-    axs[1, 1].set_xticklabels(alphaData.keys())
-    axs[1, 1].set_title(r"$\delta$")
+    bp4 = axs[3].boxplot(deltaData.values(), patch_artist=True)
+    axs[3].set_xticklabels(alphaData.keys())
+    axs[3].set_title(r"$\delta$")
 
     bps = [bp1, bp2, bp3, bp4]
     colors = ['blue', 'green', 'purple', 'tan', 'pink', 'red']
@@ -934,7 +936,6 @@ def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
     for bplot in bps:
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
-
     plt.savefig("Effectiveness Boxplots")
 
 

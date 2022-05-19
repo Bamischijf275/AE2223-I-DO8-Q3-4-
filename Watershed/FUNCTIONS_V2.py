@@ -920,7 +920,7 @@ def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
     axs[0, 1].xaxis.set_tick_params(labelbottom=False)
     axs[0, 1].set_title(r"$\beta$")
 
-    bp3 =axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
+    bp3 = axs[1, 0].boxplot(gammaData.values(), patch_artist=True)
     axs[1, 0].set_xticklabels(alphaData.keys())
     axs[1, 0].set_title(r"$\gamma$")
 
@@ -934,6 +934,7 @@ def PLOT_BOX(Data, Algo,Title,Labels,Range,Save):
     for bplot in bps:
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
+
     plt.savefig("Effectiveness Boxplots")
 
 

@@ -36,15 +36,15 @@ def ar_compar(ar1,ar2):
 
 
 def tif_generator():
-    im_start = Image.open(f"Data Processed/AI 3D/Dataset3_v2/Tape_B_2_-{0}.jpg.tif")
-    #ar = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-1L.csv',delimiter=",")
-    ar = np.array(im_start)
+    #im_start = Image.open(f"Data Processed/AI 3D/Dataset3_v2/Tape_B_2_-{0}.jpg.tif")
+    ar = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-1L.csv',delimiter=",")
+    #ar = np.array(im_start)
     ar = ar[100:200,300:400]
     ar_last = ar
     for i in range(1,201):
         print(f"Tape_B_2_-{i}.jpg.tif")
-        img = Image.open(f"Data Processed/AI 3D/Dataset3_v2/Tape_B_2_-{i}.jpg.tif")
-        #img = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-{i}L.csv',delimiter=",")
+        #img = Image.open(f"Data Processed/AI 3D/Dataset3_v2/Tape_B_2_-{i}.jpg.tif")
+        img = np.genfromtxt(f'Data Processed/Watershed/3D/Tape_B_2_-{i}L.csv',delimiter=",")
         ar1 = np.array(img)
         ar1 = ar1[100:200,300:400]
         ar_add = ar_compar(ar_last,ar1)
@@ -60,10 +60,9 @@ def tif_generator():
         print(np.argwhere(ar_new==un),un)
         ar_new[ar_new!=un]=0
         ar_new[ar_new!=0] =1
-        tifffile.imwrite(f'Data processed/3D/dataset3_V2/200-(0.5)/dataset3_V2_{un}.tif', ar_new.astype('uint16'), photometric="minisblack", imagej=True)
+        tifffile.imwrite(f'Data processed/3D/watershed/200-(0.5)/watershed_{un}.tif', ar_new.astype('uint16'), photometric="minisblack", imagej=True)
     print(np.shape(ar))
-    tifffile.imwrite(f'Data processed/3D/dataset3_V2/200-(0.5)/dataset1_V3_whole.tif', ar.astype('uint16'),photometric= "minisblack",imagej=True)
-
+    tifffile.imwrite(f'Data processed/3D/watershed/200-(0.5)/watershed_whole.tif', ar.astype('uint16'),photometric= "minisblack",imagej=True)
 tif_generator()
 def extract_pos(filename): #test_27.0.tif
     im = io.imread(f'Data processed/3D tiff (0.5)/{filename}')

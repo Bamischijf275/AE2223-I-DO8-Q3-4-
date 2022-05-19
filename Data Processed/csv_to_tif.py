@@ -166,16 +166,15 @@ def get_mask(dataset,filename):
     return mask_ar,dataset,newcmp
 
 def color_image_maker(filename):
-    mask_array = []
-    dataset_names = []
     fig = plt.figure(constrained_layout = True)
-    ax = fig.add_gridspec(3,2)
-    ax1 = fig.add_subplot(ax[0,1])
-    ax_11 = fig.add_subplot(ax[0,0])
-    ax2 = fig.add_subplot(ax[1,0])
-    ax3 = fig.add_subplot(ax[1,1])
-    ax4 = fig.add_subplot(ax[2,0])
-    ax5 = fig.add_subplot(ax[2,1])
+    ax = fig.add_gridspec(4,2)
+    ax1 = fig.add_subplot(ax[0,:])
+    ax_11 = fig.add_subplot(ax[1,0])
+    ax2 = fig.add_subplot(ax[1,1])
+    ax3 = fig.add_subplot(ax[2,0])
+    ax4 = fig.add_subplot(ax[2,1])
+    ax5 = fig.add_subplot(ax[3,0])
+    ax6 = fig.add_subplot(ax[3,1])
     #set the spacing between subplots
     plt.subplots_adjust(left=0.1,
                         bottom=0.1,
@@ -191,34 +190,40 @@ def color_image_maker(filename):
     white = np.array([0, 0, 0, 1])
     cmap_cus[:1, :] = white
     newcmp = ListedColormap(cmap_cus)
-    ax1.set_title("GT")
-    ax1.imshow(GT_ar,cmap = newcmp,interpolation='nearest')
-    ax1.axis("off")
-    ax_11.set_title("Image")
-    ax_11.imshow(Image.open(f"Data Processed/AI results/dataset1_V2/images/{filename}"),cmap="gray")
+    ax_11.set_title("GT")
+    ax_11.imshow(GT_ar,cmap = newcmp,interpolation='nearest')
     ax_11.axis("off")
+    ax1.set_title("Image")
+    ax1.imshow(Image.open(f"Data Processed/AI results/dataset1_V2/images/{filename}"),cmap="gray")
+    ax1.axis("off")
 
     for dataset in os.listdir("Data Processed/AI results"):
         print(dataset)
         mask_ar,dataset,newcmp = get_mask(dataset,filename)
 
-        if dataset == str("Dataset1_V2"):
+        if dataset == str("Dataset1_V3"):
             ax2.set_title(f"StarDist1")
             ax2.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax2.axis("off")
-        if dataset == str("Dataset2_V2"):
+
+        if dataset == str("Dataset2_V3"):
             ax3.set_title(f"StarDist2")
             ax3.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax3.axis("off")
-        if dataset == str("Dataset3_V2"):
+
+        if dataset == str("Dataset3_V3"):
             ax4.set_title(f"StarDist3")
             ax4.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
             ax4.axis("off")
-    ax5.set_title(f"Control")
+        if dataset == str("Dataset4_V3"):
+            ax5.set_title(f"StarDist4")
+            ax5.imshow(mask_ar,cmap= newcmp,interpolation='nearest')
+            ax5.axis("off")
+    ax6.set_title(f"COCV")
     filename = filename.replace(".tif","")
     print(f"Data Processed/Annotated/Watershed/Extras/{filename}_step_7_Out.png")
-    ax5.imshow(mpimg.imread(f"Data Processed/Watershed/Extras/{filename}_step_7_Out.png"),interpolation="nearest")
-    ax5.axis("off")
+    ax6.imshow(mpimg.imread(f"Data Processed/Watershed/Extras/{filename}_step_7_Out.png"),interpolation="nearest")
+    ax6.axis("off")
     plt.savefig(f"Data processed/AI comparison pictures/{filename}.pdf",bbox_inches="tight",pad_inches=0)
     plt.show()
 
@@ -247,9 +252,9 @@ def mask_to_csv():
             filename = filename.replace(".tif","")
             im_ar = np.array(im)
             np.savetxt(f"Data Processed/AI results/{dataset}/{filename}.csv",im_ar,delimiter = ",")
-mask_to_csv()
-# for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
-#     color_image_maker(filename)
+
+for filename in os.listdir("Data Processed/AI results/dataset1_V2/images"):
+    color_image_maker(filename)
 
 # im = Image.open(f"Data Processed/Training/dataset1/images/Tape_B_2_5.tif")
 # im_ar = np.array(im)

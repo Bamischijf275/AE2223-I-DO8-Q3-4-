@@ -43,13 +43,13 @@ Loop = "List"  # Range, Random, List, All
 N, M = [], []
 K = [Jurgen / 10, 2]  # if random: number of picks in folder, seed
 Name = "Tape_B"
-Tape = "Cropped"  # Large, Cropped, none=smalls
+Tape = "Cropped"  # Large(2_JPG), Cropped(Uncropped), none=smalls(Cropped)
 
 Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 
 Compute = ["", "", "CP", "PL"]  # WT,CV,CP,"PL"
 
-Save = ["Img", "Matrix", "Extra", "Plot"]  # "Img", "Matrix", "Extra", "Plot"
+Save = ["", "Matrix", "", "Plot"]  # "Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -60,13 +60,13 @@ CV = [""]  # CROP, TIFtoCSV
 CP_Parameters = [0.7, 0.7, ""]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
-    "Watershed",
+    "Annotated/Ground Truth/",
+    "Annotated/Manually Annotated",
     "AI results/Dataset1_V3",
     "AI results/Dataset2_V3",
     "AI results/Dataset3_V3",
     "AI results/Dataset4_V3",
-    "Annotated/Manually Annotated",
-    #"Annotated/Ground Truth/"
+    "Watershed"
 ]
 
 PL_Metric = [
@@ -84,7 +84,7 @@ PL_Range = [0.4, 1]
 # file paths (GitHub structure dependent)
 
 WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/"
+WT_PathOUT = "../Data Processed/Watershed/3D/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
 
 CV_PathIN = "../Data Processed/Watershed/"
@@ -354,17 +354,6 @@ if "CP" in Compute:
             # Results bt :
 
             # Area
-            CP_Confusion[a][0][0] += result[0][0]
-            CP_Confusion[a][0][1] += result[0][1]
-            CP_Confusion[a][0][2] += result[0][2]
-            CP_Confusion[a][0][3] += result[0][3]
-            # Fibers
-            CP_Confusion[a][1][0] += result[1][0]
-            CP_Confusion[a][1][1] += result[1][1]
-            CP_Confusion[a][1][2] += result[1][2]
-            CP_Confusion[a][1][3] += result[1][3]
-
-            # Area
             CP_res[a][0][0].append(result[0][0] / result[0][3])
             CP_res[a][0][1].append(1 - result[0][1] / result[0][3])
             CP_res[a][0][2].append(1 - result[0][2] / result[0][3])
@@ -458,11 +447,12 @@ if "CP" in Compute:
                     n += 1
                 a += 1
             PL_Range[1] += errorMin
-            Title = str("Effectiveness based on " + PL_Metric[m])
-
+            Title = str("Plot " + PL_Metric[m])
+            print("Plot BAR chart :",Title)
             PLOT_BAR(CP_stat, CP_Algorithms, Title, PL_Labels[m], PL_Range, Save)
             m += 1
-        PLOT_BOX(CP_res, CP_Algorithms, PL_Metric, PL_Labels, "Effectiveness based on", Save)
+        print("Plot BOX charts:")
+        PLOT_BOX(CP_res, CP_Algorithms, PL_Metric, PL_Labels, "Plot-", Save)
 
     T1 = time.time()
     print("> " + str(round((T1 - T0), 1)) + "[s] <")

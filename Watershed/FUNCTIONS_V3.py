@@ -742,7 +742,7 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
             while m <= M[1]:
                 if tape == "Large": 
                     name = Name + "_2_-" + str(n)
-                if tape == "Cropped":
+                elif tape == "Cropped":
                     name = Name + "_2_" + str(n)
                 else:
                     name = Name + "_" + str(n) + "_" + str(m)
@@ -875,9 +875,9 @@ def ID_renamer(ar):
 
 
 def PLOT_BAR(Data, Algo, Title, Labels, Range, Save):
-    width = 0.15
+    width = 0.8/len(Algo)
     gap = 0.05
-    index = -(width * len(Algo) / 2 + gap)
+    index = -(width * len(Algo) / 2)
 
     x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
@@ -922,7 +922,7 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
 
     m = 0  # metric type
     while m < len(Met):
-        print("Plot Metric: ", Met[m])
+        print("     Plot Metric: ", Met[m])
 
         bps = []
         fig, axs = plt.subplots(1, len(Lab[m]))
@@ -972,13 +972,14 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
 def PLOT_NAME(Algo):
     AlgNames=[]
     for alg in Algo:
-        if "Watershed" in alg:                 AlgNames.append("WT")
+        if "Watershed" in alg:                 AlgNames.append("OCV")
         elif ("AI" and "set1") in alg:         AlgNames.append("SD1")
         elif ("AI" and "set2") in alg:         AlgNames.append("SD2")
         elif ("AI" and "set3") in alg:         AlgNames.append("SD3")
         elif ("AI" and "set4") in alg:         AlgNames.append("SD4")
         elif ("Ground" and "Truth") in alg:    AlgNames.append("GT")
         elif "Manually" and "Annotated" in alg:AlgNames.append("MA")
+        else: AlgNames.append(":)")
     return AlgNames
 
 # ! Comparator M !

@@ -57,11 +57,11 @@ WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]  # Radius, Rel
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.7, 0.7, ""]  # cutoff
+CP_Parameters = [0.8, 0.8, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
-    "Annotated/Ground Truth/",
-    "Annotated/Manually Annotated",
+    #"Annotated/Ground Truth/",
+    #"Annotated/Manually Annotated",
     "AI results/Dataset1_V3",
     "AI results/Dataset2_V3",
     "AI results/Dataset3_V3",
@@ -93,6 +93,8 @@ if Jurgen != False: CV_PathOUT += str("Training/" + str(Jurgen) + "/Mask/")
 
 CP_PathIN = "../Data Processed/"
 CP_PathOUT = "../Data Processed/Comparator/"  # for extras, ?excel?
+
+PL_PathOUT = "../Data Processed/"
 
 # process (others)
 path_script = os.path.dirname(__file__)
@@ -427,7 +429,8 @@ if "CP" in Compute:
     # Plots
     if "PL" in Compute:
         print("\n - PLOTS - \n")
-        os.chdir(path_script)
+        path = os.path.join(path_script, PL_PathOUT)
+        os.chdir(path)
         m = 0
         while m < len(PL_Metric):  # for each plot type
             CP_stat = []

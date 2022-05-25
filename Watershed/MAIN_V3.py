@@ -37,27 +37,27 @@ np.set_printoptions(threshold=sys.maxsize)
 print("\n----- START PROGRAM ----- \n")
 
 # Macro parameters (determine what to compute)
-Jurgen = False  # for AI training sets # 100-1, 500-2
+Training = False  # for AI training sets # 100-1, 500-2
 
 Loop = "List"  # Range, Random, List, All
 N, M = [], []
-K = [Jurgen / 10, 2]  # if random: number of picks in folder, seed
+K = [Training / 10, 2]  # if random: number of picks in folder, seed
 Name = "Tape_B"
 Tape = "Cropped"  # Large(2_JPG), Cropped(Uncropped), none=smalls(Cropped)
 
 Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 
-Compute = ["", "", "CP", ""]  # WT,CV,CP,"PL"
+Compute = ["WT", "CV", "CP", "PL"]  # WT,CV,CP,"PL"
 
 Save = ["Img", "Matrix", "", ""]  # "Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
-WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]  # Radius, Relative errors, Filter, kernel
+WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]   # Radius, Relative errors, Filter, kernel
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.9, 0.9, "M"]  # cutoff
+CP_Parameters = [0.8, 0.8, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
     #"Annotated/Ground Truth/",
@@ -89,7 +89,7 @@ WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
 
 CV_PathIN = "../Data Processed/Watershed/"
 CV_PathOUT = "../Data Processed/Watershed/"  # .csv and Out-images
-if Jurgen != False: CV_PathOUT += str("Training/" + str(Jurgen) + "/Mask/")
+if Training != False: CV_PathOUT += str("Training/" + str(Training) + "/Mask/")
 
 CP_PathIN = "../Data Processed/"
 CP_PathOUT = "../Data Processed/Comparator/"  # for extras, ?excel?
@@ -152,7 +152,7 @@ if "WT" in Compute:
     print("\n --- WATERSHED --- \n")
 
     if Tape == "Large" or Tape == "Cropped":
-        if Jurgen != False:
+        if Training != False:
             WT_PathIN += "Tape_B_2_JPG/"
         elif Tape == "Cropped":
             WT_PathIN += "UncroppedImages/"
@@ -182,11 +182,11 @@ if "WT" in Compute:
         WT_Image = cv.imread(path)
         if "print" in Detail[0]: print(path)
 
-        if Jurgen != False:
+        if Training != False:
             print("saving input WT Image : ", FileName)
             path = os.path.join(path_script, WT_PathOUT)
             os.chdir(path)
-            path = str(path + "/Training/" + str(Jurgen) + "/Images/" + FileName)
+            path = str(path + "/Training/" + str(Training) + "/Images/" + FileName)
             cv.imwrite(path, WT_Image)
 
         WT = WATERSHED(WT_Image, WT_Parameters, Detail)
@@ -427,7 +427,7 @@ if "CP" in Compute:
         Score.append(1)
         for m in CP_res[a][2]:
             Score[a] *= stat.mean(m)
-        #print("Overall Score: ", round(Score[a] * 100, o), "%")
+        print("Overall Score: ", round(Score[a] * 100, o), "%")
 
         a += 1
 

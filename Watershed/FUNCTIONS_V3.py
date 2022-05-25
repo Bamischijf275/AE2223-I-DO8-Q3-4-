@@ -926,20 +926,21 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
         print("     Plot Metric: ", Met[m])
 
         bps = []
-        fig, axs = plt.subplots(len(Lab[m]), 1)
+        fig, axs = plt.subplots(math.ceil(len(Lab[m])/2), 2)
         width = 1
         fig.subplots_adjust(
                 left=0.1,
-                right=0.4,
+                right=0.9,
                 
                 bottom=0.2,
-                top=0.8*len(Lab[m]), 
+                top=0.4*len(Lab[m]),
                 
                 hspace=0.15,
                 wspace=0.5
                 )
 
         x = 0  # parameter
+        x0 = np.array([[0,0],[0,1],[1,0],[1,1]])
         while x < len(Lab[m]):
             data = {}
 
@@ -950,17 +951,17 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
                 data.update({algo : Data[a][m][x]})
 
                 a += 1
-
-            bps.append(axs[x].boxplot(data.values(), patch_artist=True, widths=width))
-            axs[x].set_xticklabels(data.keys())
-            axs[x].set_title(Lab[m][x])
-            if x+1 != len(Lab[m]):
-                axs[x].xaxis.set_tick_params(labelbottom=False)  
-                
+            print(x0[x,0],x0[x,1])
+            print(x)
+            bps.append(axs[x0[x,0],x0[x,1]].boxplot(data.values(), patch_artist=True, widths=width))
+            axs[x0[x,0],x0[x,1]].set_xticklabels(data.keys())
+            axs[x0[x,0],x0[x,1]].set_title(Lab[m][x])
+            # if x+1 != len(Lab[m]):
+            if x < 2:
+                axs[x0[x,0],x0[x,1]].xaxis.set_tick_params(labelbottom=False)
+            else:
+                axs[x0[x, 0], x0[x, 1]].xaxis.set_tick_params(labelbottom=True)
             x += 1
-                
-
-            
 
         for bplot in bps:
             for patch, color in zip(bplot['boxes'], colors):

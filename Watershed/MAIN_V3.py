@@ -47,7 +47,7 @@ Tape = "Cropped"  # Large(2_JPG), Cropped(Uncropped), none=smalls(Cropped)
 
 Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 
-Compute = ["WT", "CV", "CP", "PL"]  # WT,CV,CP,"PL"
+Compute = ["", "", "CP", "PL"]  # WT,CV,CP,"PL"
 
 Save = ["Img", "Matrix", "", ""]  # "Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]

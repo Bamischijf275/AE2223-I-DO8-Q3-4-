@@ -951,8 +951,8 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
                 data.update({algo : Data[a][m][x]})
 
                 a += 1
-            print(x0[x,0],x0[x,1])
-            print(x)
+            #print(x0[x,0],x0[x,1])
+            #print(x)
             bps.append(axs[x0[x,0],x0[x,1]].boxplot(data.values(), patch_artist=True, widths=width))
             axs[x0[x,0],x0[x,1]].set_xticklabels(data.keys())
             axs[x0[x,0],x0[x,1]].set_title(Lab[m][x])

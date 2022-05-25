@@ -978,7 +978,7 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
 def PLOT_NAME(Algo):
     AlgNames=[]
     for alg in Algo:
-        if "Watershed" in alg:                 AlgNames.append("COCv")
+        if "Watershed" in alg:                 AlgNames.append("COCV")
         elif ("AI" and "set1") in alg:         AlgNames.append("SD1")
         elif ("AI" and "set2") in alg:         AlgNames.append("SD2")
         elif ("AI" and "set3") in alg:         AlgNames.append("SD3")

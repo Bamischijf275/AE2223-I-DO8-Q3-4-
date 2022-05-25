@@ -5,8 +5,9 @@ Created on Wed May  4 14:32:55 2022
 @author: huege
 """
 
-import PIL
+
 # STANDARD MODULES
+import PIL
 import cv2 as cv
 import imutils
 import math
@@ -14,7 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as rnd
 import os
-import pandas as pd
 import statistics as stat
 import time
 from scipy import ndimage
@@ -663,7 +663,8 @@ def COMPARATOR(MatrixT, MatrixR, PARAMETERS, DETAIL):
 
     # derive metrics
     Result[2][0] = Result[1][0] / Result[1][3]
-    Result[2][1] = Result[1][1] / (Result[1][0] + Result[1][1])
+    if (Result[1][0] + Result[1][1]) == 0:Result[2][1]=0
+    else:Result[2][1] = Result[1][1] / (Result[1][0] + Result[1][1])
     Result[2][2] = Result[1][2] / Result[1][3]
     Result[2][3] = MUI / Result[1][3]
 
@@ -742,7 +743,7 @@ def NAMES(loop, N=[], M=[], K=[], tape="", Name="Tape_B"):
             while m <= M[1]:
                 if tape == "Large": 
                     name = Name + "_2_-" + str(n)
-                if tape == "Cropped":
+                elif tape == "Cropped":
                     name = Name + "_2_" + str(n)
                 else:
                     name = Name + "_" + str(n) + "_" + str(m)
@@ -875,9 +876,9 @@ def ID_renamer(ar):
 
 
 def PLOT_BAR(Data, Algo, Title, Labels, Range, Save):
-    width = 0.15
+    width = 0.8/len(Algo)
     gap = 0.05
-    index = -(width * len(Algo) / 2 + gap)
+    index = -(width * len(Algo) / 2)
 
     x = np.arange(len(Labels))  # the label locations
     fig, ax = plt.subplots()
@@ -922,21 +923,20 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
 
     m = 0  # metric type
     while m < len(Met):
-        print("Plot Metric: ", Met[m])
+        print("     Plot Metric: ", Met[m])
 
         bps = []
-        fig, axs = plt.subplots(1, len(Lab[m]))
-        width = 0.15*len(Lab[m])
-        gap = 0.05
+        fig, axs = plt.subplots(len(Lab[m]), 1)
+        width = 1
         fig.subplots_adjust(
-                left=gap,
-                right=4*width,
+                left=0.1,
+                right=0.4,
                 
-                bottom=0,
-                top=0.8, 
+                bottom=0.2,
+                top=0.8*len(Lab[m]), 
                 
-                hspace=gap, 
-                wspace=width
+                hspace=0.15,
+                wspace=0.5
                 )
 
         x = 0  # parameter
@@ -954,15 +954,20 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
             bps.append(axs[x].boxplot(data.values(), patch_artist=True, widths=width))
             axs[x].set_xticklabels(data.keys())
             axs[x].set_title(Lab[m][x])
-
+            if x+1 != len(Lab[m]):
+                axs[x].xaxis.set_tick_params(labelbottom=False)  
+                
             x += 1
+                
+
+            
 
         for bplot in bps:
             for patch, color in zip(bplot['boxes'], colors):
                 patch.set_facecolor(color)
 
         title = Title + Met[m]
-        plt.title(title)
+        #plt.title(title)
         if "Plot" in Save:
             plt.savefig(title + "_BOX",bbox_inches='tight')
         plt.show()
@@ -972,13 +977,14 @@ def PLOT_BOX(Data, Algo, Met, Lab, Title, Save):
 def PLOT_NAME(Algo):
     AlgNames=[]
     for alg in Algo:
-        if "Watershed" in alg:                 AlgNames.append("WT")
+        if "Watershed" in alg:                 AlgNames.append("COCv")
         elif ("AI" and "set1") in alg:         AlgNames.append("SD1")
         elif ("AI" and "set2") in alg:         AlgNames.append("SD2")
         elif ("AI" and "set3") in alg:         AlgNames.append("SD3")
         elif ("AI" and "set4") in alg:         AlgNames.append("SD4")
         elif ("Ground" and "Truth") in alg:    AlgNames.append("GT")
         elif "Manually" and "Annotated" in alg:AlgNames.append("MA")
+        else: AlgNames.append(":)")
     return AlgNames
 
 # ! Comparator M !

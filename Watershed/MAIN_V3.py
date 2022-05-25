@@ -47,9 +47,9 @@ Tape = "Cropped"  # Large(2_JPG), Cropped(Uncropped), none=smalls(Cropped)
 
 Detail = [["", "", "save"], 250]  # draw/print/save, substep Dt
 
-Compute = ["", "", "CP", "PL"]  # WT,CV,CP,"PL"
+Compute = ["", "", "CP", ""]  # WT,CV,CP,"PL"
 
-Save = ["", "Matrix", "", "Plot"]  # "Img", "Matrix", "Extra", "Plot"
+Save = ["Img", "Matrix", "", ""]  # "Img", "Matrix", "Extra", "Plot"
 TypeOUT = [".png", ".csv"]
 
 # Program parameters :
@@ -57,7 +57,7 @@ WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]  # Radius, Rel
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.8, 0.8, "M"]  # cutoff
+CP_Parameters = [0.9, 0.9, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
     #"Annotated/Ground Truth/",
@@ -84,7 +84,7 @@ PL_Range = [0.4, 1]
 # file paths (GitHub structure dependent)
 
 WT_PathIN = "../Data/Tape_B/"
-WT_PathOUT = "../Data Processed/Watershed/3D/"
+WT_PathOUT = "../Data Processed/Watershed/"
 WT_Type = [".jpg", ".png", ".csv"]  # in, out_img, out_matrix
 
 CV_PathIN = "../Data Processed/Watershed/"
@@ -106,9 +106,9 @@ print("\n IMAGES:  ")
 print("    ", Name, "n m", Tape)
 if Loop == "Range":
     print("     Loop in Range ", N, M)
-if Loop == "List":
+elif Loop == "List":
     print("     Loop in List")
-if Loop == "Random":
+elif Loop == "Random":
     print("     Loop in Random range ", N, M, "for", K[0], "images with seed", K[1])
 else:
     print("     Single image", N, M)
@@ -125,23 +125,27 @@ if "CV" in Compute:
 if "CP" in Compute:
     print("     \n run Comparator")
     print("     with parameters:", CP_Parameters)
-    print("     and", (CP_GroundTruth.split("/", 1))[0], "data as Ground Truth against")
+    print("     for", (CP_GroundTruth.split("/", 1))[0], "data as Ground Truth against")
     for algo in CP_Algorithms:
         print("         ", (algo.split("/", 1))[-1])
 
-print("  Detailing:")
+print("  Detailing:  ",end="")
 if "print" in Detail[0]:
     print("     steps, progress and paths")
-if "draw" in Detail[0]:
+elif "draw" in Detail[0]:
     print("     showing intermediate images - updates every", Detail[1], "[ms]")
+else:
+    print("     none")
 
-print("  Saving:")
+print("  Saving:    ",end="")
 if "Img" in Save:
     print("     output images as", TypeOUT[0])
-if "Matrix" in Save:
-    print("     Output matrices as", TypeOUT[1])
-if "Plots" in Save:
-    print("     Statistics plots")
+elif "Matrix" in Save:
+    print("     output matrices as", TypeOUT[1])
+elif "Plots" in Save:
+    print("     statistics plots")
+else:
+    print("     none")
 
 # Waterhsed
 if "WT" in Compute:
@@ -400,29 +404,30 @@ if "CP" in Compute:
     print("total number of True fibers : ", sum(CP_res[a][1][3][:]))
 
     Score = []
+    print("\n Parameters > metric: average[%], median[%]")
     while a < len(CP_Algorithms):
-
+        
         print("\n Comparing ", CP_Algorithms[a], "against", CP_GroundTruth, ": ")
         print("Area")
-        print("     TP:", round(stat.mean(CP_res[a][0][0]) * 100, o), "%")
-        print("     FP:", round(stat.mean(CP_res[a][0][1]) * 100, o), "%")
-        print("     FN:", round(stat.mean(CP_res[a][0][2]) * 100, o), "%")
+        print("     TP:     ", round(stat.mean(CP_res[a][0][0]) * 100, o),   "%    ", round(stat.median(CP_res[a][0][0]) * 100, o), "%    ")
+        print("     FP:     ", round(stat.mean(CP_res[a][0][1]) * 100, o),   "%    ", round(stat.median(CP_res[a][0][1]) * 100, o), "%    ")
+        print("     FN:     ", round(stat.mean(CP_res[a][0][2]) * 100, o),   "%    ", round(stat.median(CP_res[a][0][2]) * 100, o), "%    ")
 
         print("Fibers")
-        print("     TP:", round(stat.mean(CP_res[a][1][0]) * 100, o), "%")
-        print("     FP:", round(stat.mean(CP_res[a][1][1]) * 100, o), "%")
-        print("     FN:", round(stat.mean(CP_res[a][1][2]) * 100, o), "%")
+        print("     TP:     ", round(stat.mean(CP_res[a][1][0]) * 100, o),   "%    ", round(stat.median(CP_res[a][1][0]) * 100, o), "%    ")
+        print("     FP:     ", round(stat.mean(CP_res[a][1][1]) * 100, o),   "%    ", round(stat.median(CP_res[a][1][1]) * 100, o), "%    ")
+        print("     FN:     ", round(stat.mean(CP_res[a][1][2]) * 100, o),   "%    ", round(stat.median(CP_res[a][1][2]) * 100, o), "%    ")
 
-        print("Metrics")
-        print("     alpha:", round(stat.mean(CP_res[a][2][0]) * 100, o), "%")
-        print("     beta:", round(stat.mean(CP_res[a][2][1]) * 100, o), "%")
-        print("     gamma:", round(stat.mean(CP_res[a][2][2]) * 100, o), "%")
-        print("     delta:", round(stat.mean(CP_res[a][2][3]) * 100, o), "%")
+        print("Normalized")
+        print("     alpha:  ", round(stat.mean(CP_res[a][2][0]) * 100, o), "%   ",  round(stat.median(CP_res[a][2][0]) * 100, o), "%    ")
+        print("     beta:   ", round(stat.mean(CP_res[a][2][1]) * 100, o),  "%   ", round(stat.median(CP_res[a][2][1]) * 100, o), "%    ")
+        print("     gamma:  ", round(stat.mean(CP_res[a][2][2]) * 100, o), "%   ",  round(stat.median(CP_res[a][2][2]) * 100, o), "%    ")
+        print("     delta:  ", round(stat.mean(CP_res[a][2][3]) * 100, o), "%   ",  round(stat.median(CP_res[a][2][3]) * 100, o), "%    ")
 
         Score.append(1)
         for m in CP_res[a][2]:
             Score[a] *= stat.mean(m)
-        print("Overall Score: ", round(Score[a] * 100, o), "%")
+        #print("Overall Score: ", round(Score[a] * 100, o), "%")
 
         a += 1
 

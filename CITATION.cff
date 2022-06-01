@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Combined dataset-linked scripts of Star-Dist, COCV,
+  Comparator and MAIN
+message: Data not our own - run only MAINV3 from Scripts.
+type: software
+authors:
+  - given-names: Jurgen
+    family-names: de Groot
+  - given-names: Mikolaj
+    family-names: Helinski
+  - given-names: Théo
+    family-names: Huegens

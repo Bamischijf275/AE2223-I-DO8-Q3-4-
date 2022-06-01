@@ -57,7 +57,7 @@ WT_Parameters = [3, [0.3, 1.5, 1.5], [10, 15, 2], 3, "exact", ""]   # Radius, Re
 
 CV = [""]  # CROP, TIFtoCSV
 
-CP_Parameters = [0.8, 0.8, "M"]  # cutoff
+CP_Parameters = [0.6, 0.6, "M"]  # cutoff
 CP_GroundTruth = "Annotated/Ground Truth/"  # sub-folder
 CP_Algorithms = [  # chosen algos
     #"Annotated/Ground Truth/",

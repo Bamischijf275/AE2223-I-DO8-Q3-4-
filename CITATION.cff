@@ -8,8 +8,8 @@ title: >-
 message: Data not our own - run only MAINV3 from Scripts.
 type: software
 authors:
-  - given-names: Jurgen
-    family-names: de Groot
+  - given-names: de Groot
+    family-names: Jurgen
   - given-names: Mikolaj
     family-names: Helinski
   - given-names: Théo
